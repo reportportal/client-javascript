@@ -1,0 +1,27 @@
+{
+  "name": "reportportal-client",
+  "version": "2.6.0-alpha.2",
+  "description": "ReportPortal client for node.js",
+  "contributors": [
+    {
+      "name": "Artsiom Tkachou",
+      "email": "artsiom_tkachou@epam.com"
+    }
+  ],
+  "homepage": "https://github.com/reportportal/client-javascript",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/reportportal/client-javascript.git"
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "main": "./lib/client",
+  "engines": {
+    "node": ">= 0.10.x"
+  },
+  "dependencies": {
+    "restler": "3.4.0"
+  },
+  "license": "GPL-3.0"
+}
