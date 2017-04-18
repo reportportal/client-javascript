@@ -18,7 +18,7 @@
   },
   "main": "./lib/client",
   "engines": {
-    "node": ">= 0.10.x"
+    "node": ">= 4.0.0"
   },
   "dependencies": {
     "restler": "3.4.0"

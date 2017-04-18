@@ -1,5 +1,5 @@
 #ReportPortal js client 
-This is ALPHA version. It works fine, but public API could be changed.
+ It works fine, but public API could be changed.
 
 Library used only for implementors of custom listeners for ReportPortal.
 
@@ -22,65 +22,53 @@ Main classes are:
 Basic usage example:
 
 ```js
-var Service = require("reportportal-client");
+'use strict';
+const Service = require("reportportal-client");
 
-function now() {
-    return new Date().getTime();
-}
-
-var rpConfig = {
+let rpConfig = {
     endpoint: "http://your_reportportal_url",
     project: "project",
     token: "your_reportportal_token"
 };
 
-var rp = new Service(rpConfig);
+let rp = new Service(rpConfig);
 
-var startLaunchRQ = {
+let startLaunchRQ = {
     name: "JSLaunchName",
     description: "Some LaunchDescription",
     tags: ["tag1", "tag2"],
-    start_time: now(),
-    mode: null
+    mode: "DEFAULT"
 };
 
-var startLaunchResponse = rp.startLaunch(startLaunchRQ);
-
-var launchId;
-
-startLaunchResponse.then(function (response) {
-    var startTestItemRQ = {
+rp.startLaunch(startLaunchRQ).then(response => {
+    
+    let startTestItemRQ = {
         name: "Suite1",
         description: "SuiteDescription",
         tags: ["suite_tag1", "suite_tag2"],
-        start_time: now(),
         launch_id: response.id,
         type: "SUITE"
     };
-    var startSuiteResponse = rp.startTestItem(null, startTestItemRQ);
-    startSuiteResponse.then(function (data) {
-        var finishTestItemRQ = {
-            end_time: now(),
-            status: status.PASSED
-        };
-        rp.finishTestItem(data.id, finishTestItemRQ).then(function (data) {
-            var finishExecutionRQ = {
-                end_time: now(),
-                status: status.PASSED
+    
+    return rp.startTestItem(startTestItemRQ)
+        .then(data => {
+            
+            let finishTestItemRQ = {
+                status: 'passed'
             };
+            
+            return rp.finishTestItem(data.id, finishTestItemRQ)
+                .then(function () {
+                    return response.id
+                })
+                .catch(err => console.error(err));
+        })
+        .catch(err => console.error(err));
+}).then(launchId => {
+    let finishExecutionRQ = {};
+    return rp.finishLaunch(launchId, finishExecutionRQ)
+}).catch(err => console.error(err));
 
-            startLaunchResponse.then(function (response) {
-                console.log(response.id);
-                rp.finishLaunch(response.id, finishExecutionRQ)
-                    .then(function (data) {
-                        console.log(data);
-                    })
-            }, function (err) {
-                console.log(err);
-            });
-        });
-    })
-});
 ```
 
 # Copyright Notice
