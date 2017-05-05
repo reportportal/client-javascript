@@ -49,6 +49,7 @@ var startLaunchResponse = rp.startLaunch(startLaunchRQ);
 var launchId;
 
 startLaunchResponse.then(function (response) {
+    launchId = response.id;
     var startTestItemRQ = {
         name: "Suite1",
         description: "SuiteDescription",
@@ -57,16 +58,16 @@ startLaunchResponse.then(function (response) {
         launch_id: response.id,
         type: "SUITE"
     };
-    var startSuiteResponse = rp.startTestItem(null, startTestItemRQ);
+    var startSuiteResponse = rp.startTestItem(startTestItemRQ);
     startSuiteResponse.then(function (data) {
         var finishTestItemRQ = {
             end_time: now(),
-            status: status.PASSED
+            status: 'passed'
         };
         rp.finishTestItem(data.id, finishTestItemRQ).then(function (data) {
+
             var finishExecutionRQ = {
-                end_time: now(),
-                status: status.PASSED
+                end_time: now()
             };
 
             startLaunchResponse.then(function (response) {
@@ -75,10 +76,19 @@ startLaunchResponse.then(function (response) {
                     .then(function (data) {
                         console.log(data);
                     })
+                    .catch(function (err) {
+                        console.error(err)
+                    })
             }, function (err) {
                 console.log(err);
+            }).catch(function (err) {
+                console.error(err)
             });
+        }).catch(function (err) {
+            console.error(err)
         });
+    }).catch(function (err) {
+        console.error(err)
     })
 });
 ```
