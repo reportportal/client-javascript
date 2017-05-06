@@ -23,5 +23,13 @@
   "dependencies": {
     "restler": "3.4.0"
   },
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "scripts": {
+    "test": "istanbul cover ./node_modules/jasmine/bin/jasmine.js"
+  },
+  "devDependencies": {
+    "codecov": "^2.1.0",
+    "istanbul": "^0.4.5",
+    "jasmine": "^2.6.0"
+  }
 }
