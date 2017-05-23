@@ -1,5 +1,5 @@
 describe("ReportPortal javascript client", function() {
-  let RPClient = require('../lib/client.js');
+  let RPClient = require('../lib/report-portal-client.js');
 
   describe("constructor", function() {
     it('executes without error', function() {

@@ -1,5 +1,5 @@
 {
-  "name": "reportportal-client",
+  "name": "report-portal-client",
   "version": "3.0.0",
   "description": "ReportPortal client for node.js",
   "contributors": [
@@ -16,11 +16,13 @@
   "directories": {
     "lib": "./lib"
   },
-  "main": "./lib/client",
+  "main": "./lib/report-portal-client",
   "engines": {
-    "node": ">= 0.10.x"
+    "node": ">= 7.0.x"
   },
   "dependencies": {
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
     "restler": "3.4.0"
   },
   "license": "GPL-3.0",
@@ -28,8 +30,8 @@
     "test": "istanbul cover ./node_modules/jasmine/bin/jasmine.js"
   },
   "devDependencies": {
-    "codecov": "^2.1.0",
-    "istanbul": "^0.4.5",
-    "jasmine": "^2.6.0"
+    "codecov": "2.2.0",
+    "istanbul": "0.4.5",
+    "jasmine": "2.6.0"
   }
 }
