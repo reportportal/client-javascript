@@ -69,4 +69,28 @@ describe("ReportPortal javascript client", function() {
       done(); // need as async code is checked
     });
   });
+  describe("finishLaunch", function() {
+    it("sends put request to finish launch", function() {
+      client = new RPClient({token: "any", endpoint: "https://rp.api", project:"prj"});
+      spyOn(client, '_getResponsePromise');
+
+      client.finishLaunch("id6", {some: "data"});
+
+      expect(client._getResponsePromise).
+        toHaveBeenCalledWith("https://rp.api/prj/launch/id6/finish",
+        {some: "data"}, {headers: client.headers}, "PUT");
+    });
+  });
+  describe("startTestItem", function() {
+    it("sends post request to item", function() {
+      client = new RPClient({token: "any", endpoint: "https://rp.api", project:"prj"});
+      spyOn(client, '_getResponsePromise');
+
+      client.startTestItem({some: "data"}, "parentID5")
+
+      expect(client._getResponsePromise).
+        toHaveBeenCalledWith("https://rp.api/prj/item/parentID5",
+        {some: "data"}, {headers: client.headers}, "POST")
+    });
+  });
 });
