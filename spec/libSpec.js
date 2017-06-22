@@ -93,4 +93,16 @@ describe("ReportPortal javascript client", function() {
         {some: "data"}, {headers: client.headers}, "POST")
     });
   });
+  describe("finishTestItem", function() {
+    it("sends put request to item", function() {
+      client = new RPClient({token: "any", endpoint: "https://rp.api", project: "prj"});
+      spyOn(client, "_getResponsePromise");
+
+      client.finishTestItem("finishedItemId", {finish: "it"});
+
+      expect(client._getResponsePromise).
+        toHaveBeenCalledWith("https://rp.api/prj/item/finishedItemId",
+        {finish: "it"}, {headers: client.headers}, "PUT");
+    });
+  });
 });
