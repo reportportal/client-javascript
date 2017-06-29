@@ -1,11 +1,15 @@
 {
   "name": "reportportal-client",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "ReportPortal client for node.js",
   "contributors": [
     {
       "name": "Artsiom Tkachou",
       "email": "artsiom_tkachou@epam.com"
+    },
+    {
+      "name": "Alexey Krylov",
+      "email": "lexecon117@gmail.com"
     }
   ],
   "homepage": "https://github.com/reportportal/client-javascript",
@@ -21,7 +25,8 @@
     "node": ">= 7.0.x"
   },
   "dependencies": {
-    "restler": "3.4.0"
+    "restler": "3.4.0",
+    "uniqid": "4.1.1"
   },
   "license": "GPL-3.0",
   "scripts": {
