@@ -1,11 +1,15 @@
 {
   "name": "reportportal-client",
-  "version": "3.0.0",
+  "version": "5.0.0",
   "description": "ReportPortal client for node.js",
   "contributors": [
     {
       "name": "Artsiom Tkachou",
       "email": "artsiom_tkachou@epam.com"
+    },
+    {
+      "name": "Alexey Krylov",
+      "email": "lexecon117@gmail.com"
     }
   ],
   "homepage": "https://github.com/reportportal/client-javascript",
@@ -16,20 +20,22 @@
   "directories": {
     "lib": "./lib"
   },
-  "main": "./lib/client",
+  "main": "./lib/report-portal-client",
   "engines": {
-    "node": ">= 0.10.x"
+    "node": ">= 7.0.x"
   },
   "dependencies": {
-    "restler": "3.4.0"
+    "restler": "3.4.0",
+    "uniqid": "4.1.1"
   },
   "license": "GPL-3.0",
   "scripts": {
     "test": "istanbul cover ./node_modules/jasmine/bin/jasmine.js"
   },
   "devDependencies": {
-    "codecov": "^2.1.0",
-    "istanbul": "^0.4.5",
-    "jasmine": "^2.6.0"
+    "codecov": "2.2.0",
+    "istanbul": "0.4.5",
+    "jasmine": "2.6.0"
   }
 }
+

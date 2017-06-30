@@ -1,6 +1,4 @@
-/node_modules/
-.idea/
-test.js
-image.jpg
-rp_config.js
-coverage
+node_modules/
+.idea
+.log
+coverage/
