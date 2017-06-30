@@ -40,9 +40,14 @@ describe("ReportPortal javascript client", function () {
             client = new RPClient({token: "startLaunchTest", endpoint: "https://rp.us/api/v1", project: "tst"});
             let myPromise = Promise.resolve({id: 'testidlaunch'});
             spyOn(client.helpers, 'getServerResult').and.returnValue(myPromise);
-
-            client.startLaunch({});
-            expect(client.helpers.getServerResult).toHaveBeenCalledWith("https://rp.us/api/v1/tst/launch", {}, {headers: client.headers}, "POST");
+            let time = 12345734;
+            client.startLaunch({
+                start_time: time
+            });
+            expect(client.helpers.getServerResult).toHaveBeenCalledWith("https://rp.us/api/v1/tst/launch", {
+                start_time: time,
+                name: 'Test launch name'
+            }, {headers: client.headers}, "POST");
         });
     });
     xdescribe("updateLaunch", function () {
