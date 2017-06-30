@@ -213,7 +213,7 @@ rpClient.sendLog(stepObj.tempId, {
     time: rpClient.helpers.now()
 })
 ```
-The method takes two arguments:
+The method takes three arguments:
 * id item (returned by method 'startTestItem')
 * data object:
 
