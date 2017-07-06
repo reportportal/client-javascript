@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/reportportal/client-javascript.svg?branch=master)](https://travis-ci.org/reportportal/client-javascript)[![Code Coverage](https://codecov.io/gh/reportportal/client-javascript/branch/master/graph/badge.svg)](https://codecov.io/gh/reportportal/client-javascript)[![npm version](https://badge.fury.io/js/reportportal-client.svg)](https://badge.fury.io/js/reportportal-client)
 
-#ReportPortal js client 
+# ReportPortal js client 
 This Client is to communicate with the Report Portal on node js.
 
 Library is used only for implementors of custom listeners for ReportPortal.
