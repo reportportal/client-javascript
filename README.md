@@ -75,7 +75,9 @@ let launchObj = rpClient.startLaunch({
     name: "Client test",
     start_time: rpClient.helpers.now(),
     description: "description of the launch",
-    tags: ["tag1", "tag2"]
+    tags: ["tag1", "tag2"],
+    //this param used only when you need client to send data into the existing launch
+    id: 'id'
 });
 console.log(launchObj.tempId);
 ```
@@ -89,6 +91,7 @@ name      | (optional) launch name. Default: parameter 'launch' specified when c
 mode      | (optional) "DEFAULT" or "DEBUG". Default: "DEFAULT"
 description | (optional) description of the launch (supports markdown syntax)
 tags      | (optional) array of launch tags
+id        | id of the existing launch in which tests data would be sent, without this param new launch instance would be created
 
 To know the real launch id wait for the method to finish (the real id is not used by the client)
 ```javascript
@@ -117,6 +120,18 @@ Parameter | Description
 --------- | -----------
 end_time  | (optional) end time of launch. Default: rpClient.helpers.now()
 status    | (optional) status of launch, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "RESTED", "CANCELLED". Default: "".
+
+###getPromiseFinishAllItems
+getPromiseFinishAllItems - returns promise that contains status about all data has been sent to the Report Protal.
+This method needed when test frameworks don't wait for async methods and stop processed.
+
+```javascript
+// jasmine example. tempLaunchId - id of the client's process
+agent.getAllClientPromises(agent.tempLaunchId).then(()=> done());
+```
+Parameter       | Description
+--------- | -----------
+tempLaunchId    | id of the client's process
 
 ### updateLaunch
 updateLaunch - updates launch data. Will send a request to the server only after finishing the launch.
