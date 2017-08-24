@@ -121,7 +121,7 @@ Parameter | Description
 end_time  | (optional) end time of launch. Default: rpClient.helpers.now()
 status    | (optional) status of launch, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "RESTED", "CANCELLED". Default: "".
 
-###getPromiseFinishAllItems
+### getPromiseFinishAllItems
 getPromiseFinishAllItems - returns promise that contains status about all data has been sent to the Report Protal.
 This method needed when test frameworks don't wait for async methods and stop processed.
 
