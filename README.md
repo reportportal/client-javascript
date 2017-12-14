@@ -27,9 +27,9 @@ let rpClient = new RPClient({
     project: "PROJECT_NAME"
 });
 
-rpClient.checkConnect().then((responce) => {
+rpClient.checkConnect().then((response) => {
     console.log('You have successfully connected to the server.');
-    console.log(`You are using an account: ${responce.full_name}`);
+    console.log(`You are using an account: ${response.full_name}`);
 }, (error) => {
     console.log('Error connection to server');
     console.dir(error);
@@ -59,9 +59,9 @@ The client works synchronously, so it is not necessary to wait for the end of th
 ### checkConnect
  checkConnect - asynchronous method for verifying the correctness of the client connection
 ```javascript
-rpClient.checkConnect().then((responce) => {
+rpClient.checkConnect().then((response) => {
     console.log('You have successfully connected to the server.');
-    console.log(`You are using an account: ${responce.full_name}`);
+    console.log(`You are using an account: ${response.full_name}`);
 }, (error) => {
     console.log('Error connection to server');
     console.dir(error);
@@ -96,8 +96,8 @@ id        | id of the existing launch in which tests data would be sent, without
 To know the real launch id wait for the method to finish (the real id is not used by the client)
 ```javascript
 let launchObj = rpClient.startLaunch();
-launchObj.promise.then((responce) => {
-    console.log(`Launch real id: ${responce.id}`);
+launchObj.promise.then((response) => {
+    console.log(`Launch real id: ${response.id}`);
 }, (error) => {
     console.dir(`Error at the start of launch: ${error}`);
 })
