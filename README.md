@@ -127,7 +127,7 @@ This method needed when test frameworks don't wait for async methods and stop pr
 
 ```javascript
 // jasmine example. tempLaunchId - id of the client's process
-agent.getAllClientPromises(agent.tempLaunchId).then(()=> done());
+agent.getPromiseFinishAllItems(agent.tempLaunchId).then(()=> done());
 ```
 Parameter       | Description
 --------- | -----------
