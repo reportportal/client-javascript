@@ -33,9 +33,12 @@
     "test": "istanbul cover ./node_modules/jasmine/bin/jasmine.js"
   },
   "devDependencies": {
-    "codecov": "2.2.0",
+    "codecov": "3.1.0",
     "istanbul": "0.4.5",
-    "jasmine": "2.6.0"
+    "jasmine": "2.6.0",
+    "eslint": "4.19.1",
+    "eslint-config-airbnb-base": "12.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-node": "5.2.1"
   }
 }
-
