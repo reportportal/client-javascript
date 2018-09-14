@@ -1,10 +1,14 @@
 language: node_js
+
 node_js:
   - '7'
+
 install:
   - npm install -g codecov
   - npm install -g istanbul
   - npm install
+
 script:
+  - npm lint
   - npm test
   - codecov

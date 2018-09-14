@@ -30,6 +30,7 @@
   },
   "license": "GPL-3.0",
   "scripts": {
+    "lint": "eslint . --quiet",
     "test": "istanbul cover ./node_modules/jasmine/bin/jasmine.js"
   },
   "devDependencies": {
