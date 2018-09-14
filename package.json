@@ -31,11 +31,12 @@
   "license": "GPL-3.0",
   "scripts": {
     "lint": "eslint . --quiet",
-    "test": "istanbul cover ./node_modules/jasmine/bin/jasmine.js"
+    "test": "nyc ./node_modules/jasmine/bin/jasmine.js",
+    "coverage": "nyc report --reporter=text-lcov > coverage.lcov"
   },
   "devDependencies": {
     "codecov": "3.1.0",
-    "istanbul": "0.4.5",
+    "nyc": "13.0.1",
     "jasmine": "2.6.0",
     "eslint": "4.19.1",
     "eslint-config-airbnb-base": "12.1.0",

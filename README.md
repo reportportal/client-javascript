@@ -5,7 +5,7 @@ This Client is to communicate with the Report Portal on node js.
 
 Library is used only for implementors of custom listeners for ReportPortal.
 
-## Allready implemented listeners:
+## Already implemented listeners:
 * EMPTY
 
 
