@@ -8,26 +8,6 @@ describe('ReportPortal javascript client', () => {
             expect(client.config.token).toBe('test');
         });
     });
-    describe('formatName', () => {
-        let client = null;
-
-        beforeAll(() => {
-            client = new RPClient({ token: 'formatNameTest' });
-        });
-
-        it('slice last 256 symbols', () => {
-            expect(client.helpers.formatName(`a${'b'.repeat(256)}`)).toBe('b'.repeat(256));
-        });
-        it('leave 256 symbol name as is', () => {
-            expect(client.helpers.formatName('c'.repeat(256))).toBe('c'.repeat(256));
-        });
-        it('leave 3 symbol name as is', () => {
-            expect(client.helpers.formatName('abc')).toBe('abc');
-        });
-        it('complete with dots 2 symbol name', () => {
-            expect(client.helpers.formatName('ab')).toBe('ab.');
-        });
-    });
     describe('now', () => {
         let client;
         it('returns milliseconds from unix time', () => {
@@ -40,15 +20,15 @@ describe('ReportPortal javascript client', () => {
         it('calls getServerResult', () => {
             client = new RPClient({ token: 'startLaunchTest', endpoint: 'https://rp.us/api/v1', project: 'tst' });
             const myPromise = Promise.resolve({ id: 'testidlaunch' });
-            spyOn(client.helpers, 'getServerResult').and.returnValue(myPromise);
+            spyOn(client.restClient, 'create').and.returnValue(myPromise);
             const time = 12345734;
             client.startLaunch({
                 start_time: time,
             });
-            expect(client.helpers.getServerResult).toHaveBeenCalledWith('https://rp.us/api/v1/tst/launch', {
-                start_time: time,
+            expect(client.restClient.create).toHaveBeenCalledWith('https://rp.us/api/v1/tst/launch', {
                 name: 'Test launch name',
-            }, { headers: client.headers }, 'POST');
+                start_time: time,
+            }, { headers: client.headers });
         });
     });
     xdescribe('updateLaunch', () => {
@@ -79,7 +59,7 @@ describe('ReportPortal javascript client', () => {
 
     xdescribe('getServerResult', () => {
         it('creates promise to send json via rest', (done) => {
-            const rest = require('restler');
+            const rest = {};
             spyOn(rest, 'json');
             const conf = { token: 'upLaunchDescTest', endpoint: 'https://rp.us/api/v1', project: 'tst' };
             const client = new RPClient(conf);
