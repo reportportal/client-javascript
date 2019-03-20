@@ -25,7 +25,7 @@ describe('ReportPortal javascript client', () => {
             client.startLaunch({
                 start_time: time,
             });
-            expect(client.restClient.create).toHaveBeenCalledWith('https://rp.us/api/v1/tst/launch', {
+            expect(client.restClient.create).toHaveBeenCalledWith('launch', {
                 name: 'Test launch name',
                 start_time: time,
             }, { headers: client.headers });

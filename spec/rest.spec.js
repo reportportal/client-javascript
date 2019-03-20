@@ -17,11 +17,9 @@ describe('RestClient', () => {
         error: 'unauthorized',
         error_description: 'Full authentication is required to access this resource',
     };
-
     const unauthorizedErrorMessage = 'Request failed with status code 403: '
         + '{"error":"unauthorized","error_description":"Full authentication is required to access this resource"}';
-
-    const netErrConnectionResetErrorMessage = 'net::ERR_CONNECTION_RESET';
+    const netErrConnectionResetError = { code: 'ECONNABORTED', message: 'connection reset' };
 
     describe('constructor', () => {
         it('creates object with correct properties', () => {
@@ -61,12 +59,13 @@ describe('RestClient', () => {
         it('catches NETWORK errors', (done) => {
             const scope = nock(options.baseURL)
                 .get('/users')
-                .replyWithError('net::ERR_CONNECTION_RESET');
+                .replyWithError(netErrConnectionResetError);
 
             restClient.retrieve('users', noOptions).catch((error) => {
                 expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetErrorMessage);
+                expect(error.message).toMatch(netErrConnectionResetError.message);
                 expect(scope.isDone()).toBeTruthy();
+
                 done();
             });
         });
@@ -80,6 +79,7 @@ describe('RestClient', () => {
                 expect(error instanceof Error).toBeTruthy();
                 expect(error.message).toMatch(unauthorizedErrorMessage);
                 expect(scope.isDone()).toBeTruthy();
+
                 done();
             });
         });
@@ -107,11 +107,11 @@ describe('RestClient', () => {
 
             const scope = nock(options.baseURL)
                 .post('/users', body => isEqual(body, newUser))
-                .replyWithError(netErrConnectionResetErrorMessage);
+                .replyWithError(netErrConnectionResetError);
 
             restClient.create('users', newUser, noOptions).catch((error) => {
                 expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetErrorMessage);
+                expect(error.message).toMatch(netErrConnectionResetError.message);
                 expect(scope.isDone()).toBeTruthy();
 
                 done();
@@ -157,12 +157,12 @@ describe('RestClient', () => {
 
             const scope = nock(options.baseURL)
                 .put('/users/1', body => isEqual(body, newUserInfo))
-                .replyWithError(netErrConnectionResetErrorMessage);
+                .replyWithError(netErrConnectionResetError);
 
 
             restClient.update('users/1', newUserInfo, noOptions).catch((error) => {
                 expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetErrorMessage);
+                expect(error.message).toMatch(netErrConnectionResetError.message);
                 expect(scope.isDone()).toBeTruthy();
 
                 done();
@@ -208,11 +208,11 @@ describe('RestClient', () => {
 
             const scope = nock(options.baseURL)
                 .delete('/users/1')
-                .replyWithError(netErrConnectionResetErrorMessage);
+                .replyWithError(netErrConnectionResetError);
 
             restClient.delete('users/1', emptyBody, noOptions).catch((error) => {
                 expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetErrorMessage);
+                expect(error.message).toMatch(netErrConnectionResetError.message);
                 expect(scope.isDone()).toBeTruthy();
 
                 done();
