@@ -61,9 +61,8 @@ describe('ReportPortal javascript client', () => {
             spyOn(client, 'getMergeLaunchesData').and.returnValue(fakeMergeDataRQ);
             client.mergeLaunches();
 
-            const expectedUrl = `${client.baseURL}/launch/merge`;
             expect(client.restClient.create)
-                .toHaveBeenCalledWith(expectedUrl, fakeMergeDataRQ, { headers: client.headers });
+                .toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, { headers: client.headers });
         });
     });
 
