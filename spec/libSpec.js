@@ -1,6 +1,7 @@
 /* eslint-disable global-require,no-underscore-dangle */
 describe('ReportPortal javascript client', () => {
     const RPClient = require('../lib/report-portal-client.js');
+    const helpers = require('../lib/helpers');
 
     describe('constructor', () => {
         it('executes without error', () => {
@@ -31,6 +32,41 @@ describe('ReportPortal javascript client', () => {
             }, { headers: client.headers });
         });
     });
+
+    describe('mergeLaunches', () => {
+        const fakeLaunchIds = ['12345', '123456', ''];
+        const fakeEndTime = 12345734;
+        const fakeMergeDataRQ = {
+            description: 'Merged launch',
+            end_time: fakeEndTime,
+            extendSuitesDescription: true,
+            launches: fakeLaunchIds,
+            merge_type: 'BASIC',
+            mode: 'DEFAULT',
+            name: 'Test launch name',
+        };
+        let client;
+        it('calls client', () => {
+            client = new RPClient({
+                token: 'startLaunchTest',
+                endpoint: 'https://rp.us/api/v1',
+                project: 'tst',
+                isLaunchMergeRequired: true,
+            });
+
+            const myPromise = Promise.resolve({ id: 'testidlaunch' });
+            spyOn(client.restClient, 'create').and.returnValue(myPromise);
+
+            spyOn(helpers, 'readLaunchesFromFile').and.returnValue(fakeLaunchIds);
+            spyOn(client, 'getMergeLaunchesData').and.returnValue(fakeMergeDataRQ);
+            client.mergeLaunches();
+
+            const expectedUrl = `${client.baseURL}/launch/merge`;
+            expect(client.restClient.create)
+                .toHaveBeenCalledWith(expectedUrl, fakeMergeDataRQ, { headers: client.headers });
+        });
+    });
+
     xdescribe('updateLaunch', () => {
         let client;
         let launchObj;
