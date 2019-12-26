@@ -22,7 +22,7 @@ function makeid() {
 
 const launchObj = rpClient.startLaunch({
     name: 'Client test',
-    start_time: rpClient.helpers.now(),
+    startTime: rpClient.helpers.now(),
     description: 'DESCRIPTION',
     attributes: ['your', 'attributes'],
 });
@@ -36,7 +36,7 @@ for (let i = 0; i < 10; i += 1) {
     const suiteObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
-        start_time: rpClient.helpers.now(),
+        startTime: rpClient.helpers.now(),
         type: 'SUITE',
     }, launchObj.tempId);
     suiteIds.push(suiteObj.tempId);
@@ -44,7 +44,7 @@ for (let i = 0; i < 10; i += 1) {
         const stepObj = rpClient.startTestItem({
             description: makeid(),
             name: makeid(),
-            start_time: rpClient.helpers.now(),
+            startTime: rpClient.helpers.now(),
             type: 'STEP',
         }, launchObj.tempId, suiteObj.tempId);
         stepIds.push(stepObj.tempId);
@@ -68,19 +68,19 @@ for (let i = 0; i < 10; i += 1) {
 }
 suiteIds.forEach((id) => {
     rpClient.finishTestItem(id, {
-        end_time: rpClient.helpers.now(),
+        endTime: rpClient.helpers.now(),
         status: 'passed',
     });
 });
 stepIds.forEach((id) => {
     rpClient.finishTestItem(id, {
-        end_time: rpClient.helpers.now(),
+        endTime: rpClient.helpers.now(),
         status: 'failed',
     });
 });
 
 rpClient.finishLaunch(launchObj.tempId, {
-    end_time: rpClient.helpers.now(),
+    endTime: rpClient.helpers.now(),
 });
 
 updateLaunch.promise.then(() => {
