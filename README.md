@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/reportportal/client-javascript.svg?branch=master)](https://travis-ci.org/reportportal/client-javascript)[![Code Coverage](https://codecov.io/gh/reportportal/client-javascript/branch/master/graph/badge.svg)](https://codecov.io/gh/reportportal/client-javascript)[![npm version](https://badge.fury.io/js/reportportal-client.svg)](https://badge.fury.io/js/reportportal-client)
 
-# ReportPortal js client 
+# ReportPortal js client
 This Client is to communicate with the Report Portal on node js.
 
 Library is used only for implementors of custom listeners for ReportPortal.
@@ -14,7 +14,7 @@ The latest version is available on npm:
 ```cmd
 npm install reportportal-client
 ```
-    
+
 ## Example
 
 ```javascript
@@ -73,9 +73,17 @@ startLaunch - starts a new launch, return temp id that you want to use for all o
 ```javascript
 let launchObj = rpClient.startLaunch({
     name: "Client test",
-    start_time: rpClient.helpers.now(),
+    startTime: rpClient.helpers.now(),
     description: "description of the launch",
-    tags: ["tag1", "tag2"],
+    attributes: [
+        {
+            "key": "yourKey",
+            "value": "yourValue"
+        },
+        {
+            "value": "yourValue"
+        }
+    ],
     //this param used only when you need client to send data into the existing launch
     id: 'id'
 });
@@ -86,11 +94,11 @@ The method takes one argument:
 
 Parameter | Description
 --------- | -----------
-start_time | (optional) start time launch(unix time). Default: rpClient.helpers.now()
+startTime | (optional) start time launch(unix time). Default: rpClient.helpers.now()
 name      | (optional) launch name. Default: parameter 'launch' specified when creating the client instance
 mode      | (optional) "DEFAULT" or "DEBUG". Default: "DEFAULT"
 description | (optional) description of the launch (supports markdown syntax)
-tags      | (optional) array of launch tags
+attributes  | (optional) array of launch tags
 id        | id of the existing launch in which tests data would be sent, without this param new launch instance would be created
 
 To know the real launch id wait for the method to finish (the real id is not used by the client)
@@ -109,7 +117,7 @@ The request to finish the launch will be sent only after all items within it hav
 ```javascript
 // launchObj - object returned by method 'startLaunch'
 let launchFinishObj = rpClient.finishLaunch(launchObj.tempId, {
-    end_time: rpClient.helpers.now()
+    endTime: rpClient.helpers.now()
 });
 ```
 The method takes two arguments:
@@ -118,7 +126,7 @@ The method takes two arguments:
 
 Parameter | Description
 --------- | -----------
-end_time  | (optional) end time of launch. Default: rpClient.helpers.now()
+endTime  | (optional) end time of launch. Default: rpClient.helpers.now()
 status    | (optional) status of launch, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "RESTED", "CANCELLED". Default: "".
 
 ### getPromiseFinishAllItems
@@ -140,7 +148,15 @@ updateLaunch - updates launch data. Will send a request to the server only after
 rpClient.updateLaunch(
     launchObj.tempId, {
         description: 'new launch description',
-        tags: ['new_tag1', 'new_tag2'],
+        attributes: [
+            {
+                "key": "yourKey",
+                "value": "yourValue"
+            },
+            {
+                "value": "yourValue"
+            }
+        ],
         mode: 'DEBUG'
     }
 );
@@ -156,14 +172,23 @@ startTestItem - starts a new test item.
 let suiteObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
-        start_time: rpClient.helpers.now(),
+        startTime: rpClient.helpers.now(),
         type: "SUITE"
     }, launchObj.tempId);
 let stepObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
-        start_time: rpClient.helpers.now(),
-        tags: ['step_tag', 'step_tag2', 'step_tag3'],
+        startTime: rpClient.helpers.now(),
+        tags: [
+
+            {
+                "key": "yourKey",
+                "value": "yourValue"
+            },
+            {
+                "value": "yourValue"
+            }
+        ],
         type: "STEP"
     }, launchObj.tempId, suiteObj.tempId);
 
@@ -176,7 +201,7 @@ Parameter       | Description
 name        | item name
 type        | Item type, one of 'SUITE', 'STORY', 'TEST', 'SCENARIO', 'STEP', 'BEFORE_CLASS', 'BEFORE_GROUPS','BEFORE_METHOD', 'BEFORE_SUITE', 'BEFORE_TEST', 'AFTER_CLASS', 'AFTER_GROUPS', 'AFTER_METHOD', 'AFTER_SUITE', 'AFTER_TEST'
 description | (optional) description of the launch (supports markdown syntax)
-start_time  | (optional) start time item(unix time). Default: rpClient.helpers.now()
+startTime  | (optional) start time item(unix time). Default: rpClient.helpers.now()
 tags        | (optional) array of item tags
 
 * id launch (returned by method 'startLaunch')
@@ -198,9 +223,9 @@ The method takes two arguments:
 
 Parameter | Description
 --------- | -----------
-end_time  | (optional) end time of launch. Default: rpClient.helpers.now()
+endTime  | (optional) end time of launch. Default: rpClient.helpers.now()
 status    | (optional) item status, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "RESTED", "CANCELLED". Default: "PASSED".
-issue     | (optional) object issue 
+issue     | (optional) object issue
 
 Example issue object:
 ```
