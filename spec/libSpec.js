@@ -24,11 +24,11 @@ describe('ReportPortal javascript client', () => {
             spyOn(client.restClient, 'create').and.returnValue(myPromise);
             const time = 12345734;
             client.startLaunch({
-                start_time: time,
+                startTime: time,
             });
             expect(client.restClient.create).toHaveBeenCalledWith('launch', {
                 name: 'Test launch name',
-                start_time: time,
+                startTime: time,
             }, { headers: client.headers });
         });
     });
@@ -38,10 +38,10 @@ describe('ReportPortal javascript client', () => {
         const fakeEndTime = 12345734;
         const fakeMergeDataRQ = {
             description: 'Merged launch',
-            end_time: fakeEndTime,
+            endTime: fakeEndTime,
             extendSuitesDescription: true,
             launches: fakeLaunchIds,
-            merge_type: 'BASIC',
+            mergeType: 'BASIC',
             mode: 'DEFAULT',
             name: 'Test launch name',
         };
