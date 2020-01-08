@@ -24,11 +24,27 @@ const launchObj = rpClient.startLaunch({
     name: 'Client test',
     startTime: rpClient.helpers.now(),
     description: 'DESCRIPTION',
-    attributes: ['your', 'attributes'],
+    attributes: [
+        {
+            key: 'key',
+            value: 'value',
+        },
+        {
+            value: 'test',
+        },
+    ],
 });
 const updateLaunch = rpClient.updateLaunch(launchObj.tempId, {
     description: 'test description',
-    attributes: ['test', 'attribute'],
+    attributes: [
+        {
+            key: 'test',
+            value: 'attributes',
+        },
+        {
+            value: 'testValue',
+        },
+    ],
 });
 const suiteIds = [];
 const stepIds = [];

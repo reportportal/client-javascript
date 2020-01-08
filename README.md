@@ -179,7 +179,7 @@ let stepObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
         startTime: rpClient.helpers.now(),
-        tags: [
+        attributes: [
 
             {
                 "key": "yourKey",
