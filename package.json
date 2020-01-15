@@ -30,7 +30,7 @@
     "glob": "^7.1.4",
     "uniqid": "^5.0.3"
   },
-  "license": "GPL-3.0",
+  "license": "Apache-2.0",
   "scripts": {
     "lint": "eslint . --quiet",
     "test": "nyc ./node_modules/jasmine/bin/jasmine.js",
