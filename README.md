@@ -29,7 +29,7 @@ let rpClient = new RPClient({
 
 rpClient.checkConnect().then((response) => {
     console.log('You have successfully connected to the server.');
-    console.log(`You are using an account: ${response.full_name}`);
+    console.log(`You are using an account: ${response.fullName}`);
 }, (error) => {
     console.log('Error connection to server');
     console.dir(error);
@@ -61,7 +61,7 @@ The client works synchronously, so it is not necessary to wait for the end of th
 ```javascript
 rpClient.checkConnect().then((response) => {
     console.log('You have successfully connected to the server.');
-    console.log(`You are using an account: ${response.full_name}`);
+    console.log(`You are using an account: ${response.fullName}`);
 }, (error) => {
     console.log('Error connection to server');
     console.dir(error);
@@ -127,7 +127,7 @@ The method takes two arguments:
 Parameter | Description
 --------- | -----------
 endTime  | (optional) end time of launch. Default: rpClient.helpers.now()
-status    | (optional) status of launch, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "RESTED", "CANCELLED". Default: "".
+status    | (optional) status of launch, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "INTERRUPTED", "CANCELLED".
 
 ### getPromiseFinishAllItems
 getPromiseFinishAllItems - returns promise that contains status about all data has been sent to the Report Protal.
@@ -202,7 +202,7 @@ name        | item name
 type        | Item type, one of 'SUITE', 'STORY', 'TEST', 'SCENARIO', 'STEP', 'BEFORE_CLASS', 'BEFORE_GROUPS','BEFORE_METHOD', 'BEFORE_SUITE', 'BEFORE_TEST', 'AFTER_CLASS', 'AFTER_GROUPS', 'AFTER_METHOD', 'AFTER_SUITE', 'AFTER_TEST'
 description | (optional) description of the launch (supports markdown syntax)
 startTime  | (optional) start time item(unix time). Default: rpClient.helpers.now()
-tags        | (optional) array of item tags
+attributes        | (optional) array of item attributes
 
 * id launch (returned by method 'startLaunch')
 * id parent item (optional) (returned by method 'startTestItem')
@@ -224,7 +224,7 @@ The method takes two arguments:
 Parameter | Description
 --------- | -----------
 endTime  | (optional) end time of launch. Default: rpClient.helpers.now()
-status    | (optional) item status, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "RESTED", "CANCELLED". Default: "PASSED".
+status    | (optional) item status, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "INTERRUPTED", "CANCELLED". Default: "PASSED".
 issue     | (optional) object issue
 
 Example issue object:

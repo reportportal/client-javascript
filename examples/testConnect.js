@@ -10,7 +10,7 @@ const rpClient = new RPClient({
 
 rpClient.checkConnect().then((response) => {
     console.log('You have successfully connected to the server.');
-    console.log(`You are using an account: ${response.full_name}`);
+    console.log(`You are using an account: ${response.fullName}`);
 }, (error) => {
     console.log('Error connection to server');
     console.dir(error);
