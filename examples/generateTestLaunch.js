@@ -19,7 +19,6 @@ function makeid() {
     return text;
 }
 
-
 const launchObj = rpClient.startLaunch({
     name: 'Client test',
     startTime: rpClient.helpers.now(),
@@ -54,6 +53,12 @@ for (let i = 0; i < 10; i += 1) {
         name: makeid(),
         startTime: rpClient.helpers.now(),
         type: 'SUITE',
+        attributes: [
+            {
+                key: 'suiteAttr',
+                value: 'attributes',
+            },
+        ],
     }, launchObj.tempId);
     suiteIds.push(suiteObj.tempId);
     for (let j = 0; j < 5; j += 1) {
@@ -62,6 +67,12 @@ for (let i = 0; i < 10; i += 1) {
             name: makeid(),
             startTime: rpClient.helpers.now(),
             type: 'STEP',
+            attributes: [
+                {
+                    key: 'stepAttr',
+                    value: 'attributes',
+                },
+            ],
         }, launchObj.tempId, suiteObj.tempId);
         stepIds.push(stepObj.tempId);
         for (let r = 0; r < 2; r += 1) {
