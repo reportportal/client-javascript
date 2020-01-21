@@ -225,11 +225,12 @@ Parameter | Description
 --------- | -----------
 endTime  | (optional) end time of launch. Default: rpClient.helpers.now()
 status    | (optional) item status, one of "", "PASSED", "FAILED", "STOPPED", "SKIPPED", "INTERRUPTED", "CANCELLED". Default: "PASSED".
-issue     | (optional) object issue
+issue     | (optional) object issue. IssueType is required, allowable values: "pb***", "ab***", "si***", "ti***", "nd001". Where *** is locator id
 
 Example issue object:
 ```
 {
+    issueType: "string",
     comment: "string",
     externalSystemIssues: [
         {
