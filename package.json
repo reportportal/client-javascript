@@ -28,7 +28,8 @@
     "axios": "^0.18.1",
     "axios-retry": "^3.1.2",
     "glob": "^7.1.4",
-    "uniqid": "^5.0.3"
+    "uniqid": "^5.0.3",
+    "universal-analytics": "^0.4.20"
   },
   "license": "Apache-2.0",
   "scripts": {
