@@ -6,10 +6,9 @@ class Analytics {
         this.visitorInstance = ua(GOOGLE_ANALYTICS_INSTANCE);
     }
 
-    setPersistentParams(clientId) {
+    setPersistentParams() {
         this.visitorInstance.set('av', PJSON_VERSION);
         this.visitorInstance.set('an', PJSON_NAME);
-        this.visitorInstance.set('cd1', clientId);
     }
 
     trackEvent(event) {
