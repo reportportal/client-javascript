@@ -56,6 +56,10 @@ Each method (except checkConnect) returns an object in a specific format:
 ```
 The client works synchronously, so it is not necessary to wait for the end of the previous requests to send following ones.
 
+## Asynchronous reporting
+The client supports an asynchronous reporting.
+If you want the client to work asynchronously change v1 to v2 in addresses in endpoint
+
 ### checkConnect
  checkConnect - asynchronous method for verifying the correctness of the client connection
 ```javascript
