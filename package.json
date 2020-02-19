@@ -1,6 +1,6 @@
 {
-  "name": "reportportal-client",
-  "version": "5.5.0",
+  "name": "@comeonautomation/reportportal-client",
+  "version": "0.0.0",
   "description": "ReportPortal client for node.js",
   "contributors": [
     {
