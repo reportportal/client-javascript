@@ -105,7 +105,7 @@ description | (optional) description of the launch (supports markdown syntax)
 attributes  | (optional) array of launch tags
 id        | id of the existing launch in which tests data would be sent, without this param new launch instance would be created
 
-To know the real launch id wait for the method to finish (the real id is not used by the client)
+To know the real launch id wait for the method to finish. The real id is used by the client in asynchronous reporting.
 ```javascript
 let launchObj = rpClient.startLaunch();
 launchObj.promise.then((response) => {
