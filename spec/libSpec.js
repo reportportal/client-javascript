@@ -31,6 +31,20 @@ describe('ReportPortal javascript client', () => {
                 startTime: time,
             }, { headers: client.headers });
         });
+
+        it('dont start new launch if launchDataRQ.id is not empty', () => {
+            client = new RPClient({ token: 'startLaunchTest', endpoint: 'https://rp.us/api/v1', project: 'tst' });
+            const myPromise = Promise.resolve({ id: 'testidlaunch' });
+            spyOn(client.restClient, 'create').and.returnValue(myPromise);
+            const startTime = 12345734;
+            const id = 12345734;
+            client.startLaunch({
+                startTime,
+                id,
+            });
+            expect(client.restClient.create).not.toHaveBeenCalled();
+            expect(client.launchUuid).toEqual(id);
+        });
     });
 
     describe('mergeLaunches', () => {
