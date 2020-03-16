@@ -19,9 +19,19 @@ describe('ReportPortal javascript client', () => {
     describe('startLaunch', () => {
         let client;
         it('calls getServerResult', () => {
+            const fakeSystemAttr = [{
+                key: 'client',
+                value: 'client-name|1.0',
+                system: true,
+            }, {
+                key: 'os',
+                value: 'osType|osArchitecture',
+                system: true,
+            }];
             client = new RPClient({ token: 'startLaunchTest', endpoint: 'https://rp.us/api/v1', project: 'tst' });
             const myPromise = Promise.resolve({ id: 'testidlaunch' });
             spyOn(client.restClient, 'create').and.returnValue(myPromise);
+            spyOn(helpers, 'getSystemAttribute').and.returnValue(fakeSystemAttr);
             const time = 12345734;
             client.startLaunch({
                 startTime: time,
@@ -29,6 +39,7 @@ describe('ReportPortal javascript client', () => {
             expect(client.restClient.create).toHaveBeenCalledWith('launch', {
                 name: 'Test launch name',
                 startTime: time,
+                attributes: fakeSystemAttr,
             }, { headers: client.headers });
         });
 

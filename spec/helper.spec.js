@@ -1,5 +1,8 @@
+const os = require('os');
+const DetectBrowser = require('detect-browser');
 const RPClient = require('../lib/report-portal-client.js');
 const RestClient = require('../lib/rest');
+const pjson = require('./../package.json');
 
 describe('helpers', () => {
     const client = new RPClient({ token: 'token' });
@@ -50,6 +53,40 @@ describe('helpers', () => {
                     },
                 },
             );
+        });
+    });
+
+    describe('#getSystemAttribute', () => {
+        it('should return correct system attributes', () => {
+            spyOn(os, 'type').and.returnValue('osType');
+            spyOn(os, 'arch').and.returnValue('osArchitecture');
+            spyOn(os, 'totalmem').and.returnValue(1);
+            spyOn(DetectBrowser, 'detect').and.returnValue({
+                name: 'browserName',
+                version: '1.0',
+                os: 'os',
+            });
+            const expectedAttr = [{
+                key: 'client',
+                value: `${pjson.name}|${pjson.version}`,
+                system: true,
+            }, {
+                key: 'os',
+                value: 'osType|osArchitecture',
+                system: true,
+            }, {
+                key: 'RAMSize',
+                value: '1',
+                system: true,
+            }, {
+                key: 'browser',
+                value: 'browserName|1.0|os',
+                system: true,
+            }];
+
+            const attr = client.helpers.getSystemAttribute();
+
+            expect(attr).toEqual(expectedAttr);
         });
     });
 });
