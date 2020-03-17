@@ -114,12 +114,13 @@ launchObj.promise.then((response) => {
     console.dir(`Error at the start of launch: ${error}`);
 })
 ```
-As system attributes, this method sends the following data:
+As system attributes, this method sends the following data (these data are not for public use):
  * client name, version;
  * agent name, version (if given);
+ * browser name, version (if given);
  * OS type, architecture;
  * RAMSize;
- * browser name, version, os;
+ * node version;
 
 ### finishLaunch
 finishLaunch - finish of the launch. After calling this method, you can not add items to the launch.
