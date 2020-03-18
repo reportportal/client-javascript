@@ -74,7 +74,7 @@ describe('helpers', () => {
                 value: '1',
                 system: true,
             }, {
-                key: 'node',
+                key: 'nodeJS',
                 value: nodeVersion,
                 system: true,
             }];
