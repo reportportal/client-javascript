@@ -45,6 +45,7 @@ token     | user's token Report Portal from which you want to send requests. It 
 endpoint  | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.
 launch    | Name of launch at creation.
 project   | The name of the project in which the launches will be created.
+headers   | (optional) The object with custom headers for internal http client
 
 ## Api
 Each method (except checkConnect) returns an object in a specific format:
