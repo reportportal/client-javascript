@@ -121,7 +121,7 @@ As system attributes, this method sends the following data (these data are not f
  * browser name, version (if given);
  * OS type, architecture;
  * RAMSize;
- * node version;
+ * nodeJS version;
 
 ### finishLaunch
 finishLaunch - finish of the launch. After calling this method, you can not add items to the launch.
