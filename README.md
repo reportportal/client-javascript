@@ -123,6 +123,8 @@ As system attributes, this method sends the following data (these data are not f
  * RAMSize;
  * nodeJS version;
 
+We use Google Analytics for sending anonymous usage information as library's name/version and the agent's name/version when the launchStart is called. This information might help us to improve reportportal-client. Used by the ReportPortal team only and not for sharing with 3rd parties.
+
 ### finishLaunch
 finishLaunch - finish of the launch. After calling this method, you can not add items to the launch.
 The request to finish the launch will be sent only after all items within it have finished.
