@@ -2,7 +2,8 @@ const ua = require('universal-analytics');
 const { PJSON_VERSION, PJSON_NAME, GOOGLE_ANALYTICS_INSTANCE } = require('./constants');
 
 class Analytics {
-    constructor() {
+    constructor(agentParams) {
+        this.agentParams = agentParams;
         this.visitorInstance = ua(GOOGLE_ANALYTICS_INSTANCE);
     }
 
@@ -12,7 +13,7 @@ class Analytics {
     }
 
     trackEvent(event) {
-        this.visitorInstance.event(event.category, event.action).send();
+        this.visitorInstance.event(event.category, event.action, event.label).send();
     }
 }
 
