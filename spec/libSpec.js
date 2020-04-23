@@ -59,7 +59,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     describe('mergeLaunches', () => {
-        const fakeLaunchIds = ['12345', '123456', ''];
+        const fakeLaunchIds = ['12345-gfdgfdg-gfdgdf-fdfd45', '12345-gfdgfdg-gfdgdf-fdfd45', ''];
         const fakeEndTime = 12345734;
         const fakeMergeDataRQ = {
             description: 'Merged launch',
@@ -83,11 +83,13 @@ describe('ReportPortal javascript client', () => {
             spyOn(client.restClient, 'create').and.returnValue(myPromise);
 
             spyOn(helpers, 'readLaunchesFromFile').and.returnValue(fakeLaunchIds);
-            spyOn(client, 'getMergeLaunchesData').and.returnValue(fakeMergeDataRQ);
-            client.mergeLaunches();
-
-            expect(client.restClient.create)
-                .toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, { headers: client.headers });
+            spyOn(client, 'getMergeLaunchesRequest').and.returnValue(fakeMergeDataRQ);
+            const promise = client.mergeLaunches();
+            expect(promise.then).toBeDefined();
+            promise.then(() => {
+                expect(client.restClient.create)
+                    .toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, { headers: client.headers });
+            });
         });
     });
 
