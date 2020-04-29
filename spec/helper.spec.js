@@ -84,4 +84,37 @@ describe('helpers', () => {
             expect(attr).toEqual(expectedAttr);
         });
     });
+
+    describe('#generateTestCaseId', () => {
+        it('should return undefined if there is no codeRef', () => {
+            const testCaseId = client.helpers.generateTestCaseId();
+
+            expect(testCaseId).toEqual(undefined);
+        });
+
+        it('should return codeRef if there is no params', () => {
+            const testCaseId = client.helpers.generateTestCaseId('codeRef');
+
+            expect(testCaseId).toEqual('codeRef');
+        });
+
+        it('should return codeRef with parameters if there are all parameters', () => {
+            const parameters = [
+                {
+                    key: 'key',
+                    value: 'value',
+                },
+                { value: 'valueTwo' },
+                { key: 'keyTwo' },
+                {
+                    key: 'keyThree',
+                    value: 'valueThree',
+                },
+            ];
+
+            const testCaseId = client.helpers.generateTestCaseId('codeRef', parameters);
+
+            expect(testCaseId).toEqual('codeRef[value,valueTwo,valueThree]');
+        });
+    });
 });
