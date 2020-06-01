@@ -28,7 +28,7 @@ describe('RestClient', () => {
         });
     });
 
-    describe('#buildPath', () => {
+    describe('buildPath', () => {
         it('compose path basing on base', () => {
             expect(restClient.buildPath('users')).toBe(`${options.baseURL}/users`);
             expect(restClient.buildPath('users/123')).toBe(`${options.baseURL}/users/123`);
@@ -36,7 +36,7 @@ describe('RestClient', () => {
         });
     });
 
-    describe('#retrieve', () => {
+    describe('retrieve', () => {
         it('performs GET request for resource', (done) => {
             const listOfUsers = [
                 { id: 1 },
@@ -48,7 +48,7 @@ describe('RestClient', () => {
                 .get('/users')
                 .reply(200, listOfUsers);
 
-            restClient.retrieve('users', noOptions).then((result) => {
+            restClient.retrieve('users').then((result) => {
                 expect(result).toEqual(listOfUsers);
                 expect(scope.isDone()).toBeTruthy();
 
@@ -85,7 +85,7 @@ describe('RestClient', () => {
         });
     });
 
-    describe('#create', () => {
+    describe('create', () => {
         it('performs POST request to resource', (done) => {
             const newUser = { username: 'John' };
             const userCreated = { id: 1 };
@@ -94,7 +94,7 @@ describe('RestClient', () => {
                 .post('/users', body => isEqual(body, newUser))
                 .reply(201, userCreated);
 
-            restClient.create('users', newUser, noOptions).then((result) => {
+            restClient.create('users', newUser).then((result) => {
                 expect(result).toEqual(userCreated);
                 expect(scope.isDone()).toBeTruthy();
 
@@ -135,7 +135,7 @@ describe('RestClient', () => {
         });
     });
 
-    describe('#update', () => {
+    describe('update', () => {
         it('performs PUT request to resource', (done) => {
             const newUserInfo = { username: 'Mike' };
             const userUpdated = { id: 1 };
@@ -144,7 +144,7 @@ describe('RestClient', () => {
                 .put('/users/1', body => isEqual(body, newUserInfo))
                 .reply(200, userUpdated);
 
-            restClient.update('users/1', newUserInfo, noOptions).then((result) => {
+            restClient.update('users/1', newUserInfo).then((result) => {
                 expect(result).toEqual(userUpdated);
                 expect(scope.isDone()).toBeTruthy();
 
@@ -186,7 +186,7 @@ describe('RestClient', () => {
         });
     });
 
-    describe('#delete', () => {
+    describe('delete', () => {
         it('performs DELETE request to resource', (done) => {
             const emptyBody = {};
             const userDeleted = {};
@@ -195,7 +195,7 @@ describe('RestClient', () => {
                 .delete('/users/1')
                 .reply(200, userDeleted);
 
-            restClient.delete('users/1', emptyBody, noOptions).then((result) => {
+            restClient.delete('users/1', emptyBody).then((result) => {
                 expect(result).toEqual(userDeleted);
                 expect(scope.isDone()).toBeTruthy();
 
@@ -227,6 +227,55 @@ describe('RestClient', () => {
                 .reply(403, unathorizedError);
 
             restClient.delete('users/1', emptyBody, noOptions).catch((error) => {
+                expect(error instanceof Error).toBeTruthy();
+                expect(error.message).toMatch(unauthorizedErrorMessage);
+                expect(scope.isDone()).toBeTruthy();
+
+                done();
+            });
+        });
+    });
+
+    describe('retrieveSyncAPI', () => {
+        it('should retrieve SyncAPI', (done) => {
+            const listOfUsers = [
+                { id: 1 },
+                { id: 2 },
+                { id: 3 },
+            ];
+
+            const scope = nock(options.baseURL)
+                .get('/users')
+                .reply(200, listOfUsers);
+
+            restClient.retrieveSyncAPI('users').then((result) => {
+                expect(result).toEqual(listOfUsers);
+                expect(scope.isDone()).toBeTruthy();
+
+                done();
+            });
+        });
+
+        it('catches NETWORK errors', (done) => {
+            const scope = nock(options.baseURL)
+                .get('/users')
+                .replyWithError(netErrConnectionResetError);
+
+            restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
+                expect(error instanceof Error).toBeTruthy();
+                expect(error.message).toMatch(netErrConnectionResetError.message);
+                expect(scope.isDone()).toBeTruthy();
+
+                done();
+            });
+        });
+
+        it('catches API errors', (done) => {
+            const scope = nock(options.baseURL)
+                .get('/users')
+                .reply(403, unathorizedError);
+
+            restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
                 expect(error instanceof Error).toBeTruthy();
                 expect(error.message).toMatch(unauthorizedErrorMessage);
                 expect(scope.isDone()).toBeTruthy();
