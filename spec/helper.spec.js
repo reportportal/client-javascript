@@ -1,12 +1,14 @@
 const os = require('os');
+const fs = require('fs');
+const glob = require('glob');
 const RPClient = require('../lib/report-portal-client.js');
 const RestClient = require('../lib/rest');
 const pjson = require('./../package.json');
 
-describe('helpers', () => {
+describe('Helpers', () => {
     const client = new RPClient({ token: 'token' });
 
-    describe('#formatName', () => {
+    describe('formatName', () => {
         it('slice last 256 symbols', () => {
             expect(client.helpers.formatName(`a${'b'.repeat(256)}`)).toBe('b'.repeat(256));
         });
@@ -21,13 +23,13 @@ describe('helpers', () => {
         });
     });
 
-    describe('#now', () => {
+    describe('now', () => {
         it('returns milliseconds from unix time', () => {
             expect(new Date() - client.helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
         });
     });
 
-    describe('#getServerResults', () => {
+    describe('getServerResults', () => {
         it('calls RestClient#request', () => {
             spyOn(RestClient, 'request');
 
@@ -55,7 +57,27 @@ describe('helpers', () => {
         });
     });
 
-    describe('#getSystemAttribute', () => {
+    describe('readLaunchesFromFile', () => {
+        it('should return the right ids', () => {
+            spyOn(glob, 'sync').and.returnValue(['rplaunch-fileOne.tmp', 'rplaunch-fileTwo.tmp']);
+
+            const ids = client.helpers.readLaunchesFromFile();
+
+            expect(ids).toEqual(['fileOne', 'fileTwo']);
+        });
+    });
+
+    describe('saveLaunchIdToFile', () => {
+        it('should call fs.open method with right parameters', () => {
+            spyOn(fs, 'open');
+
+            client.helpers.saveLaunchIdToFile('fileOne');
+
+            expect(fs.open).toHaveBeenCalledWith('rplaunch-fileOne.tmp', 'w', jasmine.any(Function));
+        });
+    });
+
+    describe('getSystemAttribute', () => {
         it('should return correct system attributes', () => {
             spyOn(os, 'type').and.returnValue('osType');
             spyOn(os, 'arch').and.returnValue('osArchitecture');
@@ -85,7 +107,7 @@ describe('helpers', () => {
         });
     });
 
-    describe('#generateTestCaseId', () => {
+    describe('generateTestCaseId', () => {
         it('should return undefined if there is no codeRef', () => {
             const testCaseId = client.helpers.generateTestCaseId();
 
