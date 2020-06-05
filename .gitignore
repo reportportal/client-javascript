@@ -3,3 +3,4 @@ node_modules/
 .log
 coverage.lcov
 .nyc_output
+coverage/

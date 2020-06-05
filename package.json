@@ -35,7 +35,7 @@
   "scripts": {
     "lint": "eslint . --quiet",
     "test": "nyc ./node_modules/jasmine/bin/jasmine.js",
-    "coverage": "nyc report --reporter=lcov --reporter=text-summary"
+    "test:coverage": "nyc report --reporter=lcov --reporter=text-summary"
   },
   "devDependencies": {
     "codecov": "3.6.5",
