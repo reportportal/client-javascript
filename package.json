@@ -2,6 +2,7 @@
   "name": "@reportportal/client-javascript",
   "version": "4.0.0",
   "description": "ReportPortal client for node.js",
+  "author": "ReportPortal.io",
   "contributors": [
     {
       "name": "Artsiom Tkachou",
@@ -47,5 +48,13 @@
     "lodash": "^4.17.11",
     "nock": "^10.0.6",
     "nyc": "^14.1.1"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/reportportal/client-javascript/issues"
+  },
+  "keywords": [
+    "epam",
+    "reportportal",
+    "rp"
+  ]
 }
