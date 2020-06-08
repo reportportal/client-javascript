@@ -57,6 +57,8 @@ jobs:
   create-tag:
     needs: calculate-version
     runs-on: ubuntu-latest
+    outputs:
+      versionInfo: ${{ steps.readChangelogEntry.outputs.log_entry }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -81,11 +83,17 @@ jobs:
           releaseDate=$(date +'%Y-%m-%d')
           echo "Release date: $releaseDate"
           versionInfo="## [${{ needs.calculate-version.outputs.releaseVersion }}] - $releaseDate"
-          sed -i '1s/^/'"$versionInfo"'\n/' ${{ env.changelogFileName }}
+          sed -i '1s/^/\n'"$versionInfo"'\n/' ${{ env.changelogFileName }}
           git status
           git add ${{ env.changelogFileName }}
           git commit -m "Mention ${{ needs.calculate-version.outputs.releaseVersion }} version in changelog file"
           git push origin master
+      - name: Read changelog Entry
+        id: readChangelogEntry
+        uses: mindsers/changelog-reader-action@v1.1.0
+        with:
+          version: ${{ needs.calculate-version.outputs.releaseVersion }}
+          path: ./${{ env.changelogFileName }}
       - name: Bump snapshot version
         id: bumpSnapshotVersion
         uses: christian-draeger/increment-semantic-version@1.0.1
@@ -94,9 +102,9 @@ jobs:
           version-fragment: 'bug'
       - name: Update develop with snapshot version
         run: |
-          git fetch --unshallow
+          git fetch
           git checkout develop
-          git merge master -Xtheirs
+          git merge master -Xtheirs --allow-unrelated-histories
           echo "${{ steps.bumpSnapshotVersion.outputs.next-version }}-SNAPSHOT" > ${{ env.versionFileName }}
           git status
           git add ${{ env.versionFileName }}
@@ -109,11 +117,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Read release notes from changelog file
-        id: readReleaseNotes
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ${{ env.changelogFileName }}
       - name: Create Release
         id: createRelease
         uses: actions/create-release@v1
@@ -122,6 +125,6 @@ jobs:
         with:
           tag_name: v${{ needs.calculate-version.outputs.releaseVersion }}
           release_name: Release v${{ needs.calculate-version.outputs.releaseVersion }}
-          body: ${{ steps.readReleaseNotes.outputs.content }}
+          body: ${{ needs.create-tag.outputs.versionInfo }}
           draft: false
           prerelease: false
