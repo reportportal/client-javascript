@@ -14,11 +14,9 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 10.x
       - name: Clean install of node dependencies
         run: npm ci
-      - name: Build the source code
-        run: npm run build
       - name: Run tests
         run: npm test
       - name: Check coverage
@@ -33,12 +31,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 10.x
           registry-url: 'https://registry.npmjs.org'
       - name: Clean install of node dependencies
         run: npm ci
-      - name: Build the source code
-        run: npm run build
       - name: Publish package to npm
         run: npm publish
         env:
@@ -53,13 +49,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 10.x
           registry-url: 'https://npm.pkg.github.com'
           scope: '@reportportal'
       - name: Clean install of node dependencies
         run: npm ci
-      - name: Build the source code
-        run: npm run build
       - name: Publish package to github packages
         run: npm publish
         env:
