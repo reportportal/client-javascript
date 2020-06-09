@@ -19,6 +19,8 @@ jobs:
           node-version: 10.x
       - name: Clean install of node dependencies
         run: npm ci
+      - name: Run lint
+        run: npm run lint
       - name: Run tests
         run: npm test
       - name: Check coverage

@@ -1,24 +1,29 @@
-[![Build Status](https://travis-ci.org/reportportal/client-javascript.svg?branch=master)](https://travis-ci.org/reportportal/client-javascript)[![Code Coverage](https://codecov.io/gh/reportportal/client-javascript/branch/master/graph/badge.svg)](https://codecov.io/gh/reportportal/client-javascript)[![npm version](https://badge.fury.io/js/reportportal-client.svg)](https://badge.fury.io/js/reportportal-client)
-
 # ReportPortal js client
 This Client is to communicate with the Report Portal on node js.
 
 Library is used only for implementors of custom listeners for ReportPortal.
 
 ## Already implemented listeners:
-* EMPTY
+* [Jest integration](https://github.com/reportportal/agent-js-jest)
+* [Cypress integration](https://github.com/reportportal/agent-js-cypress)
+* [Mocha integration](https://github.com/reportportal/agent-js-mocha)
+* [Jasmine integration](https://github.com/reportportal/agent-js-jasmine)
+* [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
+* [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
+* [Codecept integration](https://github.com/reportportal/agent-js-codecept)
 
+Examples for test framework integrations from the list above described in [examples](https://github.com/reportportal/examples-js) repository.
 
 ## Installation
 The latest version is available on npm:
 ```cmd
-npm install reportportal-client
+npm install @reportportal/client-javascript
 ```
 
 ## Example
 
 ```javascript
-let RPClient = require('reportportal-client');
+let RPClient = require('@reportportal/client-javascript');
 
 let rpClient = new RPClient({
     token: "00000000-0000-0000-0000-000000000000",
