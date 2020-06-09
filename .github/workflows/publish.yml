@@ -38,7 +38,7 @@ jobs:
       - name: Clean install of node dependencies
         run: npm ci
       - name: Publish package to npm
-        run: npm publish
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
 
