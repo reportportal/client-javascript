@@ -39,7 +39,7 @@
     "test:coverage": "nyc report --reporter=lcov --reporter=text-summary"
   },
   "devDependencies": {
-    "codecov": "3.6.5",
+    "codecov": "3.7.1",
     "eslint": "5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.0",
