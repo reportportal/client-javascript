@@ -88,6 +88,53 @@ describe('ReportPortal javascript client', () => {
         });
     });
 
+    describe('triggerAnalyticsEvent', () => {
+        it('should not call analytics.trackEvent if disableGA is true', () => {
+            const client = new RPClient({
+                token: 'startLaunchTest',
+                endpoint: 'https://rp.us/api/v1',
+                project: 'tst',
+                disableGA: true,
+            });
+            spyOn(events, 'getAgentEventLabel').and.returnValue('name|version');
+            spyOn(client.analytics, 'trackEvent');
+
+            client.triggerAnalyticsEvent();
+
+            expect(client.analytics.trackEvent).not.toHaveBeenCalled();
+        });
+
+        it('should call analytics.trackEvent with label if agentParams is not empty', () => {
+            const client = new RPClient({
+                token: 'startLaunchTest',
+                endpoint: 'https://rp.us/api/v1',
+                project: 'tst',
+            });
+            client.analytics.agentParams = { name: 'name', version: 'version' };
+            spyOn(events, 'getAgentEventLabel').and.returnValue('name|version');
+            spyOn(client.analytics, 'trackEvent');
+
+            client.triggerAnalyticsEvent();
+
+            expect(client.analytics.trackEvent).toHaveBeenCalledWith(
+                Object.assign(events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH, { label: 'name|version' }),
+            );
+        });
+
+        it('should call analytics.trackEvent without label if agentParams is empty', () => {
+            const client = new RPClient({
+                token: 'startLaunchTest',
+                endpoint: 'https://rp.us/api/v1',
+                project: 'tst',
+            });
+            spyOn(client.analytics, 'trackEvent');
+
+            client.triggerAnalyticsEvent();
+
+            expect(client.analytics.trackEvent).toHaveBeenCalledWith(events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH);
+        });
+    });
+
     describe('startLaunch', () => {
         it('should call restClient with suitable parameters', () => {
             const fakeSystemAttr = [{
@@ -150,42 +197,6 @@ describe('ReportPortal javascript client', () => {
                     },
                 ],
             }, { headers: client.headers });
-        });
-
-        it('should call analytics.trackEvent with label if agentParams is not empty', () => {
-            const client = new RPClient({
-                token: 'startLaunchTest',
-                endpoint: 'https://rp.us/api/v1',
-                project: 'tst',
-            });
-            const time = 12345734;
-            client.analytics.agentParams = { name: 'name', version: 'version' };
-            spyOn(events, 'getAgentEventLabel').and.returnValue('name|version');
-            spyOn(client.analytics, 'trackEvent');
-
-            client.startLaunch({
-                startTime: time,
-            });
-
-            expect(client.analytics.trackEvent).toHaveBeenCalledWith(
-                Object.assign(events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH, { label: 'name|version' }),
-            );
-        });
-
-        it('should call analytics.trackEvent without label if agentParams is empty', () => {
-            const client = new RPClient({
-                token: 'startLaunchTest',
-                endpoint: 'https://rp.us/api/v1',
-                project: 'tst',
-            });
-            const time = 12345734;
-            spyOn(client.analytics, 'trackEvent');
-
-            client.startLaunch({
-                startTime: time,
-            });
-
-            expect(client.analytics.trackEvent).toHaveBeenCalledWith(events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH);
         });
 
         it('dont start new launch if launchDataRQ.id is not empty', () => {
