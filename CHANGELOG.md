@@ -1,3 +1,5 @@
+
+## [5.0.1] - 2020-08-14
 ### Changed
 - Packages publishing workflow improved
 ### Added
