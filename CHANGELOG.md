@@ -1,3 +1,7 @@
+### Changed
+- Packages publishing workflow improved
+### Added
+- The ability to disable google analytics
 
 ## [5.0.0] - 2020-06-09
 ### Added
