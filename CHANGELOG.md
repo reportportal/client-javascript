@@ -1,3 +1,5 @@
+### Fixed
+- [Issue](https://github.com/reportportal/client-javascript/pull/91) with request headers
 
 ## [5.0.1] - 2020-08-14
 ### Changed
