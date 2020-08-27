@@ -16,8 +16,11 @@ name: CI-pipeline
 on:
   push:
     branches:
-      - master
       - develop
+      - '!master'
+    paths-ignore:
+      - README.md
+      - CHANGELOG.md
   pull_request:
 
 jobs:
