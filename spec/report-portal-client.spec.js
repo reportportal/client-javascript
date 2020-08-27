@@ -221,7 +221,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getRejectAnswer');
@@ -235,7 +235,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                     promiseStart: Promise.resolve(),
                 },
                 child1: {
@@ -368,7 +368,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({});
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
                 child1: {
                     promiseFinish: Promise.resolve(),
@@ -388,7 +388,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getRejectAnswer');
@@ -402,7 +402,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                     promiseFinish: Promise.resolve(),
                 },
             };
@@ -420,7 +420,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getRejectAnswer');
@@ -434,7 +434,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                     finishSend: true,
                 },
             };
@@ -450,10 +450,10 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id: {
-                    childrens: ['id1'],
+                    children: ['id1'],
                 },
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getRejectAnswer');
@@ -468,11 +468,11 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id: {
-                    childrens: ['id1', '4n5pxq24kpiob12og9'],
+                    children: ['id1', '4n5pxq24kpiob12og9'],
                     promiseStart: Promise.resolve(),
                 },
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                     promiseStart: Promise.resolve(),
                 },
                 '4n5pxq24kpiob12og9': {
@@ -493,11 +493,11 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id: {
-                    childrens: ['id1', '4n5pxq24kpiob12og9'],
+                    children: ['id1', '4n5pxq24kpiob12og9'],
                     promiseStart: Promise.resolve(),
                 },
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                     promiseStart: Promise.resolve(),
                 },
                 '4n5pxq24kpiob12og9': {
@@ -523,7 +523,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getRejectAnswer');
@@ -537,11 +537,11 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id: {
-                    childrens: ['id1'],
+                    children: ['id1'],
                     promiseFinish: Promise.resolve(),
                 },
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                     promiseFinish: Promise.resolve(),
                 },
             };
@@ -567,11 +567,11 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id: {
-                    childrens: ['id1'],
+                    children: ['id1'],
                     promiseFinish: Promise.resolve(),
                 },
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                     promiseFinish: Promise.reject(),
                 },
             };
@@ -599,7 +599,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
@@ -608,7 +608,7 @@ describe('ReportPortal javascript client', () => {
             const result = client.saveLog({
                 promiseStart: Promise.resolve(),
                 realId: 'realId',
-                childrens: [],
+                children: [],
             }, client.restClient.create);
 
             expect(result.tempId).toEqual('4n5pxq24kpiob12og9');
@@ -641,7 +641,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getRejectAnswer');
@@ -655,7 +655,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 itemTempId: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'saveLog').and.returnValue('saveLog');
@@ -671,7 +671,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'getRejectAnswer');
@@ -685,7 +685,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 itemTempId: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'saveLog').and.returnValue('saveLog');
@@ -701,7 +701,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'buildMultiPartStream').and.returnValue();
@@ -716,7 +716,7 @@ describe('ReportPortal javascript client', () => {
             const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
             client.map = {
                 id1: {
-                    childrens: ['child1'],
+                    children: ['child1'],
                 },
             };
             spyOn(client, 'buildMultiPartStream').and.returnValue();
