@@ -1,3 +1,5 @@
+
+## [5.0.2] - 2020-08-27
 ### Fixed
 - [Issue](https://github.com/reportportal/client-javascript/pull/91) with request headers
 - Default status for suite/test items without children
