@@ -1,3 +1,4 @@
+const process = require('process');
 const RPClient = require('../lib/report-portal-client.js');
 const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
@@ -89,7 +90,17 @@ describe('ReportPortal javascript client', () => {
     });
 
     describe('triggerAnalyticsEvent', () => {
-        it('should not call analytics.trackEvent if disableGA is true', () => {
+        const OLD_ENV = process.env;
+
+        beforeEach(() => {
+            process.env = { ...OLD_ENV };
+        });
+
+        afterEach(() => {
+            process.env = OLD_ENV;
+        });
+
+        it('should not call analytics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', () => {
             const client = new RPClient({
                 token: 'startLaunchTest',
                 endpoint: 'https://rp.us/api/v1',
@@ -97,6 +108,7 @@ describe('ReportPortal javascript client', () => {
                 disableGA: true,
             });
             spyOn(events, 'getAgentEventLabel').and.returnValue('name|version');
+            process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = true;
             spyOn(client.analytics, 'trackEvent');
 
             client.triggerAnalyticsEvent();
@@ -112,6 +124,7 @@ describe('ReportPortal javascript client', () => {
             });
             client.analytics.agentParams = { name: 'name', version: 'version' };
             spyOn(events, 'getAgentEventLabel').and.returnValue('name|version');
+            process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = false;
             spyOn(client.analytics, 'trackEvent');
 
             client.triggerAnalyticsEvent();
@@ -128,6 +141,7 @@ describe('ReportPortal javascript client', () => {
                 project: 'tst',
             });
             spyOn(client.analytics, 'trackEvent');
+            process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = false;
 
             client.triggerAnalyticsEvent();
 
