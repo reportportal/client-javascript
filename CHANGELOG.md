@@ -1,5 +1,5 @@
 
-### Add
+### Added
 - Environment variable
 
 ## [5.0.2] - 2020-08-27
