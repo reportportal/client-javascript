@@ -1,3 +1,5 @@
+### Added
+- Timeout (5000ms) on Axios Requests
 
 ## [5.0.3] - 2020-11-09
 

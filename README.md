@@ -11,6 +11,7 @@ Library is used only for implementors of custom listeners for ReportPortal.
 * [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
 * [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
 * [Codecept integration](https://github.com/reportportal/agent-js-codecept)
+* [Postman integration](https://github.com/reportportal/agent-js-postman)
 
 Examples for test framework integrations from the list above described in [examples](https://github.com/reportportal/examples-js) repository.
 
@@ -77,6 +78,9 @@ rpClient.checkConnect().then((response) => {
     console.dir(error);
 });
 ```
+
+### timeout (5000ms) on axios requests
+There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error "Error: timeout of 5000ms exceeded".
 
 ### startLaunch
 startLaunch - starts a new launch, return temp id that you want to use for all of the items within this launch.
