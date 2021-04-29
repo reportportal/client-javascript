@@ -1,8 +1,10 @@
 ### Added
-- Timeout (5000ms) on Axios Requests
+- Timeout (default is 5000ms) on Axios Requests
+### Fixed
+- Security vulnerabilities ([axios](https://github.com/reportportal/client-javascript/issues/109))
+- [Issue](https://github.com/reportportal/client-javascript/issues/94) with the finish of a non-existent test item
 
 ## [5.0.3] - 2020-11-09
-
 ### Added
 - Environment variable
 
