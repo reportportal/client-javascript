@@ -1,3 +1,5 @@
+
+## [5.0.4] - 2021-04-29
 ### Added
 - Timeout (default is 5000ms) on Axios Requests
 ### Fixed
