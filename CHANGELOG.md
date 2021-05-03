@@ -1,3 +1,5 @@
+### Fixed
+- [Issue](https://github.com/reportportal/client-javascript/issues/102) with  self-signed certificate
 
 ## [5.0.4] - 2021-04-29
 ### Added

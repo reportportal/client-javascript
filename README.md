@@ -52,6 +52,7 @@ endpoint  | URL of your server. For example, if you visit the page at 'https://s
 launch    | Name of launch at creation.
 project   | The name of the project in which the launches will be created.
 headers   | (optional) The object with custom headers for internal http client
+restClientConfig | (optional) The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client
 
 ## Api
 Each method (except checkConnect) returns an object in a specific format:
