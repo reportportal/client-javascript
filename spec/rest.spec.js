@@ -14,6 +14,7 @@ describe('RestClient', () => {
             agent: {
                 rejectUnauthorized: false,
             },
+            timeout: 0,
         },
     };
     const noOptions = {};
@@ -54,9 +55,12 @@ describe('RestClient', () => {
                 agent: {
                     rejectUnauthorized: false,
                 },
+                timeout: 10000,
             };
             expect(restClient.getRestConfig().httpAgent).toBeDefined();
             expect(restClient.getRestConfig().httpAgent).toBeInstanceOf(http.Agent);
+            expect(restClient.getRestConfig().timeout).toBe(10000);
+            expect(restClient.getRestConfig().agent).toBeUndefined();
         });
     });
 
