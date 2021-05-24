@@ -47,12 +47,16 @@ When creating a client instance, you need to specify the following parameters:
 
 Parameter | Description
 --------- | -----------
-token     | user's token Report Portal from which you want to send requests. It can be found on the profile page of this user.
+token     | User's token Report Portal from which you want to send requests. It can be found on the profile page of this user.
 endpoint  | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.
 launch    | Name of launch at creation.
 project   | The name of the project in which the launches will be created.
-headers   | (optional) The object with custom headers for internal http client
-restClientConfig | (optional) The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client
+headers   | (optional) The object with custom headers for internal http client.
+restClientConfig | (optional) The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, may contain other client options eg. `timeout`.
+
+## Asynchronous reporting
+The client supports an asynchronous reporting.
+If you want the client to work asynchronously change v1 to v2 in addresses in endpoint.
 
 ## Api
 Each method (except checkConnect) returns an object in a specific format:
@@ -64,9 +68,10 @@ Each method (except checkConnect) returns an object in a specific format:
 ```
 The client works synchronously, so it is not necessary to wait for the end of the previous requests to send following ones.
 
-## Asynchronous reporting
-The client supports an asynchronous reporting.
-If you want the client to work asynchronously change v1 to v2 in addresses in endpoint
+### Timeout (30000ms) on axios requests
+There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error "Error: timeout of 30000ms exceeded".
+
+You can simply change this timeout by adding a `timeout` property to `restClientConfig` with your desired numeric value.
 
 ### checkConnect
  checkConnect - asynchronous method for verifying the correctness of the client connection
@@ -79,9 +84,6 @@ rpClient.checkConnect().then((response) => {
     console.dir(error);
 });
 ```
-
-### timeout (30000ms) on axios requests
-There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error "Error: timeout of 30000ms exceeded".
 
 ### startLaunch
 startLaunch - starts a new launch, return temp id that you want to use for all of the items within this launch.
