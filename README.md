@@ -80,8 +80,8 @@ rpClient.checkConnect().then((response) => {
 });
 ```
 
-### timeout (5000ms) on axios requests
-There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error "Error: timeout of 5000ms exceeded".
+### timeout (30000ms) on axios requests
+There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error "Error: timeout of 30000ms exceeded".
 
 ### startLaunch
 startLaunch - starts a new launch, return temp id that you want to use for all of the items within this launch.
