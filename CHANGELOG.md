@@ -1,3 +1,5 @@
+
+## [5.0.5] - 2021-05-25
 ### Added
 - Possibility to change Axios Requests timeout (closes [#115](https://github.com/reportportal/client-javascript/issues/115))
 ### Changed
