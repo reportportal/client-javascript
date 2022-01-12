@@ -1,9 +1,9 @@
 const os = require('os');
 const fs = require('fs');
 const glob = require('glob');
-const RPClient = require('../lib/report-portal-client.js');
+const RPClient = require('../lib/report-portal-client');
 const RestClient = require('../lib/rest');
-const pjson = require('./../package.json');
+const pjson = require('../package.json');
 
 describe('Helpers', () => {
     const client = new RPClient({ token: 'token' });
