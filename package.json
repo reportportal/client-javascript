@@ -21,6 +21,7 @@
   "directories": {
     "lib": "./lib"
   },
+  "files" : ["/lib", "/analytics", "VERSION"],
   "main": "./lib/report-portal-client",
   "engines": {
     "node": ">= 8.0.x"
