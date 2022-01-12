@@ -12,6 +12,7 @@ Library is used only for implementors of custom listeners for ReportPortal.
 * [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
 * [Codecept integration](https://github.com/reportportal/agent-js-codecept)
 * [Postman integration](https://github.com/reportportal/agent-js-postman)
+* [TestCafe integration](https://github.com/reportportal/agent-js-testcafe)
 * [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
 * [Playwright integration](https://github.com/reportportal/agent-js-playwright)
 

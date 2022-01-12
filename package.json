@@ -24,7 +24,7 @@
   "files": [
     "/lib",
     "/analytics",
-    "VERSION"
+    "/VERSION"
   ],
   "main": "./lib/report-portal-client",
   "engines": {
