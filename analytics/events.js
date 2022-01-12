@@ -8,7 +8,7 @@ const CLIENT_JAVASCRIPT_EVENTS = {
     },
 };
 
-const getAgentEventLabel = agentParams => `Agent name "${agentParams.name}", version "${agentParams.version}"`;
+const getAgentEventLabel = (agentParams) => `Agent name "${agentParams.name}", version "${agentParams.version}"`;
 
 module.exports = {
     CLIENT_JAVASCRIPT_EVENTS,

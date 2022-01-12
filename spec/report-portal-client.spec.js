@@ -1,5 +1,5 @@
 const process = require('process');
-const RPClient = require('../lib/report-portal-client.js');
+const RPClient = require('../lib/report-portal-client');
 const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
 const events = require('../analytics/events');
@@ -22,7 +22,6 @@ describe('ReportPortal javascript client', () => {
 
             expect(console.log).toHaveBeenCalledWith('message');
         });
-
 
         it('should not call console.log if debug is false', () => {
             const client = new RPClient({ debug: false });
