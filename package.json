@@ -21,16 +21,20 @@
   "directories": {
     "lib": "./lib"
   },
-  "files" : ["/lib", "/analytics", "VERSION"],
+  "files": [
+    "/lib",
+    "/analytics",
+    "VERSION"
+  ],
   "main": "./lib/report-portal-client",
   "engines": {
     "node": ">= 8.0.x"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "axios-retry": "^3.1.2",
-    "glob": "^7.1.4",
-    "uniqid": "^5.0.3",
+    "axios": "^0.24.0",
+    "axios-retry": "^3.2.4",
+    "glob": "^7.2.0",
+    "uniqid": "^5.4.0",
     "universal-analytics": "^0.4.20"
   },
   "license": "Apache-2.0",
@@ -41,14 +45,14 @@
   },
   "devDependencies": {
     "codecov": "3.7.1",
-    "eslint": "5.16.0",
+    "eslint": "8.6.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.17.0",
     "eslint-plugin-node": "^8.0.1",
     "jasmine": "^3.5.0",
     "lodash": "^4.17.11",
     "nock": "^10.0.6",
-    "nyc": "^14.1.1"
+    "nyc": "^15.1.0"
   },
   "bugs": {
     "url": "https://github.com/reportportal/client-javascript/issues"
