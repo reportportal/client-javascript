@@ -12,6 +12,8 @@ Library is used only for implementors of custom listeners for ReportPortal.
 * [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
 * [Codecept integration](https://github.com/reportportal/agent-js-codecept)
 * [Postman integration](https://github.com/reportportal/agent-js-postman)
+* [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
+* [Playwright integration](https://github.com/reportportal/agent-js-playwright)
 
 Examples for test framework integrations from the list above described in [examples](https://github.com/reportportal/examples-js) repository.
 
