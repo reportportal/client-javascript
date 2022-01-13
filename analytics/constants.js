@@ -1,4 +1,4 @@
-const pjson = require('./../package.json');
+const pjson = require('../package.json');
 
 const PJSON_VERSION = pjson.version;
 const PJSON_NAME = pjson.name;

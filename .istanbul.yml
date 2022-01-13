@@ -1,3 +1,0 @@
-instrumentation:
-    excludes:
-        - "spec/libSpec.js"

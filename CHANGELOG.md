@@ -1,3 +1,7 @@
+### Fixed
+- Security vulnerabilities (axios, path-parse, minimist)
+### Changed
+- Package size reduced
 
 ## [5.0.5] - 2021-05-25
 ### Added
