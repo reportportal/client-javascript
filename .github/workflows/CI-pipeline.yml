@@ -22,13 +22,16 @@ on:
       - README.md
       - CHANGELOG.md
   pull_request:
+    branches:
+      - develop
+      - master
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [8, 12]
+        node: [10, 12, 14, 16]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
