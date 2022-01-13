@@ -26,13 +26,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [8, 12]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: ${{ matrix.node }}
       - name: Clean install of node dependencies
         run: npm ci
       - name: Run lint
