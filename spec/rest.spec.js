@@ -19,20 +19,28 @@ describe('RestClient', () => {
     };
     const unauthorizedErrorMessage = 'Request failed with status code 403: '
         + '{"error":"unauthorized","error_description":"Full authentication is required to access this resource"}';
-    const netErrConnectionResetError = { code: 'ECONNABORTED', message: 'connection reset' };
+    const netErrConnectionResetError = {
+        code: 'ECONNABORTED',
+        message: 'connection reset'
+    };
 
     describe('constructor', () => {
         it('creates object with correct properties', () => {
-            expect(restClient.baseURL).toBe(options.baseURL);
-            expect(restClient.headers).toEqual(options.headers);
+            expect(restClient.baseURL)
+                .toBe(options.baseURL);
+            expect(restClient.headers)
+                .toEqual(options.headers);
         });
     });
 
     describe('#buildPath', () => {
         it('compose path basing on base', () => {
-            expect(restClient.buildPath('users')).toBe(`${options.baseURL}/users`);
-            expect(restClient.buildPath('users/123')).toBe(`${options.baseURL}/users/123`);
-            expect(restClient.buildPath()).toBe(`${options.baseURL}/`);
+            expect(restClient.buildPath('users'))
+                .toBe(`${options.baseURL}/users`);
+            expect(restClient.buildPath('users/123'))
+                .toBe(`${options.baseURL}/users/123`);
+            expect(restClient.buildPath())
+                .toBe(`${options.baseURL}/`);
         });
     });
 
@@ -48,12 +56,15 @@ describe('RestClient', () => {
                 .get('/users')
                 .reply(200, listOfUsers);
 
-            restClient.retrieve('users', noOptions).then((result) => {
-                expect(result).toEqual(listOfUsers);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.retrieve('users', noOptions)
+                .then((result) => {
+                    expect(result)
+                        .toEqual(listOfUsers);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches NETWORK errors', (done) => {
@@ -61,13 +72,17 @@ describe('RestClient', () => {
                 .get('/users')
                 .replyWithError(netErrConnectionResetError);
 
-            restClient.retrieve('users', noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetError.message);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.retrieve('users', noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(netErrConnectionResetError.message);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches API errors', (done) => {
@@ -75,13 +90,17 @@ describe('RestClient', () => {
                 .get('/users')
                 .reply(403, unathorizedError);
 
-            restClient.retrieve('users', noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(unauthorizedErrorMessage);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.retrieve('users', noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(unauthorizedErrorMessage);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
     });
 
@@ -94,12 +113,15 @@ describe('RestClient', () => {
                 .post('/users', body => isEqual(body, newUser))
                 .reply(201, userCreated);
 
-            restClient.create('users', newUser, noOptions).then((result) => {
-                expect(result).toEqual(userCreated);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.create('users', newUser, noOptions)
+                .then((result) => {
+                    expect(result)
+                        .toEqual(userCreated);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches NETWORK errors', (done) => {
@@ -109,13 +131,17 @@ describe('RestClient', () => {
                 .post('/users', body => isEqual(body, newUser))
                 .replyWithError(netErrConnectionResetError);
 
-            restClient.create('users', newUser, noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetError.message);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.create('users', newUser, noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(netErrConnectionResetError.message);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches API errors', (done) => {
@@ -125,13 +151,17 @@ describe('RestClient', () => {
                 .post('/users', body => isEqual(body, newUser))
                 .reply(403, unathorizedError);
 
-            restClient.create('users', newUser, noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(unauthorizedErrorMessage);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.create('users', newUser, noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(unauthorizedErrorMessage);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
     });
 
@@ -144,12 +174,15 @@ describe('RestClient', () => {
                 .put('/users/1', body => isEqual(body, newUserInfo))
                 .reply(200, userUpdated);
 
-            restClient.update('users/1', newUserInfo, noOptions).then((result) => {
-                expect(result).toEqual(userUpdated);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.update('users/1', newUserInfo, noOptions)
+                .then((result) => {
+                    expect(result)
+                        .toEqual(userUpdated);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches NETWORK errors', (done) => {
@@ -160,13 +193,17 @@ describe('RestClient', () => {
                 .replyWithError(netErrConnectionResetError);
 
 
-            restClient.update('users/1', newUserInfo, noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetError.message);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.update('users/1', newUserInfo, noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(netErrConnectionResetError.message);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches API errors', (done) => {
@@ -176,13 +213,17 @@ describe('RestClient', () => {
                 .put('/users/1', body => isEqual(body, newUserInfo))
                 .reply(403, unathorizedError);
 
-            restClient.update('users/1', newUserInfo, noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(unauthorizedErrorMessage);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.update('users/1', newUserInfo, noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(unauthorizedErrorMessage);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
     });
 
@@ -195,12 +236,15 @@ describe('RestClient', () => {
                 .delete('/users/1')
                 .reply(200, userDeleted);
 
-            restClient.delete('users/1', emptyBody, noOptions).then((result) => {
-                expect(result).toEqual(userDeleted);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.delete('users/1', emptyBody, noOptions)
+                .then((result) => {
+                    expect(result)
+                        .toEqual(userDeleted);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches NETWORK errors', (done) => {
@@ -210,13 +254,17 @@ describe('RestClient', () => {
                 .delete('/users/1')
                 .replyWithError(netErrConnectionResetError);
 
-            restClient.delete('users/1', emptyBody, noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(netErrConnectionResetError.message);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.delete('users/1', emptyBody, noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(netErrConnectionResetError.message);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
 
         it('catches API errors', (done) => {
@@ -226,13 +274,17 @@ describe('RestClient', () => {
                 .delete('/users/1')
                 .reply(403, unathorizedError);
 
-            restClient.delete('users/1', emptyBody, noOptions).catch((error) => {
-                expect(error instanceof Error).toBeTruthy();
-                expect(error.message).toMatch(unauthorizedErrorMessage);
-                expect(scope.isDone()).toBeTruthy();
+            restClient.delete('users/1', emptyBody, noOptions)
+                .catch((error) => {
+                    expect(error instanceof Error)
+                        .toBeTruthy();
+                    expect(error.message)
+                        .toMatch(unauthorizedErrorMessage);
+                    expect(scope.isDone())
+                        .toBeTruthy();
 
-                done();
-            });
+                    done();
+                });
         });
     });
 });

@@ -1,4 +1,7 @@
-const { PJSON_VERSION, PJSON_NAME } = require('./constants');
+const {
+    PJSON_VERSION,
+    PJSON_NAME
+} = require('./constants');
 
 const CLIENT_JAVASCRIPT = `Client name "${PJSON_NAME}", version "${PJSON_VERSION}"`;
 const CLIENT_JAVASCRIPT_EVENTS = {
