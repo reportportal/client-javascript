@@ -8,10 +8,11 @@ const rpClient = new RPClient({
     project: 'PROJECT_NAME',
 });
 
-rpClient.checkConnect().then((response) => {
-    console.log('You have successfully connected to the server.');
-    console.log(`You are using an account: ${response.fullName}`);
-}, (error) => {
-    console.log('Error connection to server');
-    console.dir(error);
-});
+rpClient.checkConnect()
+    .then((response) => {
+        console.log('You have successfully connected to the server.');
+        console.log(`You are using an account: ${response.fullName}`);
+    }, (error) => {
+        console.log('Error connection to server');
+        console.dir(error);
+    });
