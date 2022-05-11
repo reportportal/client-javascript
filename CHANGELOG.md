@@ -1,6 +1,27 @@
 
-## [5.0.3] - 2020-11-09
+## [5.0.6] - 2022-01-13
+### Fixed
+- Security vulnerabilities (axios, path-parse, minimist)
+### Changed
+- Package size reduced
 
+## [5.0.5] - 2021-05-25
+### Added
+- Possibility to change Axios Requests timeout (closes [#115](https://github.com/reportportal/client-javascript/issues/115))
+### Changed
+- Default timeout on Axios Requests increased to 30000ms
+### Fixed
+- [Issue](https://github.com/reportportal/client-javascript/issues/102) with self-signed certificate
+- Security vulnerabilities (lodash, handlebars, hosted-git-info)
+
+## [5.0.4] - 2021-04-29
+### Added
+- Timeout (default is 5000ms) on Axios Requests
+### Fixed
+- Security vulnerabilities ([axios](https://github.com/reportportal/client-javascript/issues/109))
+- [Issue](https://github.com/reportportal/client-javascript/issues/94) with the finish of a non-existent test item
+
+## [5.0.3] - 2020-11-09
 ### Added
 - Environment variable
 
