@@ -24,8 +24,9 @@ describe('RestClient', () => {
     error: 'unauthorized',
     error_description: 'Full authentication is required to access this resource',
   };
-  const unauthorizedErrorMessage = 'Request failed with status code 403: '
-        + '{"error":"unauthorized","error_description":"Full authentication is required to access this resource"}';
+  const unauthorizedErrorMessage =
+    'Request failed with status code 403: ' +
+    '{"error":"unauthorized","error_description":"Full authentication is required to access this resource"}';
   const netErrConnectionResetError = { code: 'ECONNABORTED', message: 'connection reset' };
 
   describe('constructor', () => {
@@ -45,7 +46,7 @@ describe('RestClient', () => {
   });
 
   describe('getRestConfig', () => {
-    it('return {} in case agent property is doesn\'t exist', () => {
+    it("return {} in case agent property is doesn't exist", () => {
       restClient.restClientConfig = {};
       expect(restClient.getRestConfig()).toEqual({});
     });
@@ -66,15 +67,9 @@ describe('RestClient', () => {
 
   describe('retrieve', () => {
     it('performs GET request for resource', (done) => {
-      const listOfUsers = [
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-      ];
+      const listOfUsers = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .reply(200, listOfUsers);
+      const scope = nock(options.baseURL).get('/users').reply(200, listOfUsers);
 
       restClient.retrieve('users').then((result) => {
         expect(result).toEqual(listOfUsers);
@@ -85,9 +80,7 @@ describe('RestClient', () => {
     });
 
     it('catches NETWORK errors', (done) => {
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .replyWithError(netErrConnectionResetError);
+      const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
       restClient.retrieve('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
@@ -99,9 +92,7 @@ describe('RestClient', () => {
     });
 
     it('catches API errors', (done) => {
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .reply(403, unathorizedError);
+      const scope = nock(options.baseURL).get('/users').reply(403, unathorizedError);
 
       restClient.retrieve('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
@@ -218,9 +209,7 @@ describe('RestClient', () => {
       const emptyBody = {};
       const userDeleted = {};
 
-      const scope = nock(options.baseURL)
-        .delete('/users/1')
-        .reply(200, userDeleted);
+      const scope = nock(options.baseURL).delete('/users/1').reply(200, userDeleted);
 
       restClient.delete('users/1', emptyBody).then((result) => {
         expect(result).toEqual(userDeleted);
@@ -249,9 +238,7 @@ describe('RestClient', () => {
     it('catches API errors', (done) => {
       const emptyBody = {};
 
-      const scope = nock(options.baseURL)
-        .delete('/users/1')
-        .reply(403, unathorizedError);
+      const scope = nock(options.baseURL).delete('/users/1').reply(403, unathorizedError);
 
       restClient.delete('users/1', emptyBody, noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
@@ -265,15 +252,9 @@ describe('RestClient', () => {
 
   describe('retrieveSyncAPI', () => {
     it('should retrieve SyncAPI', (done) => {
-      const listOfUsers = [
-        { id: 1 },
-        { id: 2 },
-        { id: 3 },
-      ];
+      const listOfUsers = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .reply(200, listOfUsers);
+      const scope = nock(options.baseURL).get('/users').reply(200, listOfUsers);
 
       restClient.retrieveSyncAPI('users').then((result) => {
         expect(result).toEqual(listOfUsers);
@@ -284,9 +265,7 @@ describe('RestClient', () => {
     });
 
     it('catches NETWORK errors', (done) => {
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .replyWithError(netErrConnectionResetError);
+      const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
       restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
@@ -298,9 +277,7 @@ describe('RestClient', () => {
     });
 
     it('catches API errors', (done) => {
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .reply(403, unathorizedError);
+      const scope = nock(options.baseURL).get('/users').reply(403, unathorizedError);
 
       restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();

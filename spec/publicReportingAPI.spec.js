@@ -40,7 +40,10 @@ describe('PublicReportingAPI', () => {
 
     PublicReportingAPI.addLaunchLog({ level: 'INFO', message: 'message' });
 
-    expect(process.emit).toHaveBeenCalledWith(EVENTS.ADD_LAUNCH_LOG, { level: 'INFO', message: 'message' });
+    expect(process.emit).toHaveBeenCalledWith(EVENTS.ADD_LAUNCH_LOG, {
+      level: 'INFO',
+      message: 'message',
+    });
   });
 
   it('setTestCaseId should trigger process.emit with correct parameters', () => {
