@@ -21,7 +21,7 @@ describe('Analytics', () => {
 
     it('trackEvent should called the method event with correct parameters', () => {
       spyOn(analytics.visitorInstance, 'event').and.returnValue({
-        send: () => {},
+        send: () => {}, // eslint-disable-line
       });
 
       analytics.trackEvent({

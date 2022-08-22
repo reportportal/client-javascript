@@ -83,23 +83,28 @@ describe('Helpers', () => {
       spyOn(os, 'arch').and.returnValue('osArchitecture');
       spyOn(os, 'totalmem').and.returnValue('1');
       const nodeVersion = process.version;
-      const expectedAttr = [{
-        key: 'client',
-        value: `${pjson.name}|${pjson.version}`,
-        system: true,
-      }, {
-        key: 'os',
-        value: 'osType|osArchitecture',
-        system: true,
-      }, {
-        key: 'RAMSize',
-        value: '1',
-        system: true,
-      }, {
-        key: 'nodeJS',
-        value: nodeVersion,
-        system: true,
-      }];
+      const expectedAttr = [
+        {
+          key: 'client',
+          value: `${pjson.name}|${pjson.version}`,
+          system: true,
+        },
+        {
+          key: 'os',
+          value: 'osType|osArchitecture',
+          system: true,
+        },
+        {
+          key: 'RAMSize',
+          value: '1',
+          system: true,
+        },
+        {
+          key: 'nodeJS',
+          value: nodeVersion,
+          system: true,
+        },
+      ];
 
       const attr = client.helpers.getSystemAttribute();
 

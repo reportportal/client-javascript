@@ -34,7 +34,7 @@ describe('ReportPortal javascript client', () => {
   });
 
   describe('calculateNonRetriedItemMapKey', () => {
-    it('should return correct parameter\'s string', () => {
+    it("should return correct parameter's string", () => {
       const client = new RPClient({});
 
       const str = client.calculateNonRetriedItemMapKey('lId', 'pId', 'name', 'itemId');
@@ -42,7 +42,7 @@ describe('ReportPortal javascript client', () => {
       expect(str).toEqual('lId__pId__name__itemId');
     });
 
-    it('should return correct parameter\'s string with default value if itemId doesn\'t pass', () => {
+    it("should return correct parameter's string with default value if itemId doesn't pass", () => {
       const client = new RPClient({});
 
       const str = client.calculateNonRetriedItemMapKey('lId', 'pId', 'name');
@@ -144,22 +144,31 @@ describe('ReportPortal javascript client', () => {
 
       client.triggerAnalyticsEvent();
 
-      expect(client.analytics.trackEvent).toHaveBeenCalledWith(events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH);
+      expect(client.analytics.trackEvent).toHaveBeenCalledWith(
+        events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH,
+      );
     });
   });
 
   describe('startLaunch', () => {
     it('should call restClient with suitable parameters', () => {
-      const fakeSystemAttr = [{
-        key: 'client',
-        value: 'client-name|1.0',
-        system: true,
-      }, {
-        key: 'os',
-        value: 'osType|osArchitecture',
-        system: true,
-      }];
-      const client = new RPClient({ token: 'startLaunchTest', endpoint: 'https://rp.us/api/v1', project: 'tst' });
+      const fakeSystemAttr = [
+        {
+          key: 'client',
+          value: 'client-name|1.0',
+          system: true,
+        },
+        {
+          key: 'os',
+          value: 'osType|osArchitecture',
+          system: true,
+        },
+      ];
+      const client = new RPClient({
+        token: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
       spyOn(client.restClient, 'create').and.returnValue(myPromise);
@@ -169,19 +178,25 @@ describe('ReportPortal javascript client', () => {
         startTime: time,
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
-        name: 'Test launch name',
-        startTime: time,
-        attributes: fakeSystemAttr,
-      }, { headers: client.headers });
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        'launch',
+        {
+          name: 'Test launch name',
+          startTime: time,
+          attributes: fakeSystemAttr,
+        },
+        { headers: client.headers },
+      );
     });
 
     it('should call restClient with suitable parameters, attributes is concatenated', () => {
-      const fakeSystemAttr = [{
-        key: 'client',
-        value: 'client-name|1.0',
-        system: true,
-      }];
+      const fakeSystemAttr = [
+        {
+          key: 'client',
+          value: 'client-name|1.0',
+          system: true,
+        },
+      ];
       const client = new RPClient({
         token: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -198,22 +213,30 @@ describe('ReportPortal javascript client', () => {
         attributes: [{ value: 'value' }],
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
-        name: 'Test launch name',
-        startTime: time,
-        attributes: [
-          { value: 'value' },
-          {
-            key: 'client',
-            value: 'client-name|1.0',
-            system: true,
-          },
-        ],
-      }, { headers: client.headers });
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        'launch',
+        {
+          name: 'Test launch name',
+          startTime: time,
+          attributes: [
+            { value: 'value' },
+            {
+              key: 'client',
+              value: 'client-name|1.0',
+              system: true,
+            },
+          ],
+        },
+        { headers: client.headers },
+      );
     });
 
     it('dont start new launch if launchDataRQ.id is not empty', () => {
-      const client = new RPClient({ token: 'startLaunchTest', endpoint: 'https://rp.us/api/v1', project: 'tst' });
+      const client = new RPClient({
+        token: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const startTime = 12345734;
       const id = 12345734;
@@ -241,7 +264,10 @@ describe('ReportPortal javascript client', () => {
 
       client.finishLaunch('id2', { some: 'data' });
 
-      expect(client.getRejectAnswer).toHaveBeenCalledWith('id2', new Error('Launch "id2" not found'));
+      expect(client.getRejectAnswer).toHaveBeenCalledWith(
+        'id2',
+        new Error('Launch "id2" not found'),
+      );
     });
 
     it('should trigger promiseFinish', (done) => {
@@ -329,16 +355,19 @@ describe('ReportPortal javascript client', () => {
       spyOn(client.restClient, 'create').and.returnValue(myPromise);
       spyOn(helpers, 'readLaunchesFromFile').and.returnValue(fakeLaunchIds);
       spyOn(client, 'getMergeLaunchesRequest').and.returnValue(fakeMergeDataRQ);
-      spyOn(client.restClient, 'retrieveSyncAPI').and.returnValue(Promise.resolve({
-        content: [{ id: 'id1' }],
-      }));
+      spyOn(client.restClient, 'retrieveSyncAPI').and.returnValue(
+        Promise.resolve({
+          content: [{ id: 'id1' }],
+        }),
+      );
 
       const promise = client.mergeLaunches();
 
       expect(promise.then).toBeDefined();
       promise.then(() => {
-        expect(client.restClient.create)
-          .toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, { headers: client.headers });
+        expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, {
+          headers: client.headers,
+        });
 
         done();
       });
@@ -408,7 +437,10 @@ describe('ReportPortal javascript client', () => {
 
       client.updateLaunch('id2', { some: 'data' });
 
-      expect(client.getRejectAnswer).toHaveBeenCalledWith('id2', new Error('Launch "id2" not found'));
+      expect(client.getRejectAnswer).toHaveBeenCalledWith(
+        'id2',
+        new Error('Launch "id2" not found'),
+      );
     });
 
     it('should return object with tempId and promise', () => {
@@ -440,7 +472,10 @@ describe('ReportPortal javascript client', () => {
 
       client.startTestItem({}, 'id2');
 
-      expect(client.getRejectAnswer).toHaveBeenCalledWith('id2', new Error('Launch "id2" not found'));
+      expect(client.getRejectAnswer).toHaveBeenCalledWith(
+        'id2',
+        new Error('Launch "id2" not found'),
+      );
     });
 
     it('should call getRejectAnswer if launchObj.finishSend is true', () => {
@@ -618,11 +653,14 @@ describe('ReportPortal javascript client', () => {
       spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
       spyOn(client.restClient, 'create').and.resolveTo();
 
-      const result = client.saveLog({
-        promiseStart: Promise.resolve(),
-        realId: 'realId',
-        children: [],
-      }, client.restClient.create);
+      const result = client.saveLog(
+        {
+          promiseStart: Promise.resolve(),
+          realId: 'realId',
+          children: [],
+        },
+        client.restClient.create,
+      );
 
       expect(result.tempId).toEqual('4n5pxq24kpiob12og9');
       return expectAsync(result.promise).toBeResolved();
@@ -661,7 +699,10 @@ describe('ReportPortal javascript client', () => {
 
       client.sendLogWithoutFile('itemTempId', {});
 
-      expect(client.getRejectAnswer).toHaveBeenCalledWith('itemTempId', new Error('Item "itemTempId" not found'));
+      expect(client.getRejectAnswer).toHaveBeenCalledWith(
+        'itemTempId',
+        new Error('Item "itemTempId" not found'),
+      );
     });
 
     it('should return saveLog function', () => {
@@ -691,7 +732,10 @@ describe('ReportPortal javascript client', () => {
 
       client.sendLogWithFile('itemTempId', {});
 
-      expect(client.getRejectAnswer).toHaveBeenCalledWith('itemTempId', new Error('Item "itemTempId" not found'));
+      expect(client.getRejectAnswer).toHaveBeenCalledWith(
+        'itemTempId',
+        new Error('Item "itemTempId" not found'),
+      );
     });
 
     it('should return saveLog function', () => {
