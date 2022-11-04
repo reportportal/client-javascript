@@ -1,3 +1,5 @@
+### Added
+- Public Reporting API method `addParameters`
 
 ## [5.0.6] - 2022-01-13
 ### Fixed
