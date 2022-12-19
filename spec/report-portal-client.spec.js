@@ -448,7 +448,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.getRejectAnswer).toHaveBeenCalledWith(
         'id2',
-        new Error('Launch "id2" not found'),
+        new Error('Launch with tempId "id2" not found'),
       );
     });
 
@@ -483,7 +483,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.getRejectAnswer).toHaveBeenCalledWith(
         'id2',
-        new Error('Launch "id2" not found'),
+        new Error('Launch with tempId "id2" not found'),
       );
     });
 
@@ -496,7 +496,9 @@ describe('ReportPortal javascript client', () => {
         },
       };
       spyOn(client, 'getRejectAnswer');
-      const error = new Error('Launch with tempId "id1" is already finished, you can not add an item to it');
+      const error = new Error(
+        'Launch with tempId "id1" is already finished, you can not add an item to it',
+      );
 
       client.startTestItem({}, 'id1');
 
@@ -587,7 +589,10 @@ describe('ReportPortal javascript client', () => {
 
       client.finishTestItem('id2', {});
 
-      expect(client.getRejectAnswer).toHaveBeenCalledWith('id2', new Error('Item "id2" not found'));
+      expect(client.getRejectAnswer).toHaveBeenCalledWith(
+        'id2',
+        new Error('Item with tempId "id2" not found'),
+      );
     });
 
     it('should call finishTestItemPromiseStart with correct parameters', (done) => {
@@ -710,7 +715,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.getRejectAnswer).toHaveBeenCalledWith(
         'itemTempId',
-        new Error('Item "itemTempId" not found'),
+        new Error('Item with tempId "itemTempId" not found'),
       );
     });
 
@@ -743,7 +748,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.getRejectAnswer).toHaveBeenCalledWith(
         'itemTempId',
-        new Error('Item "itemTempId" not found'),
+        new Error('Item with tempId "itemTempId" not found'),
       );
     });
 
