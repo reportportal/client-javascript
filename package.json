@@ -41,7 +41,7 @@
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rimraf ./build",
-    "lint": "eslint ./analytics/**/* ./lib/**/* ./spec/**/* --quiet",
+    "lint": "eslint ./analytics/**/* ./lib/**/* ./spec/**/*",
     "format": "npm run lint -- --fix",
     "test": "nyc ./node_modules/jasmine/bin/jasmine.js",
     "test:coverage": "nyc report --reporter=lcov --reporter=text-summary"
