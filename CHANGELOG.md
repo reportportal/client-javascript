@@ -1,3 +1,5 @@
+
+## [5.0.7] - 2022-12-26
 ### Added
 - The ability to see verbose logs in debug mode. To enable the debug mode, the `debug: true` flag should be specified in `params`.
 ### Security

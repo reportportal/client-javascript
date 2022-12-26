@@ -76,7 +76,7 @@ The client works synchronously, so it is not necessary to wait for the end of th
 ### Timeout (30000ms) on axios requests
 There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error "Error: timeout of 30000ms exceeded".
 
-You can simply change this timeout by adding a `timeout` property to `restClientConfig` with your desired numeric value.
+You can simply change this timeout by adding a `timeout` property to `restClientConfig` with your desired numeric value (in _ms_) or *0* to disable it.
 
 ### checkConnect
  checkConnect - asynchronous method for verifying the correctness of the client connection
