@@ -1,3 +1,7 @@
+### Added
+- The ability to see verbose logs in debug mode. To enable the debug mode, the `debug: true` flag should be specified in `params`.
+### Security
+- Updated versions of vulnerable packages (ajv, qs, follow-redirects, minimatch).
 
 ## [5.0.6] - 2022-01-13
 ### Fixed
@@ -39,6 +43,5 @@
 ## [5.0.0] - 2020-06-09
 ### Added
 - Full compatibility with ReportPortal version 5.* (see [reportportal releases](https://github.com/reportportal/reportportal/releases))
-
 ### Deprecated
 - Previous package version (`reportportal-client`) will no longer supported by reportportal.io

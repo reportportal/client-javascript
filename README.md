@@ -48,14 +48,16 @@ rpClient.checkConnect().then((response) => {
 ## Settings
 When creating a client instance, you need to specify the following parameters:
 
-Parameter | Description
---------- | -----------
-token     | User's token Report Portal from which you want to send requests. It can be found on the profile page of this user.
-endpoint  | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.
-launch    | Name of launch at creation.
-project   | The name of the project in which the launches will be created.
-headers   | (optional) The object with custom headers for internal http client.
-restClientConfig | (optional) The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, may contain other client options eg. `timeout`.
+| Parameter             | Description                                                                                                                                                                                                        |
+|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| token                 | User's token Report Portal from which you want to send requests. It can be found on the profile page of this user.                                                                                                 |
+| endpoint              | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.                                                                   |
+| launch                | Name of launch at creation.                                                                                                                                                                                        |
+| project               | The name of the project in which the launches will be created.                                                                                                                                                     |
+| headers               | (optional) The object with custom headers for internal http client.                                                                                                                                                |
+| debug                 | (optional) *Default: false.* This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                 |
+| isLaunchMergeRequired | (optional) *Default: false.*  Allows client to merge launches into one at the end of the run via saving their UUIDs to the file system. At the end of the run launches can be merged using `mergeLaunches` method. |
+| restClientConfig      | (optional) The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, may contain other client options eg. `timeout`.            |
 
 ## Asynchronous reporting
 The client supports an asynchronous reporting.

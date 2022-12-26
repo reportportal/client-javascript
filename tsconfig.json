@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "strictNullChecks": true,
+    "downlevelIteration": true,
+    "declaration": true,
+    "lib": ["es2016", "es2016.array.include"],
+    "module": "commonjs",
+    "target": "ES2015",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/*"]
+    },
+    "typeRoots": ["node_modules/@types"],
+    "outDir": "./build"
+  },
+  "include": ["analytics/**/*", "lib/**/*", "spec/**/*"],
+  "exclude": ["node_modules"]
+}
