@@ -1,5 +1,7 @@
 ### Added
-- The ability to see verbose logs in debug mode. To enable the debug mode, the `debug:true` flag should be specified in RPConfig.
+- The ability to see verbose logs in debug mode. To enable the debug mode, the `debug: true` flag should be specified in `params`.
+### Security
+- Updated versions of vulnerable packages (ajv, qs, follow-redirects, minimatch).
 
 ## [5.0.6] - 2022-01-13
 ### Fixed
