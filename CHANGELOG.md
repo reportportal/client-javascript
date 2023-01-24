@@ -1,3 +1,8 @@
+### Added
+- `mergeOptions` parameter to `mergeLaunches` method.
+- Dynamic page size for launch merge based on launches count, resolves [#86](https://github.com/reportportal/client-javascript/issues/86).
+### Security
+- Updated versions of vulnerable packages (json5, minimist).
 
 ## [5.0.7] - 2022-12-26
 ### Added
