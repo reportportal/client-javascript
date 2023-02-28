@@ -1,3 +1,5 @@
+### Changed
+- A lot of package dependencies have been updated.
 
 ## [5.0.8] - 2023-01-24
 ### Added
