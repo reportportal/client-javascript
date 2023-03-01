@@ -31,7 +31,9 @@ jobs:
         run: npm ci
       - name: Run lint
         run: npm run lint
-      - name: Run tests and check coverage
+      - name: Run tests
+        run: npm test
+      - name: Check coverage
         run: npm run test:coverage
 
   publish-to-npm-and-gpr:
