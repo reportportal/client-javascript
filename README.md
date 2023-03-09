@@ -235,6 +235,7 @@ Parameter       | Description
 --------- | -----------
 name        | item name
 type        | Item type, one of 'SUITE', 'STORY', 'TEST', 'SCENARIO', 'STEP', 'BEFORE_CLASS', 'BEFORE_GROUPS','BEFORE_METHOD', 'BEFORE_SUITE', 'BEFORE_TEST', 'AFTER_CLASS', 'AFTER_GROUPS', 'AFTER_METHOD', 'AFTER_SUITE', 'AFTER_TEST'
+hasStats | (optional) Changes behavior for item of type 'STEP'. When set to true, step is treaten as a test case (entity containig statistics). When false, step becomes a nested step. Default: true
 description | (optional) description of the launch (supports markdown syntax)
 startTime  | (optional) start time item(unix time). Default: rpClient.helpers.now()
 attributes        | (optional) array of item attributes
