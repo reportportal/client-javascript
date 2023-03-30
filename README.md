@@ -27,9 +27,9 @@ npm install @reportportal/client-javascript
 ## Example
 
 ```javascript
-let RPClient = require('@reportportal/client-javascript');
+const RPClient = require('@reportportal/client-javascript');
 
-let rpClient = new RPClient({
+const rpClient = new RPClient({
     token: "00000000-0000-0000-0000-000000000000",
     endpoint: "http://your-instance.com:8080/api/v1",
     launch: "LAUNCH_NAME",
@@ -93,7 +93,7 @@ rpClient.checkConnect().then((response) => {
 ### startLaunch
 startLaunch - starts a new launch, return temp id that you want to use for all of the items within this launch.
 ```javascript
-let launchObj = rpClient.startLaunch({
+const launchObj = rpClient.startLaunch({
     name: "Client test",
     startTime: rpClient.helpers.now(),
     description: "description of the launch",
@@ -125,7 +125,7 @@ id        | id of the existing launch in which tests data would be sent, without
 
 To know the real launch id wait for the method to finish. The real id is used by the client in asynchronous reporting.
 ```javascript
-let launchObj = rpClient.startLaunch();
+const launchObj = rpClient.startLaunch();
 launchObj.promise.then((response) => {
     console.log(`Launch real id: ${response.id}`);
 }, (error) => {
@@ -151,7 +151,7 @@ finishLaunch - finish of the launch. After calling this method, you can not add 
 The request to finish the launch will be sent only after all items within it have finished.
 ```javascript
 // launchObj - object returned by method 'startLaunch'
-let launchFinishObj = rpClient.finishLaunch(launchObj.tempId, {
+const launchFinishObj = rpClient.finishLaunch(launchObj.tempId, {
     endTime: rpClient.helpers.now()
 });
 ```
@@ -204,13 +204,13 @@ The method takes two arguments:
 startTestItem - starts a new test item.
 ```javascript
 // launchObj - object returned by method 'startLaunch'
-let suiteObj = rpClient.startTestItem({
+const suiteObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
         startTime: rpClient.helpers.now(),
         type: "SUITE"
     }, launchObj.tempId);
-let stepObj = rpClient.startTestItem({
+const stepObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
         startTime: rpClient.helpers.now(),
