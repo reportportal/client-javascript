@@ -2,7 +2,7 @@ const process = require('process');
 const RPClient = require('../lib/report-portal-client');
 const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
-const events = require('../analytics/events');
+const events = require('../statistics/events');
 
 describe('ReportPortal javascript client', () => {
   describe('constructor', () => {
@@ -108,7 +108,7 @@ describe('ReportPortal javascript client', () => {
       process.env = OLD_ENV;
     });
 
-    it('should not call analytics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', () => {
+    it('should not call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', () => {
       const client = new RPClient({
         token: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -117,43 +117,43 @@ describe('ReportPortal javascript client', () => {
       });
       spyOn(events, 'getAgentEventLabel').and.returnValue('name|version');
       process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = true;
-      spyOn(client.analytics, 'trackEvent');
+      spyOn(client.statistics, 'trackEvent');
 
-      client.triggerAnalyticsEvent();
+      client.triggerStatisticsEvent();
 
-      expect(client.analytics.trackEvent).not.toHaveBeenCalled();
+      expect(client.statistics.trackEvent).not.toHaveBeenCalled();
     });
 
-    it('should call analytics.trackEvent with label if agentParams is not empty', () => {
+    it('should call statistics.trackEvent with label if agentParams is not empty', () => {
       const client = new RPClient({
         token: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
-      client.analytics.agentParams = { name: 'name', version: 'version' };
+      client.statistics.agentParams = { name: 'name', version: 'version' };
       spyOn(events, 'getAgentEventLabel').and.returnValue('name|version');
       process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = false;
-      spyOn(client.analytics, 'trackEvent');
+      spyOn(client.statistics, 'trackEvent');
 
-      client.triggerAnalyticsEvent();
+      client.triggerStatisticsEvent();
 
-      expect(client.analytics.trackEvent).toHaveBeenCalledWith(
+      expect(client.statistics.trackEvent).toHaveBeenCalledWith(
         Object.assign(events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH, { label: 'name|version' }),
       );
     });
 
-    it('should call analytics.trackEvent without label if agentParams is empty', () => {
+    it('should call statistics.trackEvent without label if agentParams is empty', () => {
       const client = new RPClient({
         token: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
-      spyOn(client.analytics, 'trackEvent');
+      spyOn(client.statistics, 'trackEvent');
       process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = false;
 
-      client.triggerAnalyticsEvent();
+      client.triggerStatisticsEvent();
 
-      expect(client.analytics.trackEvent).toHaveBeenCalledWith(
+      expect(client.statistics.trackEvent).toHaveBeenCalledWith(
         events.CLIENT_JAVASCRIPT_EVENTS.START_LAUNCH,
       );
     });

@@ -1,17 +1,17 @@
-const Analytics = require('../analytics/analytics');
-const { getAgentEventLabel } = require('../analytics/events');
+const Statistics = require('../statistics/statistics');
+const { getAgentEventLabel } = require('../statistics/events');
 
 const agentParams = {
   name: 'AgentName',
   version: 'AgentVersion',
 };
 
-describe('Analytics', () => {
-  describe('class Analytics', () => {
+describe('Statistics', () => {
+  describe('class Statistics', () => {
     let analytics;
 
     beforeEach(() => {
-      analytics = new Analytics(agentParams);
+      analytics = new Statistics(agentParams);
     });
 
     it('should be properly initialized', () => {
