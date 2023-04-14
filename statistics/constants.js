@@ -12,8 +12,8 @@ const [MEASUREMENT_ID, API_KEY] = CLIENT_INFO.split(':');
 const EVENT_NAME = 'start_launch';
 
 function getBrowser() {
-  /* eslint-disable */
   if (typeof window !== 'undefined') {
+    /* eslint-disable */
     if (window.navigator) {
       const userAgent = window.navigator.userAgent;
       if (userAgent) {
@@ -22,8 +22,8 @@ function getBrowser() {
         return `${name} ${version}`;
       }
     }
+    /* eslint-enable */
   }
-  /* eslint-enable */
   return null;
 }
 
