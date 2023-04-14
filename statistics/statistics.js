@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION } = require('./constants');
+const { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } = require('./constants');
 const { getClientId } = require('./clientId');
 
 class Statistics {
@@ -10,6 +10,7 @@ class Statistics {
 
   getEventParams(agentParams) {
     const params = {
+      interpreter: INTERPRETER,
       client_name: PJSON_NAME,
       client_version: PJSON_VERSION,
     };
