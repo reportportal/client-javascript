@@ -13,7 +13,7 @@ const EVENT_NAME = 'start_launch';
 
 function getBrowser() {
   /* eslint-disable */
-  if (window) {
+  if (typeof window !== 'undefined') {
     if (window.navigator) {
       const userAgent = window.navigator.userAgent;
       if (userAgent) {
