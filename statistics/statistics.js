@@ -35,7 +35,7 @@ class Statistics {
     };
 
     await axios.post(
-      `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_key=${API_KEY}`,
+      `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_KEY}`,
       requestBody,
     );
   }
