@@ -69,6 +69,6 @@ describe('Client ID test suite', () => {
     const clientId = getClientId();
     const content = fs.readFileSync(clientIdFile, 'utf-8');
     expect(content).toMatch(new RegExp(`(?:^|\n)client\\.id\\s*=\\s*${clientId}\\s*(?:$|\n)`));
-    expect(content).toMatch(/(?:^|\n)test\.property=555(?:$|\n)/);
+    expect(content).toMatch(/(?:^|\n)test\.property\s*=\s*555(?:$|\n)/);
   });
 });
