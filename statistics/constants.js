@@ -16,6 +16,7 @@ const [MEASUREMENT_ID, API_KEY] = CLIENT_INFO.split(':');
 const EVENT_NAME = 'start_launch';
 
 function getBrowser() {
+  // A workaround to avoid reference error in case this is not a browser
   if (typeof window !== 'undefined') {
     /* eslint-disable */
     if (window.navigator) {
@@ -34,7 +35,8 @@ function getBrowser() {
 const BROWSER_VERSION = getBrowser();
 
 function getNodeVersion() {
-  if (process) {
+  // A workaround to avoid reference error in case this is not a Nod.js application
+  if (typeof process !== 'undefined') {
     if (process.versions) {
       const version = process.versions.node;
       if (version) {
