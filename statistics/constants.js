@@ -35,7 +35,7 @@ function getBrowser() {
 const BROWSER_VERSION = getBrowser();
 
 function getNodeVersion() {
-  // A workaround to avoid reference error in case this is not a Nod.js application
+  // A workaround to avoid reference error in case this is not a Node.js application
   if (typeof process !== 'undefined') {
     if (process.versions) {
       const version = process.versions.node;
