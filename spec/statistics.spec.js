@@ -43,13 +43,13 @@ const agentRequestValidation = jasmine.objectContaining({
 });
 
 describe('Statistics', () => {
-  it('should send proper event to axios', () => {
+  it('should send proper event to axios', async () => {
     spyOn(axios, 'post').and.returnValue({
       send: () => {}, // eslint-disable-line
     });
 
     const statistics = new Statistics(eventName, agentParams);
-    statistics.trackEvent();
+    await statistics.trackEvent();
 
     expect(axios.post).toHaveBeenCalledOnceWith(url, agentRequestValidation);
   });
@@ -62,13 +62,13 @@ describe('Statistics', () => {
       version: null,
     },
   ].forEach((params) => {
-    it(`should not fail if agent params: ${JSON.stringify(params)}`, () => {
+    it(`should not fail if agent params: ${JSON.stringify(params)}`, async () => {
       spyOn(axios, 'post').and.returnValue({
         send: () => {}, // eslint-disable-line
       });
 
       const statistics = new Statistics(eventName, params);
-      statistics.trackEvent();
+      await statistics.trackEvent();
 
       expect(axios.post).toHaveBeenCalledOnceWith(url, baseRequestValidation);
     });
