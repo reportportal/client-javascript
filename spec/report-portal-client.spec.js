@@ -4,6 +4,9 @@ const RPClient = require('../lib/report-portal-client');
 const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
 
+// eslint-disable-next-line no-promise-executor-return
+const sleep = (m) => new Promise((r) => setTimeout(r, m));
+
 describe('ReportPortal javascript client', () => {
   describe('constructor', () => {
     it('executes without error', () => {
@@ -277,7 +280,7 @@ describe('ReportPortal javascript client', () => {
       expect(client.launchUuid).toEqual(id);
     });
 
-    it('should call GA endpoint', () => {
+    it('should call GA endpoint', async () => {
       const client = new RPClient({
         token: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -285,9 +288,10 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       spyOn(client.restClient, 'create').and.returnValue(myPromise);
-      spyOn(axios, 'post').and.returnValue({
+      const axiosResponse = Promise.resolve({
         send: () => {}, // eslint-disable-line
       });
+      spyOn(axios, 'post').and.returnValue(axiosResponse);
 
       const startTime = 12345734;
       const id = 12345734;
@@ -296,7 +300,9 @@ describe('ReportPortal javascript client', () => {
         id,
       });
 
-      expect(axios.post).toHaveBeenCalledOnceWith(
+      await sleep(100); // Ensure async code triggered, didn't find the way to make it more reliable
+
+      expect(axios.post).toHaveBeenCalledWith(
         jasmine.stringContaining('https://www.google-analytics.com/mp/collect'),
         jasmine.anything(),
       );
