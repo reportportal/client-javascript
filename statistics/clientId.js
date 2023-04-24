@@ -1,35 +1,45 @@
 // client-id.js
 const fs = require('fs');
+const util = require('util');
 const ini = require('ini');
 const { v4: uuidv4 } = require('uuid');
 const { ENCODING, CLIENT_ID_KEY, RP_FOLDER_PATH, RP_PROPERTIES_FILE_PATH } = require('./constants');
 
-function readClientId() {
-  if (fs.existsSync(RP_PROPERTIES_FILE_PATH)) {
-    const propertiesContent = fs.readFileSync(RP_PROPERTIES_FILE_PATH, ENCODING);
+const exists = util.promisify(fs.exists);
+const readFile = util.promisify(fs.readFile);
+const mkdir = util.promisify(fs.mkdir);
+const writeFile = util.promisify(fs.writeFile);
+
+async function readClientId() {
+  if (await exists(RP_PROPERTIES_FILE_PATH)) {
+    const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
     const properties = ini.parse(propertiesContent);
     return properties[CLIENT_ID_KEY];
   }
   return null;
 }
 
-function storeClientId(clientId) {
+async function storeClientId(clientId) {
   const properties = {};
-  if (fs.existsSync(RP_PROPERTIES_FILE_PATH)) {
-    const propertiesContent = fs.readFileSync(RP_PROPERTIES_FILE_PATH, ENCODING);
-    Object.assign(properties, ini.parse(propertiesContent));
+  try {
+    if (await exists(RP_PROPERTIES_FILE_PATH)) {
+      const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
+      Object.assign(properties, ini.parse(propertiesContent));
+    }
+    properties[CLIENT_ID_KEY] = clientId;
+    const propertiesContent = ini.stringify(properties);
+    await mkdir(RP_FOLDER_PATH, { recursive: true });
+    await writeFile(RP_PROPERTIES_FILE_PATH, propertiesContent, ENCODING);
+  } catch (ignore) {
+    // do nothing on saving error, client ID will be always new
   }
-  properties[CLIENT_ID_KEY] = clientId;
-  const propertiesContent = ini.stringify(properties);
-  fs.mkdirSync(RP_FOLDER_PATH, { recursive: true });
-  fs.writeFileSync(RP_PROPERTIES_FILE_PATH, propertiesContent, ENCODING);
 }
 
-function getClientId() {
-  let clientId = readClientId();
+async function getClientId() {
+  let clientId = await readClientId();
   if (!clientId) {
     clientId = uuidv4(undefined, undefined, 0);
-    storeClientId(clientId);
+    await storeClientId(clientId);
   }
   return clientId;
 }

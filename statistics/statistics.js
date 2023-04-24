@@ -25,7 +25,7 @@ class Statistics {
 
   async trackEvent() {
     const requestBody = {
-      client_id: getClientId(),
+      client_id: await getClientId(),
       events: [
         {
           name: this.eventName,
