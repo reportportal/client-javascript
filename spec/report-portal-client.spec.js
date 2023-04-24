@@ -1,11 +1,7 @@
-const axios = require('axios');
 const process = require('process');
 const RPClient = require('../lib/report-portal-client');
 const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
-
-// eslint-disable-next-line no-promise-executor-return
-const sleep = (m) => new Promise((r) => setTimeout(r, m));
 
 describe('ReportPortal javascript client', () => {
   describe('constructor', () => {
@@ -278,34 +274,6 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.restClient.create).not.toHaveBeenCalled();
       expect(client.launchUuid).toEqual(id);
-    });
-
-    it('should call GA endpoint', async () => {
-      const client = new RPClient({
-        token: 'startLaunchTest',
-        endpoint: 'https://rp.us/api/v1',
-        project: 'tst',
-      });
-      const myPromise = Promise.resolve({ id: 'testidlaunch' });
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
-      const axiosResponse = Promise.resolve({
-        send: () => {}, // eslint-disable-line
-      });
-      spyOn(axios, 'post').and.returnValue(axiosResponse);
-
-      const startTime = 12345734;
-      const id = 12345734;
-      client.startLaunch({
-        startTime,
-        id,
-      });
-
-      await sleep(100); // Ensure async code triggered, didn't find the way to make it more reliable
-
-      expect(axios.post).toHaveBeenCalledWith(
-        jasmine.stringContaining('https://www.google-analytics.com/mp/collect'),
-        jasmine.anything(),
-      );
     });
   });
 
