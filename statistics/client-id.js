@@ -20,7 +20,6 @@ async function readClientId() {
 
 async function storeClientId(clientId) {
   const properties = {};
-
   if (await exists(RP_PROPERTIES_FILE_PATH)) {
     const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
     Object.assign(properties, ini.parse(propertiesContent));
