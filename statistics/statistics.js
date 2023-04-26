@@ -14,7 +14,11 @@ class Statistics {
       client_name: PJSON_NAME,
       client_version: PJSON_VERSION,
     };
-    if (agentParams && Object.hasOwn(agentParams, 'name') && agentParams.name) {
+    if (
+      agentParams &&
+      Object.prototype.hasOwnProperty.call(agentParams, 'name') &&
+      agentParams.name
+    ) {
       params.agent_name = agentParams.name;
     }
     if (agentParams && Object.hasOwn(agentParams, 'version') && agentParams.version) {

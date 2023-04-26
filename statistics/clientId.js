@@ -1,4 +1,3 @@
-// client-id.js
 const fs = require('fs');
 const util = require('util');
 const ini = require('ini');
