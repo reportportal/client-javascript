@@ -20,25 +20,26 @@ async function readClientId() {
 
 async function storeClientId(clientId) {
   const properties = {};
-  try {
-    if (await exists(RP_PROPERTIES_FILE_PATH)) {
-      const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
-      Object.assign(properties, ini.parse(propertiesContent));
-    }
-    properties[CLIENT_ID_KEY] = clientId;
-    const propertiesContent = ini.stringify(properties);
-    await mkdir(RP_FOLDER_PATH, { recursive: true });
-    await writeFile(RP_PROPERTIES_FILE_PATH, propertiesContent, ENCODING);
-  } catch (ignore) {
-    // do nothing on saving error, client ID will be always new
+
+  if (await exists(RP_PROPERTIES_FILE_PATH)) {
+    const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
+    Object.assign(properties, ini.parse(propertiesContent));
   }
+  properties[CLIENT_ID_KEY] = clientId;
+  const propertiesContent = ini.stringify(properties);
+  await mkdir(RP_FOLDER_PATH, { recursive: true });
+  await writeFile(RP_PROPERTIES_FILE_PATH, propertiesContent, ENCODING);
 }
 
 async function getClientId() {
   let clientId = await readClientId();
   if (!clientId) {
     clientId = uuidv4(undefined, undefined, 0);
-    await storeClientId(clientId);
+    try {
+      await storeClientId(clientId);
+    } catch (ignore) {
+      // do nothing on saving error, client ID will be always new
+    }
   }
   return clientId;
 }
