@@ -3,7 +3,7 @@ const util = require('util');
 const os = require('os');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const { getClientId } = require('../statistics/clientId');
+const { getClientId } = require('../statistics/client-id');
 
 const uuidv4Validation = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 const clientIdFile = path.join(os.homedir(), '.rp', 'rp.properties');

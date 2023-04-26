@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } = require('./constants');
-const { getClientId } = require('./clientId');
+const { getClientId } = require('./client-id');
 
 class Statistics {
   constructor(eventName, agentParams) {
