@@ -18,6 +18,7 @@
     "typeRoots": ["node_modules/@types"],
     "outDir": "./build"
   },
-  "include": ["analytics/**/*", "lib/**/*", "spec/**/*"],
+  "include": [
+    "statistics/**/*", "lib/**/*", "spec/**/*"],
   "exclude": ["node_modules"]
 }
