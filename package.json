@@ -1,6 +1,6 @@
 {
   "name": "@reportportal/client-javascript",
-  "version": "5.0.8",
+  "version": "5.0.9",
   "description": "ReportPortal client for Node.js",
   "author": "ReportPortal.io",
   "scripts": {
