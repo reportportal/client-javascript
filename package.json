@@ -1,7 +1,7 @@
 {
   "name": "@reportportal/client-javascript",
   "version": "5.0.8",
-  "description": "ReportPortal client for node.js",
+  "description": "ReportPortal client for Node.js",
   "author": "ReportPortal.io",
   "scripts": {
     "build": "npm run clean && tsc",
@@ -16,7 +16,7 @@
   },
   "files": [
     "/lib",
-    "/analytics",
+    "/statistics",
     "/VERSION"
   ],
   "main": "./lib/report-portal-client",

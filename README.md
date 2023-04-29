@@ -140,10 +140,12 @@ As system attributes, this method sends the following data (these data are not f
  * RAMSize;
  * nodeJS version;
 
-ReportPortal is supporting now integrations with more than 15 test frameworks simultaneously. In order to define the most popular agents and plan the team workload accordingly, we are using Google analytics.
+ReportPortal is supporting now integrations with more than 15 test frameworks simultaneously.
+In order to define the most popular agents and plan the team workload accordingly, we are using Google Analytics.
 
-ReportPortal collects only information about agent name and version. This information is sent to Google analytics on the launch start. Please help us to make our work effective.
-If you still want to switch Off Google analytics, please change env variable.
+ReportPortal collects only information about agent name, version and version of Node.js. This information is sent to Google Analytics on the launch start.
+Please help us to make our work effective.
+If you still want to switch Off Google Analytics, please change env variable.
 'REPORTPORTAL_CLIENT_JS_NO_ANALYTICS=true'
 
 ### finishLaunch
