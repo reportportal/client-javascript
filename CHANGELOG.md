@@ -1,3 +1,6 @@
+### Changed
+- A lot of package dependencies have been updated.
+- Statistics engine updated on new contract.
 
 ## [5.0.8] - 2023-01-24
 ### Added

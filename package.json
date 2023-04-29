@@ -1,8 +1,59 @@
 {
   "name": "@reportportal/client-javascript",
   "version": "5.0.8",
-  "description": "ReportPortal client for node.js",
+  "description": "ReportPortal client for Node.js",
   "author": "ReportPortal.io",
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "clean": "rimraf ./build",
+    "lint": "eslint ./statistics/**/* ./lib/**/* ./spec/**/*",
+    "format": "npm run lint -- --fix",
+    "test": "nyc ./node_modules/jasmine/bin/jasmine.js",
+    "test:coverage": "nyc report --reporter=lcov --reporter=text-summary"
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "files": [
+    "/lib",
+    "/statistics",
+    "/VERSION"
+  ],
+  "main": "./lib/report-portal-client",
+  "engines": {
+    "node": ">=10.x"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "axios-retry": "^3.4.0",
+    "glob": "^7.2.3",
+    "ini": "^4.0.0",
+    "uniqid": "^5.4.0",
+    "uuid": "^9.0.0"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/jasmine": "^4.3.1",
+    "@types/node": "^18.14.2",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jasmine": "^3.10.0",
+    "jasmine-ts": "^0.4.0",
+    "lodash": "^4.17.21",
+    "nock": "^13.3.0",
+    "nyc": "^15.1.0",
+    "prettier": "^2.8.4",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  },
   "contributors": [
     {
       "name": "Artsiom Tkachou",
@@ -17,56 +68,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/reportportal/client-javascript.git"
-  },
-  "directories": {
-    "lib": "./lib"
-  },
-  "files": [
-    "/lib",
-    "/analytics",
-    "/VERSION"
-  ],
-  "main": "./lib/report-portal-client",
-  "engines": {
-    "node": ">= 10.0.0"
-  },
-  "dependencies": {
-    "axios": "^0.27.2",
-    "axios-retry": "^3.2.4",
-    "glob": "^7.2.0",
-    "uniqid": "^5.4.0",
-    "universal-analytics": "^0.5.3"
-  },
-  "license": "Apache-2.0",
-  "scripts": {
-    "build": "npm run clean && tsc",
-    "clean": "rimraf ./build",
-    "lint": "eslint ./analytics/**/* ./lib/**/* ./spec/**/*",
-    "format": "npm run lint -- --fix",
-    "test": "nyc ./node_modules/jasmine/bin/jasmine.js",
-    "test:coverage": "nyc report --reporter=lcov --reporter=text-summary"
-  },
-  "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-node": "^11.1.0",
-    "typescript": "^4.7.4",
-    "jasmine": "^3.5.0",
-    "lodash": "^4.17.11",
-    "nock": "^13.2.9",
-    "nyc": "^15.1.0",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "@types/jasmine": "^4.0.3",
-    "@types/node": "^18.7.6",
-    "@typescript-eslint/eslint-plugin": "^5.33.1",
-    "@typescript-eslint/parser": "^5.33.1",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "jasmine-ts": "^0.4.0",
-    "ts-node": "^10.9.1"
   },
   "bugs": {
     "url": "https://github.com/reportportal/client-javascript/issues"

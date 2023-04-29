@@ -1,5 +1,5 @@
 # ReportPortal js client
-This Client is to communicate with the Report Portal on node js.
+This Client is to communicate with the Report Portal on Node.js.
 
 Library is used only for implementors of custom listeners for ReportPortal.
 
@@ -27,9 +27,9 @@ npm install @reportportal/client-javascript
 ## Example
 
 ```javascript
-let RPClient = require('@reportportal/client-javascript');
+const RPClient = require('@reportportal/client-javascript');
 
-let rpClient = new RPClient({
+const rpClient = new RPClient({
     token: "00000000-0000-0000-0000-000000000000",
     endpoint: "http://your-instance.com:8080/api/v1",
     launch: "LAUNCH_NAME",
@@ -93,7 +93,7 @@ rpClient.checkConnect().then((response) => {
 ### startLaunch
 startLaunch - starts a new launch, return temp id that you want to use for all of the items within this launch.
 ```javascript
-let launchObj = rpClient.startLaunch({
+const launchObj = rpClient.startLaunch({
     name: "Client test",
     startTime: rpClient.helpers.now(),
     description: "description of the launch",
@@ -125,7 +125,7 @@ id        | id of the existing launch in which tests data would be sent, without
 
 To know the real launch id wait for the method to finish. The real id is used by the client in asynchronous reporting.
 ```javascript
-let launchObj = rpClient.startLaunch();
+const launchObj = rpClient.startLaunch();
 launchObj.promise.then((response) => {
     console.log(`Launch real id: ${response.id}`);
 }, (error) => {
@@ -140,10 +140,12 @@ As system attributes, this method sends the following data (these data are not f
  * RAMSize;
  * nodeJS version;
 
-ReportPortal is supporting now integrations with more than 15 test frameworks simultaneously. In order to define the most popular agents and plan the team workload accordingly, we are using Google analytics.
+ReportPortal is supporting now integrations with more than 15 test frameworks simultaneously.
+In order to define the most popular agents and plan the team workload accordingly, we are using Google Analytics.
 
-ReportPortal collects only information about agent name and version. This information is sent to Google analytics on the launch start. Please help us to make our work effective.
-If you still want to switch Off Google analytics, please change env variable.
+ReportPortal collects only information about agent name, version and version of Node.js. This information is sent to Google Analytics on the launch start.
+Please help us to make our work effective.
+If you still want to switch Off Google Analytics, please change env variable.
 'REPORTPORTAL_CLIENT_JS_NO_ANALYTICS=true'
 
 ### finishLaunch
@@ -151,7 +153,7 @@ finishLaunch - finish of the launch. After calling this method, you can not add 
 The request to finish the launch will be sent only after all items within it have finished.
 ```javascript
 // launchObj - object returned by method 'startLaunch'
-let launchFinishObj = rpClient.finishLaunch(launchObj.tempId, {
+const launchFinishObj = rpClient.finishLaunch(launchObj.tempId, {
     endTime: rpClient.helpers.now()
 });
 ```
@@ -204,13 +206,13 @@ The method takes two arguments:
 startTestItem - starts a new test item.
 ```javascript
 // launchObj - object returned by method 'startLaunch'
-let suiteObj = rpClient.startTestItem({
+const suiteObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
         startTime: rpClient.helpers.now(),
         type: "SUITE"
     }, launchObj.tempId);
-let stepObj = rpClient.startTestItem({
+const stepObj = rpClient.startTestItem({
         description: makeid(),
         name: makeid(),
         startTime: rpClient.helpers.now(),
@@ -235,6 +237,7 @@ Parameter       | Description
 --------- | -----------
 name        | item name
 type        | Item type, one of 'SUITE', 'STORY', 'TEST', 'SCENARIO', 'STEP', 'BEFORE_CLASS', 'BEFORE_GROUPS','BEFORE_METHOD', 'BEFORE_SUITE', 'BEFORE_TEST', 'AFTER_CLASS', 'AFTER_GROUPS', 'AFTER_METHOD', 'AFTER_SUITE', 'AFTER_TEST'
+hasStats | (optional) Changes behavior for item of type 'STEP'. When set to true, step is treaten as a test case (entity containig statistics). When false, step becomes a nested step. Default: true
 description | (optional) description of the launch (supports markdown syntax)
 startTime  | (optional) start time item(unix time). Default: rpClient.helpers.now()
 attributes        | (optional) array of item attributes
