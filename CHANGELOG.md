@@ -1,3 +1,5 @@
+
+## [5.0.10] - 2023-04-30
 ### Fixed
 - Node.js old versions support (client still supports Node.js >=10).
 
