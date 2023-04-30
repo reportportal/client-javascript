@@ -10,7 +10,10 @@ const RP_FOLDER = '.rp';
 const RP_PROPERTIES_FILE = 'rp.properties';
 const RP_FOLDER_PATH = path.join(os.homedir(), RP_FOLDER);
 const RP_PROPERTIES_FILE_PATH = path.join(RP_FOLDER_PATH, RP_PROPERTIES_FILE);
-const CLIENT_INFO = atob('Ry1XUDU3UlNHOFhMOmVFazhPMGJ0UXZ5MmI2VXVRT19TOFE=');
+const CLIENT_INFO = Buffer.from(
+  'Ry1XUDU3UlNHOFhMOmVFazhPMGJ0UXZ5MmI2VXVRT19TOFE=',
+  'base64',
+).toString('binary');
 const [MEASUREMENT_ID, API_KEY] = CLIENT_INFO.split(':');
 const EVENT_NAME = 'start_launch';
 

@@ -74,6 +74,6 @@ describe('Client ID test suite', () => {
     const clientId = await getClientId();
     const content = await readFile(clientIdFile, 'utf-8');
     expect(content).toMatch(new RegExp(`(?:^|\n)client\\.id\\s*=\\s*${clientId}\\s*(?:$|\n)`));
-    expect(content).toMatch(/(?:^|\n)test\.property\s*=\s*555(?:$|\n)/);
+    expect(content).toMatch(/(?:^|\n)test\.property\s*=\s*555\s*(?:$|\n)/);
   });
 });

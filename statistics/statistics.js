@@ -21,7 +21,11 @@ class Statistics {
     ) {
       params.agent_name = agentParams.name;
     }
-    if (agentParams && Object.hasOwn(agentParams, 'version') && agentParams.version) {
+    if (
+      agentParams &&
+      Object.prototype.hasOwnProperty.call(agentParams, 'version') &&
+      agentParams.version
+    ) {
       params.agent_version = agentParams.version;
     }
     return params;
