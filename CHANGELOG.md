@@ -1,3 +1,5 @@
+
+## [5.0.11] - 2023-06-01
 ### Fixed
 - Request body logging has been removed by default for the HTTP client.
 
