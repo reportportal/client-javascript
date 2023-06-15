@@ -5,10 +5,10 @@ const helpers = require('../lib/helpers');
 
 describe('ReportPortal javascript client', () => {
   describe('constructor', () => {
-    it('executes without error', () => {
-      const client = new RPClient({ token: 'test' });
+    it('creates the client instance without error', () => {
+      const client = new RPClient({ apiKey: 'test' });
 
-      expect(client.config.token).toBe('test');
+      expect(client.config.apiKey).toBe('test');
     });
   });
 
