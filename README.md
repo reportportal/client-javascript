@@ -322,19 +322,19 @@ The method takes three arguments:
 * test item `tempId` (returned by method `startTestItem`)
 * data object:
 
-| Option  | Necessity | Default                | Description                                                                                                        |
-|---------|-----------|------------------------|--------------------------------------------------------------------------------------------------------------------|
-| message | Optional  | ''                   | The log message.                                                                                                   |
-| level   | Optional  | ''               | The log level, one of 'trace', 'debug', 'info', 'warn', 'error', ''. |
-| time    | Optional  | rpClient.helpers.now() | The time of the log.                                                                                               |
+| Option  | Necessity | Default                | Description                                                          |
+|---------|-----------|------------------------|----------------------------------------------------------------------|
+| message | Optional  | ''                     | The log message.                                                     |
+| level   | Optional  | ''                     | The log level, one of 'trace', 'debug', 'info', 'warn', 'error', ''. |
+| time    | Optional  | rpClient.helpers.now() | The time of the log.                                                 |
 
 * file object (optional):
 
-| Option  | Necessity | Default | Description                                                                                                                                                                        |
-|---------|-----------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| name    |           |         | The name of the file.                                                                                                                                                              |
-| type    |           |         | The file mimeType, example 'image/png' (support types: 'image/*', application/ ['xml', 'javascript', 'json', 'css', 'php'] , another format will be opened in a new browser tab ). |
-| content |           |         | File.                                                                                                                                                                              |
+| Option  | Necessity | Default | Description                                                                                                                                                                                         |
+|---------|-----------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| name    | Required  |         | The name of the file.                                                                                                                                                                               |
+| type    | Required  |         | The file mimeType, example 'image/png' (support types: 'image/*', application/['xml', 'javascript', 'json', 'css', 'php'], other formats will be opened in reportportal in a new browser tab only). |
+| content | Required  |         | base64 encoded file content.                                                                                                                                                                        |
 
 # Copyright Notice
 
