@@ -67,7 +67,7 @@ When creating a client instance, you need to specify the following options:
 ## Asynchronous reporting
 
 The client supports an asynchronous reporting.
-If you want the client to work asynchronously change v1 to v2 in addresses in endpoint.
+If you want the client to work asynchronously change `v1` to `v2` in addresses in endpoint.
 
 ## API
 
