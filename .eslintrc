@@ -34,6 +34,7 @@
     "@typescript-eslint/naming-convention": 0,
     "@typescript-eslint/dot-notation": 0,
     "@typescript-eslint/ban-ts-comment": 0,
-    "@typescript-eslint/no-var-requires": 0
+    "@typescript-eslint/no-var-requires": 0,
+    "max-classes-per-file": 0
   }
 }
