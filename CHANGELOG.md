@@ -1,3 +1,5 @@
+
+## [5.0.12] - 2023-06-19
 ### Changed
 - `token` configuration option was renamed to `apiKey` to maintain common convention.
 
