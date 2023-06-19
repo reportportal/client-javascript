@@ -5,16 +5,27 @@ const helpers = require('../lib/helpers');
 
 describe('ReportPortal javascript client', () => {
   describe('constructor', () => {
-    it('executes without error', () => {
-      const client = new RPClient({ token: 'test' });
+    it('creates the client instance without error', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
 
-      expect(client.config.token).toBe('test');
+      expect(client.config.apiKey).toBe('test');
+      expect(client.config.project).toBe('test');
+      expect(client.config.endpoint).toBe('https://abc.com');
     });
   });
 
   describe('logDebug', () => {
     it('should call console.log with provided message if debug is true', () => {
-      const client = new RPClient({ debug: true });
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        debug: true,
+      });
       spyOn(console, 'log');
 
       client.logDebug('message');
@@ -23,7 +34,12 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should call console.log with messages if debug is true and dataMsg provided', () => {
-      const client = new RPClient({ debug: true });
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        debug: true,
+      });
       spyOn(console, 'log');
 
       client.logDebug('message', { key: 1, value: 2 });
@@ -32,7 +48,12 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should not call console.log if debug is false', () => {
-      const client = new RPClient({ debug: false });
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        debug: false,
+      });
       spyOn(console, 'log');
 
       client.logDebug('message');
@@ -43,7 +64,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('calculateNonRetriedItemMapKey', () => {
     it("should return correct parameter's string", () => {
-      const client = new RPClient({});
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
 
       const str = client.calculateNonRetriedItemMapKey('lId', 'pId', 'name', 'itemId');
 
@@ -51,7 +76,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it("should return correct parameter's string with default value if itemId doesn't pass", () => {
-      const client = new RPClient({});
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
 
       const str = client.calculateNonRetriedItemMapKey('lId', 'pId', 'name');
 
@@ -61,7 +90,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('getRejectAnswer', () => {
     it('should return object with tempId and promise.reject with error', () => {
-      const client = new RPClient({});
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
 
       const rejectAnswer = client.getRejectAnswer('tempId', 'error');
 
@@ -72,7 +105,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('cleanMap', () => {
     it('should delete element with id', () => {
-      const client = new RPClient({});
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
       client.map = {
         id1: 'firstElement',
         id2: 'secondElement',
@@ -87,7 +124,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('checkConnect', () => {
     it('should return promise', () => {
-      const client = new RPClient({ endpoint: 'endpoint' });
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
       spyOn(RestClient, 'request').and.returnValue(Promise.resolve('ok'));
 
       const request = client.checkConnect();
@@ -109,7 +150,7 @@ describe('ReportPortal javascript client', () => {
 
     it('should call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is not set', () => {
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
@@ -122,7 +163,7 @@ describe('ReportPortal javascript client', () => {
 
     it('should not call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', () => {
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
@@ -141,7 +182,7 @@ describe('ReportPortal javascript client', () => {
       };
       const client = new RPClient(
         {
-          token: 'startLaunchTest',
+          apiKey: 'startLaunchTest',
           endpoint: 'https://rp.us/api/v1',
           project: 'tst',
         },
@@ -160,7 +201,7 @@ describe('ReportPortal javascript client', () => {
 
     it('should create statistics object without agentParams if they are empty', () => {
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
@@ -190,7 +231,7 @@ describe('ReportPortal javascript client', () => {
         },
       ];
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
@@ -223,7 +264,7 @@ describe('ReportPortal javascript client', () => {
         },
       ];
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
@@ -258,7 +299,7 @@ describe('ReportPortal javascript client', () => {
 
     it('dont start new launch if launchDataRQ.id is not empty', () => {
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
@@ -279,7 +320,7 @@ describe('ReportPortal javascript client', () => {
 
   describe('finishLaunch', () => {
     it('should call getRejectAnswer if there is no launchTempId with suitable launchTempId', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],
@@ -296,7 +337,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should trigger promiseFinish', (done) => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],
@@ -327,7 +368,12 @@ describe('ReportPortal javascript client', () => {
         name: 'Test launch name',
         attributes: [{ value: 'value' }],
       };
-      const client = new RPClient({ attributes: [{ value: 'value' }] });
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        attributes: [{ value: 'value' }],
+      });
       spyOn(client.helpers, 'now').and.returnValue(12345734);
 
       const mergeLaunches = client.getMergeLaunchesRequest(['12345', '12346']);
@@ -346,7 +392,13 @@ describe('ReportPortal javascript client', () => {
         name: 'launch',
         attributes: [{ value: 'value' }],
       };
-      const client = new RPClient({ launch: 'launch', attributes: [{ value: 'value' }] });
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        launch: 'launch',
+        attributes: [{ value: 'value' }],
+      });
       spyOn(client.helpers, 'now').and.returnValue(12345734);
 
       const mergeLaunches = client.getMergeLaunchesRequest(['12345', '12346']);
@@ -370,7 +422,7 @@ describe('ReportPortal javascript client', () => {
 
     it('should calls client', (done) => {
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
         isLaunchMergeRequired: true,
@@ -400,6 +452,9 @@ describe('ReportPortal javascript client', () => {
 
     it('should not call client if something went wrong', (done) => {
       const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
         isLaunchMergeRequired: true,
       });
 
@@ -418,7 +473,7 @@ describe('ReportPortal javascript client', () => {
 
     it('should return undefined if isLaunchMergeRequired is false', () => {
       const client = new RPClient({
-        token: 'startLaunchTest',
+        apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
         isLaunchMergeRequired: false,
@@ -432,7 +487,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('getPromiseFinishAllItems', () => {
     it('should return promise', (done) => {
-      const client = new RPClient({});
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id1: {
           children: ['child1'],
@@ -452,7 +511,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('updateLaunch', () => {
     it('should call getRejectAnswer if there is no launchTempId with suitable launchTempId', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id1: {
           children: ['child1'],
@@ -469,7 +532,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should return object with tempId and promise', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id1: {
           children: ['child1'],
@@ -487,7 +554,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('startTestItem', () => {
     it('should call getRejectAnswer if there is no launchTempId with suitable launchTempId', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id1: {
           children: ['child1'],
@@ -504,7 +575,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should call getRejectAnswer if launchObj.finishSend is true', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id1: {
           children: ['child1'],
@@ -522,7 +597,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should call getRejectAnswer if there is no parentObj with suitable parentTempId', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id: {
           children: ['id1'],
@@ -540,7 +619,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should return object with tempId and promise', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id: {
           children: ['id1', '4n5pxq24kpiob12og9'],
@@ -565,7 +648,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should call nonRetriedItemMap if retry is false', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id: {
           children: ['id1', '4n5pxq24kpiob12og9'],
@@ -595,7 +682,11 @@ describe('ReportPortal javascript client', () => {
 
   describe('finishTestItem', () => {
     it('should call getRejectAnswer if there is no itemObj with suitable itemTempId', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id1: {
           children: ['child1'],
@@ -612,7 +703,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should call finishTestItemPromiseStart with correct parameters', (done) => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id: {
           children: ['id1'],
@@ -642,7 +737,11 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should call finishTestItemPromiseStart with correct parameters if smt went wrong', (done) => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
       client.map = {
         id: {
           children: ['id1'],
@@ -674,7 +773,7 @@ describe('ReportPortal javascript client', () => {
 
   describe('saveLog', () => {
     it('should return object with tempId and promise', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],
@@ -699,7 +798,7 @@ describe('ReportPortal javascript client', () => {
 
   describe('sendLog', () => {
     it('should return sendLogWithFile if fileObj is not empty', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       spyOn(client, 'sendLogWithFile').and.returnValue('sendLogWithFile');
 
       const result = client.sendLog('itemTempId', { message: 'message' }, { name: 'name' });
@@ -708,7 +807,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should return sendLogWithoutFile if fileObj is empty', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       spyOn(client, 'sendLogWithoutFile').and.returnValue('sendLogWithoutFile');
 
       const result = client.sendLog('itemTempId', { message: 'message' });
@@ -719,7 +818,7 @@ describe('ReportPortal javascript client', () => {
 
   describe('sendLogWithoutFile', () => {
     it('should call getRejectAnswer if there is no itemObj with suitable itemTempId', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],
@@ -736,7 +835,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should return saveLog function', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         itemTempId: {
           children: ['child1'],
@@ -752,7 +851,7 @@ describe('ReportPortal javascript client', () => {
 
   describe('sendLogWithFile', () => {
     it('should call getRejectAnswer if there is no itemObj with suitable itemTempId', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],
@@ -769,7 +868,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should return saveLog function', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         itemTempId: {
           children: ['child1'],
@@ -785,7 +884,7 @@ describe('ReportPortal javascript client', () => {
 
   describe('getRequestLogWithFile', () => {
     it('should return restClient.create', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],
@@ -800,7 +899,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should return restClient.create with error', () => {
-      const client = new RPClient({ token: 'any', endpoint: 'https://rp.api', project: 'prj' });
+      const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],

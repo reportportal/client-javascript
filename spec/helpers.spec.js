@@ -1,31 +1,30 @@
 const os = require('os');
 const fs = require('fs');
 const glob = require('glob');
-const RPClient = require('../lib/report-portal-client');
+const helpers = require('../lib/helpers');
 const RestClient = require('../lib/rest');
 const pjson = require('../package.json');
 
 describe('Helpers', () => {
-  const client = new RPClient({ token: 'token' });
 
   describe('formatName', () => {
     it('slice last 256 symbols', () => {
-      expect(client.helpers.formatName(`a${'b'.repeat(256)}`)).toBe('b'.repeat(256));
+      expect(helpers.formatName(`a${'b'.repeat(256)}`)).toBe('b'.repeat(256));
     });
     it('leave 256 symbol name as is', () => {
-      expect(client.helpers.formatName('c'.repeat(256))).toBe('c'.repeat(256));
+      expect(helpers.formatName('c'.repeat(256))).toBe('c'.repeat(256));
     });
     it('leave 3 symbol name as is', () => {
-      expect(client.helpers.formatName('abc')).toBe('abc');
+      expect(helpers.formatName('abc')).toBe('abc');
     });
     it('complete with dots 2 symbol name', () => {
-      expect(client.helpers.formatName('ab')).toBe('ab.');
+      expect(helpers.formatName('ab')).toBe('ab.');
     });
   });
 
   describe('now', () => {
     it('returns milliseconds from unix time', () => {
-      expect(new Date() - client.helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
+      expect(new Date() - helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
     });
   });
 
@@ -33,7 +32,7 @@ describe('Helpers', () => {
     it('calls RestClient#request', () => {
       spyOn(RestClient, 'request');
 
-      client.helpers.getServerResult(
+      helpers.getServerResult(
         'http://localhost:80/api/v1',
         { userId: 1 },
         {
@@ -61,7 +60,7 @@ describe('Helpers', () => {
     it('should return the right ids', () => {
       spyOn(glob, 'sync').and.returnValue(['rplaunch-fileOne.tmp', 'rplaunch-fileTwo.tmp']);
 
-      const ids = client.helpers.readLaunchesFromFile();
+      const ids = helpers.readLaunchesFromFile();
 
       expect(ids).toEqual(['fileOne', 'fileTwo']);
     });
@@ -71,7 +70,7 @@ describe('Helpers', () => {
     it('should call fs.open method with right parameters', () => {
       spyOn(fs, 'open');
 
-      client.helpers.saveLaunchIdToFile('fileOne');
+      helpers.saveLaunchIdToFile('fileOne');
 
       expect(fs.open).toHaveBeenCalledWith('rplaunch-fileOne.tmp', 'w', jasmine.any(Function));
     });
@@ -106,7 +105,7 @@ describe('Helpers', () => {
         },
       ];
 
-      const attr = client.helpers.getSystemAttribute();
+      const attr = helpers.getSystemAttribute();
 
       expect(attr).toEqual(expectedAttr);
     });
@@ -114,13 +113,13 @@ describe('Helpers', () => {
 
   describe('generateTestCaseId', () => {
     it('should return undefined if there is no codeRef', () => {
-      const testCaseId = client.helpers.generateTestCaseId();
+      const testCaseId = helpers.generateTestCaseId();
 
       expect(testCaseId).toEqual(undefined);
     });
 
     it('should return codeRef if there is no params', () => {
-      const testCaseId = client.helpers.generateTestCaseId('codeRef');
+      const testCaseId = helpers.generateTestCaseId('codeRef');
 
       expect(testCaseId).toEqual('codeRef');
     });
@@ -139,7 +138,7 @@ describe('Helpers', () => {
         },
       ];
 
-      const testCaseId = client.helpers.generateTestCaseId('codeRef', parameters);
+      const testCaseId = helpers.generateTestCaseId('codeRef', parameters);
 
       expect(testCaseId).toEqual('codeRef[value,valueTwo,valueThree]');
     });
