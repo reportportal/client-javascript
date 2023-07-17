@@ -2,6 +2,10 @@ const axios = require('axios');
 const { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } = require('./constants');
 const { getClientId } = require('./client-id');
 
+const hasOption = (options, optionName) => {
+  return Object.prototype.hasOwnProperty.call(options, optionName);
+};
+
 class Statistics {
   constructor(eventName, agentParams) {
     this.eventName = eventName;
@@ -14,18 +18,10 @@ class Statistics {
       client_name: PJSON_NAME,
       client_version: PJSON_VERSION,
     };
-    if (
-      agentParams &&
-      Object.prototype.hasOwnProperty.call(agentParams, 'name') &&
-      agentParams.name
-    ) {
+    if (agentParams && hasOption(agentParams, 'name') && agentParams.name) {
       params.agent_name = agentParams.name;
     }
-    if (
-      agentParams &&
-      Object.prototype.hasOwnProperty.call(agentParams, 'version') &&
-      agentParams.version
-    ) {
+    if (agentParams && hasOption(agentParams, 'version') && agentParams.version) {
       params.agent_version = agentParams.version;
     }
     return params;
