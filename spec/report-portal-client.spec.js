@@ -2,6 +2,7 @@ const process = require('process');
 const RPClient = require('../lib/report-portal-client');
 const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
+const { OUTPUT_TYPES } = require('../lib/constants/outputs');
 
 describe('ReportPortal javascript client', () => {
   describe('constructor', () => {
@@ -315,6 +316,93 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.restClient.create).not.toHaveBeenCalled();
       expect(client.launchUuid).toEqual(id);
+    });
+
+    it('should log Launch UUID if enabled', () => {
+      spyOn(OUTPUT_TYPES, 'STDOUT');
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+        launchUuidPrint: true,
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      const time = 12345734;
+      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      return client
+        .startLaunch({
+          startTime: time,
+        })
+        .promise.then(function () {
+          expect(OUTPUT_TYPES.STDOUT).toHaveBeenCalledWith(
+            'Report Portal Launch UUID: testidlaunch',
+          );
+        });
+    });
+
+    it('should log Launch UUID into STDERR if enabled', () => {
+      spyOn(OUTPUT_TYPES, 'STDERR');
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+        launchUuidPrint: true,
+        launchUuidPrintOutput: 'stderr',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      const time = 12345734;
+      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      return client
+        .startLaunch({
+          startTime: time,
+        })
+        .promise.then(function () {
+          expect(OUTPUT_TYPES.STDERR).toHaveBeenCalledWith(
+            'Report Portal Launch UUID: testidlaunch',
+          );
+        });
+    });
+
+    it('should log Launch UUID into STDOUT if invalid output is set', () => {
+      spyOn(OUTPUT_TYPES, 'STDOUT');
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+        launchUuidPrint: true,
+        launchUuidPrintOutput: 'asdfgh',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      const time = 12345734;
+      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      return client
+        .startLaunch({
+          startTime: time,
+        })
+        .promise.then(function () {
+          expect(OUTPUT_TYPES.STDOUT).toHaveBeenCalledWith(
+            'Report Portal Launch UUID: testidlaunch',
+          );
+        });
+    });
+
+    it('should not log Launch UUID if not enabled', () => {
+      spyOn(OUTPUT_TYPES, 'STDOUT');
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      const time = 12345734;
+      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      return client
+        .startLaunch({
+          startTime: time,
+        })
+        .promise.then(function () {
+          expect(OUTPUT_TYPES.STDOUT).not.toHaveBeenCalled();
+        });
     });
   });
 
