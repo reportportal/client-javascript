@@ -1,3 +1,5 @@
+### Added
+- `launchUuidPrint` and `launchUuidPrintOutput` configuration options to ease integration with CI tools, by @HardNorth
 
 ## [5.0.12] - 2023-06-19
 ### Changed
