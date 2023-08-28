@@ -52,17 +52,19 @@ rpClient.checkConnect().then((response) => {
 
 When creating a client instance, you need to specify the following options:
 
-| Option                | Necessity  | Default | Description                                                                                                                                                                                  |
-|-----------------------|------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| apiKey                | Required   |         | User's reportportal token from which you want to send requests. It can be found on the profile page of this user.                                                                            |
-| endpoint              | Required   |         | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.                                             |
-| launch                | Required   |         | Name of launch at creation.                                                                                                                                                                  |
-| project               | Required   |         | The name of the project in which the launches will be created.                                                                                                                               |
-| headers               | Optional   | {}      | The object with custom headers for internal http client.                                                                                                                                     |
-| debug                 | Optional   | false   | This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                        |
-| isLaunchMergeRequired | Optional   | false   | Allows client to merge launches into one at the end of the run via saving their UUIDs to the file system. At the end of the run launches can be merged using `mergeLaunches` method.         |
-| restClientConfig      | Optional   | Not set | The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, may contain other client options eg. `timeout`. |
-| token                 | Deprecated | Not set | Use `apiKey` instead.                                                                                                                                                                        |
+| Option                | Necessity  | Default  | Description                                                                                                                                                                                  |
+|-----------------------|------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| apiKey                | Required   |          | User's reportportal token from which you want to send requests. It can be found on the profile page of this user.                                                                            |
+| endpoint              | Required   |          | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.                                             |
+| launch                | Required   |          | Name of launch at creation.                                                                                                                                                                  |
+| project               | Required   |          | The name of the project in which the launches will be created.                                                                                                                               |
+| headers               | Optional   | {}       | The object with custom headers for internal http client.                                                                                                                                     |
+| debug                 | Optional   | false    | This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                        |
+| isLaunchMergeRequired | Optional   | false    | Allows client to merge launches into one at the end of the run via saving their UUIDs to the file system. At the end of the run launches can be merged using `mergeLaunches` method.         |
+| restClientConfig      | Optional   | Not set  | The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, may contain other client options eg. `timeout`. |
+| launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                    |
+| launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR'. Works only if `launchUuidPrint` set to `true`.                                                                             |
+| token                 | Deprecated | Not set  | Use `apiKey` instead.                                                                                                                                                                        |
 
 ## Asynchronous reporting
 
