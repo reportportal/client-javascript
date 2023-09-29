@@ -28,20 +28,24 @@ class Statistics {
   }
 
   async trackEvent() {
-    const requestBody = {
-      client_id: await getClientId(),
-      events: [
-        {
-          name: this.eventName,
-          params: this.eventParams,
-        },
-      ],
-    };
+    try {
+      const requestBody = {
+        client_id: await getClientId(),
+        events: [
+          {
+            name: this.eventName,
+            params: this.eventParams,
+          },
+        ],
+      };
 
-    await axios.post(
-      `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_KEY}`,
-      requestBody,
-    );
+      await axios.post(
+        `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_KEY}`,
+        requestBody,
+      );
+    } catch (error) {
+      console.error(error.message);
+    }
   }
 }
 
