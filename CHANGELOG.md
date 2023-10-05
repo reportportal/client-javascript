@@ -1,5 +1,3 @@
-
-## [5.0.14] - 2023-10-05
 ### Added
 - `Promise.allSettled` polyfill to support NodeJS 10
 ### Fixed
