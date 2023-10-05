@@ -72,5 +72,17 @@ describe('Statistics', () => {
 
       expect(axios.post).toHaveBeenCalledOnceWith(url, baseRequestValidation);
     });
+
+    it('Should properly handle errors if any', async () => {
+      const statistics = new Statistics(eventName, agentParams);
+      const errorMessage = 'Error message';
+
+      spyOn(axios, 'post').and.throwError(errorMessage);
+      spyOn(console, 'error');
+
+      await statistics.trackEvent();
+
+      expect(console.error).toHaveBeenCalledWith(errorMessage);
+    });
   });
 });
