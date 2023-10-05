@@ -1,4 +1,8 @@
-
+### Added
+- `Promise.allSettled` polyfill to support NodeJS 10
+### Fixed
+-  Reporting is down on error with collect request on reporting start
+-  Can not read property `realId` of undefined during reporting
 ## [5.0.13] - 2023-08-28
 ### Added
 - `launchUuidPrint` and `launchUuidPrintOutput` configuration options to ease integration with CI tools, by @HardNorth
