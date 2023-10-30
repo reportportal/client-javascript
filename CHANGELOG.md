@@ -1,3 +1,5 @@
+### Added
+- Logging link to the launch on the launch finish
 
 ## [5.0.14] - 2023-10-05
 ### Added
