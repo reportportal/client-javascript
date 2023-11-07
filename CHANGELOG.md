@@ -1,3 +1,5 @@
+### Security
+- Updated versions of vulnerable packages (axios).
 ### Added
 - Logging link to the launch on the launch finish
 
