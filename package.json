@@ -8,7 +8,7 @@
     "clean": "rimraf ./build",
     "lint": "eslint ./statistics/**/* ./lib/**/* ./spec/**/*",
     "format": "npm run lint -- --fix",
-    "test": "nyc node --experimental-modules ./node_modules/jasmine/bin/jasmine.js",
+    "test": "NODE_OPTIONS=--experimental-modules nyc ./node_modules/jasmine/bin/jasmine.js",
     "test:coverage": "nyc report --reporter=lcov --reporter=text-summary"
   },
   "directories": {
