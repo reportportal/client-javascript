@@ -24,7 +24,7 @@
     "node": ">=10.x"
   },
   "dependencies": {
-    "axios": "^0.27.2",
+    "axios": "^1.6.0",
     "axios-retry": "^3.4.0",
     "glob": "^7.2.3",
     "ini": "^2.0.0",
