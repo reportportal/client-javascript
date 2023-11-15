@@ -1,16 +1,16 @@
 ### Added
-- Logging link to the launch on the launch finish
+- Logging link to the launch on its finish.
 
 ## [5.0.14] - 2023-10-05
 ### Added
-- `Promise.allSettled` polyfill to support NodeJS 10
+- `Promise.allSettled` polyfill to support NodeJS 10.
 ### Fixed
--  Reporting is down on error with collect request on reporting start
-- Can not read property `realId` of undefined during reporting, resolves [#99](https://github.com/reportportal/agent-js-playwright/issues/99)
+- Reporting is down on error with collect request on reporting start.
+- Can not read property `realId` of undefined during reporting, resolves [#99](https://github.com/reportportal/agent-js-playwright/issues/99).
 
 ## [5.0.13] - 2023-08-28
 ### Added
-- `launchUuidPrint` and `launchUuidPrintOutput` configuration options to ease integration with CI tools, by @HardNorth
+- `launchUuidPrint` and `launchUuidPrintOutput` configuration options to ease integration with CI tools, by @HardNorth.
 
 ## [5.0.12] - 2023-06-19
 ### Changed
