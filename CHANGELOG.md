@@ -1,3 +1,5 @@
+
+## [5.1.0] - 2024-01-19
 ### Changed
 - **Breaking change** Drop support of Node.js 10. The version [5.0.15](https://github.com/reportportal/client-javascript/releases/tag/v5.0.15) is the latest that supports it.
 ### Security
