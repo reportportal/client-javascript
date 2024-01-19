@@ -1,3 +1,7 @@
+### Changed
+- **Breaking change** Drop support of Node.js 10. The version [5.0.15](https://github.com/reportportal/client-javascript/releases/tag/v5.0.15) is the latest that supports it.
+### Security
+- Updated versions of vulnerable packages (axios, follow-redirects).
 
 ## [5.0.15] - 2023-11-20
 ### Added
