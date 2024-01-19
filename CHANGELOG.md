@@ -6,6 +6,8 @@
 ## [5.0.15] - 2023-11-20
 ### Added
 - Logging link to the launch on its finish.
+### Deprecated
+- Node.js 10 usage. This version is the latest that supports Node.js 10.
 
 ## [5.0.14] - 2023-10-05
 ### Added
