@@ -1,4 +1,3 @@
-## [5.1.1] - 2024-01-23
 ### Added
 - Debug logs for RestClient.
 
