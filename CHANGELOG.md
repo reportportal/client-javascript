@@ -1,3 +1,5 @@
+### Added
+- Debug logs for RestClient.
 
 ## [5.1.0] - 2024-01-19
 ### Changed
