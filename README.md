@@ -6,17 +6,18 @@ Library is used only for implementors of custom listeners for ReportPortal.
 
 ## Already implemented listeners:
 
-* [Jest integration](https://github.com/reportportal/agent-js-jest)
-* [Cypress integration](https://github.com/reportportal/agent-js-cypress)
-* [Mocha integration](https://github.com/reportportal/agent-js-mocha)
-* [Jasmine integration](https://github.com/reportportal/agent-js-jasmine)
-* [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
-* [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
-* [Codecept integration](https://github.com/reportportal/agent-js-codecept)
-* [Postman integration](https://github.com/reportportal/agent-js-postman)
-* [TestCafe integration](https://github.com/reportportal/agent-js-testcafe)
-* [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
 * [Playwright integration](https://github.com/reportportal/agent-js-playwright)
+* [Cypress integration](https://github.com/reportportal/agent-js-cypress)
+* [Jest integration](https://github.com/reportportal/agent-js-jest)
+* [Mocha integration](https://github.com/reportportal/agent-js-mocha)
+* [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
+* [Postman integration](https://github.com/reportportal/agent-js-postman)
+* [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
+* [Vitest integration](https://github.com/reportportal/agent-js-vitest)
+* [Jasmine integration](https://github.com/reportportal/agent-js-jasmine)
+* [TestCafe integration](https://github.com/reportportal/agent-js-testcafe)
+* [Codecept integration](https://github.com/reportportal/agent-js-codecept)
+* [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
 
 Examples for test framework integrations from the list above described in [examples](https://github.com/reportportal/examples-js) repository.
 
