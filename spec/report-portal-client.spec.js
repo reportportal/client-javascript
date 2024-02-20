@@ -63,7 +63,7 @@ describe('ReportPortal javascript client', () => {
     });
   });
 
-  describe('calculateExecutableItemMapKey', () => {
+  describe('calculateItemRetriesChainMapKey', () => {
     it("should return correct parameter's string", () => {
       const client = new RPClient({
         apiKey: 'test',
@@ -71,7 +71,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
       });
 
-      const str = client.calculateExecutableItemMapKey('lId', 'pId', 'name', 'itemId');
+      const str = client.calculateItemRetriesChainMapKey('lId', 'pId', 'name', 'itemId');
 
       expect(str).toEqual('lId__pId__name__itemId');
     });
@@ -83,7 +83,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
       });
 
-      const str = client.calculateExecutableItemMapKey('lId', 'pId', 'name');
+      const str = client.calculateItemRetriesChainMapKey('lId', 'pId', 'name');
 
       expect(str).toEqual('lId__pId__name__');
     });
@@ -725,7 +725,7 @@ describe('ReportPortal javascript client', () => {
           promiseStart: Promise.resolve(),
         },
       };
-      spyOn(client.executableItemMap, 'get').and.resolveTo();
+      spyOn(client.itemRetriesChainMap, 'get').and.resolveTo();
       spyOn(client.restClient, 'create').and.resolveTo({});
       spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
 
@@ -735,7 +735,7 @@ describe('ReportPortal javascript client', () => {
       return expectAsync(result.promise).toBeResolved();
     });
 
-    it('should get previous try promise from executableItemMap if retry is true', () => {
+    it('should get previous try promise from itemRetriesChainMap if retry is true', () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -754,14 +754,14 @@ describe('ReportPortal javascript client', () => {
           promiseStart: Promise.resolve(),
         },
       };
-      spyOn(client, 'calculateExecutableItemMapKey').and.returnValue('id1__name__');
+      spyOn(client, 'calculateItemRetriesChainMapKey').and.returnValue('id1__name__');
       spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
       spyOn(client.map['4n5pxq24kpiob12og9'], 'promiseStart').and.resolveTo();
-      spyOn(client.executableItemMap, 'get');
+      spyOn(client.itemRetriesChainMap, 'get');
 
       client.startTestItem({ retry: true }, 'id1');
 
-      expect(client.executableItemMap.get).toHaveBeenCalledWith('id1__name__');
+      expect(client.itemRetriesChainMap.get).toHaveBeenCalledWith('id1__name__');
     });
   });
 
