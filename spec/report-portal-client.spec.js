@@ -63,7 +63,7 @@ describe('ReportPortal javascript client', () => {
     });
   });
 
-  describe('calculateNonRetriedItemMapKey', () => {
+  describe('calculateItemRetriesChainMapKey', () => {
     it("should return correct parameter's string", () => {
       const client = new RPClient({
         apiKey: 'test',
@@ -71,7 +71,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
       });
 
-      const str = client.calculateNonRetriedItemMapKey('lId', 'pId', 'name', 'itemId');
+      const str = client.calculateItemRetriesChainMapKey('lId', 'pId', 'name', 'itemId');
 
       expect(str).toEqual('lId__pId__name__itemId');
     });
@@ -83,7 +83,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
       });
 
-      const str = client.calculateNonRetriedItemMapKey('lId', 'pId', 'name');
+      const str = client.calculateItemRetriesChainMapKey('lId', 'pId', 'name');
 
       expect(str).toEqual('lId__pId__name__');
     });
@@ -725,17 +725,17 @@ describe('ReportPortal javascript client', () => {
           promiseStart: Promise.resolve(),
         },
       };
-      spyOn(client.nonRetriedItemMap, 'get').and.resolveTo();
+      spyOn(client.itemRetriesChainMap, 'get').and.resolveTo();
       spyOn(client.restClient, 'create').and.resolveTo({});
       spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
 
-      const result = client.startTestItem({ retry: true }, 'id1', 'id');
+      const result = client.startTestItem({ retry: false }, 'id1', 'id');
 
       expect(result.tempId).toEqual('4n5pxq24kpiob12og9');
       return expectAsync(result.promise).toBeResolved();
     });
 
-    it('should call nonRetriedItemMap if retry is false', () => {
+    it('should get previous try promise from itemRetriesChainMap if retry is true', () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -754,17 +754,14 @@ describe('ReportPortal javascript client', () => {
           promiseStart: Promise.resolve(),
         },
       };
-      spyOn(client, 'calculateNonRetriedItemMapKey').and.returnValue('id1__name__');
+      spyOn(client, 'calculateItemRetriesChainMapKey').and.returnValue('id1__name__');
       spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
       spyOn(client.map['4n5pxq24kpiob12og9'], 'promiseStart').and.resolveTo();
-      spyOn(client.nonRetriedItemMap, 'set');
+      spyOn(client.itemRetriesChainMap, 'get');
 
-      client.startTestItem({ retry: false }, 'id1');
+      client.startTestItem({ retry: true }, 'id1');
 
-      expect(client.nonRetriedItemMap.set).toHaveBeenCalledWith(
-        'id1__name__',
-        client.map['4n5pxq24kpiob12og9'].promiseStart,
-      );
+      expect(client.itemRetriesChainMap.get).toHaveBeenCalledWith('id1__name__');
     });
   });
 
