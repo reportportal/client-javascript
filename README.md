@@ -6,17 +6,18 @@ Library is used only for implementors of custom listeners for ReportPortal.
 
 ## Already implemented listeners:
 
-* [Jest integration](https://github.com/reportportal/agent-js-jest)
-* [Cypress integration](https://github.com/reportportal/agent-js-cypress)
-* [Mocha integration](https://github.com/reportportal/agent-js-mocha)
-* [Jasmine integration](https://github.com/reportportal/agent-js-jasmine)
-* [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
-* [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
-* [Codecept integration](https://github.com/reportportal/agent-js-codecept)
-* [Postman integration](https://github.com/reportportal/agent-js-postman)
-* [TestCafe integration](https://github.com/reportportal/agent-js-testcafe)
-* [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
 * [Playwright integration](https://github.com/reportportal/agent-js-playwright)
+* [Cypress integration](https://github.com/reportportal/agent-js-cypress)
+* [Jest integration](https://github.com/reportportal/agent-js-jest)
+* [Mocha integration](https://github.com/reportportal/agent-js-mocha)
+* [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
+* [Postman integration](https://github.com/reportportal/agent-js-postman)
+* [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
+* [Vitest integration](https://github.com/reportportal/agent-js-vitest)
+* [Jasmine integration](https://github.com/reportportal/agent-js-jasmine)
+* [TestCafe integration](https://github.com/reportportal/agent-js-testcafe)
+* [Codecept integration](https://github.com/reportportal/agent-js-codecept)
+* [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
 
 Examples for test framework integrations from the list above described in [examples](https://github.com/reportportal/examples-js) repository.
 
@@ -61,7 +62,7 @@ When creating a client instance, you need to specify the following options:
 | headers               | Optional   | {}       | The object with custom headers for internal http client.                                                                                                                                                                                            |
 | debug                 | Optional   | false    | This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                                                                               |
 | isLaunchMergeRequired | Optional   | false    | Allows client to merge launches into one at the end of the run via saving their UUIDs to the temp files at filesystem . At the end of the run launches can be merged using `mergeLaunches` method. Temp file format: `rplaunch-${launch_uuid}.tmp`. |
-| restClientConfig      | Optional   | Not set  | The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, may contain other client options eg. `timeout`. For debugging and displaying logs you can set `debug: true`                                                       |
+| restClientConfig      | Optional   | Not set  | `axios` like http client [config](https://github.com/axios/axios#request-config). May contain `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, and other client options eg. `timeout`. For debugging and displaying logs you can set `debug: true`.                                                       |
 | launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                                                                           |
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR'. Works only if `launchUuidPrint` set to `true`.                                                                                                                                    |
 | token                 | Deprecated | Not set  | Use `apiKey` instead.                                                                                                                                                                                                                               |
