@@ -1,3 +1,5 @@
+### Fixed
+- Execution sequence for retry tests [#134](https://github.com/reportportal/agent-js-playwright/issues/134).
 
 ## [5.1.1] - 2024-01-23
 ### Added
