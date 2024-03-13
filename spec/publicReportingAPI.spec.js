@@ -75,4 +75,14 @@ describe('PublicReportingAPI', () => {
       suite: 'suite',
     });
   });
+
+  it('addParameters should trigger process.emit with correct parameters', () => {
+    spyOn(process, 'emit');
+
+    PublicReportingAPI.addParameters([{ value: 'value' }]);
+
+    expect(process.emit).toHaveBeenCalledWith(EVENTS.ADD_PARAMETERS, {
+      parameters: [{ value: 'value' }],
+    });
+  });
 });
