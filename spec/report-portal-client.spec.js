@@ -334,9 +334,7 @@ describe('ReportPortal javascript client', () => {
           startTime: time,
         })
         .promise.then(function () {
-          expect(OUTPUT_TYPES.STDOUT).toHaveBeenCalledWith(
-            'Report Portal Launch UUID: testidlaunch',
-          );
+          expect(OUTPUT_TYPES.STDOUT).toHaveBeenCalledWith('testidlaunch');
         });
     });
 
@@ -357,9 +355,7 @@ describe('ReportPortal javascript client', () => {
           startTime: time,
         })
         .promise.then(function () {
-          expect(OUTPUT_TYPES.STDERR).toHaveBeenCalledWith(
-            'Report Portal Launch UUID: testidlaunch',
-          );
+          expect(OUTPUT_TYPES.STDERR).toHaveBeenCalledWith('testidlaunch');
         });
     });
 
@@ -380,9 +376,49 @@ describe('ReportPortal javascript client', () => {
           startTime: time,
         })
         .promise.then(function () {
-          expect(OUTPUT_TYPES.STDOUT).toHaveBeenCalledWith(
-            'Report Portal Launch UUID: testidlaunch',
-          );
+          expect(OUTPUT_TYPES.STDOUT).toHaveBeenCalledWith('testidlaunch');
+        });
+    });
+
+    it('should log Launch UUID into ENVIRONMENT if enabled', () => {
+      spyOn(OUTPUT_TYPES, 'ENVIRONMENT');
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+        launchUuidPrint: true,
+        launchUuidPrintOutput: 'environment',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      const time = 12345734;
+      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      return client
+        .startLaunch({
+          startTime: time,
+        })
+        .promise.then(function () {
+          expect(OUTPUT_TYPES.ENVIRONMENT).toHaveBeenCalledWith('testidlaunch');
+        });
+    });
+
+    it('should log Launch UUID into FILE if enabled', () => {
+      spyOn(OUTPUT_TYPES, 'FILE');
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+        launchUuidPrint: true,
+        launchUuidPrintOutput: 'file',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      const time = 12345734;
+      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      return client
+        .startLaunch({
+          startTime: time,
+        })
+        .promise.then(function () {
+          expect(OUTPUT_TYPES.FILE).toHaveBeenCalledWith('testidlaunch');
         });
     });
 
