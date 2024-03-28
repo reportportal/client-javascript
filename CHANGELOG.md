@@ -1,3 +1,5 @@
+### Added
+- Output launch UUID to file and ENV variable
 
 ## [5.1.2] - 2024-02-20
 ### Fixed
