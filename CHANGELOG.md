@@ -1,5 +1,7 @@
 ### Added
-- Output launch UUID to file and ENV variable
+- Output launch UUID to file and ENV variable, thanks to [artsiomBandarenka](https://github.com/artsiomBandarenka). Addressed [#195](https://github.com/reportportal/client-javascript/issues/195), [#50](https://github.com/reportportal/agent-js-webdriverio/issues/50).
+### Security
+- Updated versions of vulnerable packages (follow-redirects).
 
 ## [5.1.2] - 2024-02-20
 ### Fixed
