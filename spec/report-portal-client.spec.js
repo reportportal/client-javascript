@@ -269,7 +269,6 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
-      client.isLaunchMergeRequired = true;
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
       spyOn(client.restClient, 'create').and.returnValue(myPromise);
