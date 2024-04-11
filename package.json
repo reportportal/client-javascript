@@ -26,7 +26,7 @@
   "dependencies": {
     "axios": "^1.6.8",
     "axios-retry": "^4.1.0",
-    "glob": "^9.3.5",
+    "glob": "^8.1.0",
     "ini": "^2.0.0",
     "uniqid": "^5.4.0",
     "uuid": "^9.0.1"
