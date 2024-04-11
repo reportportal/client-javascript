@@ -143,4 +143,18 @@ describe('Helpers', () => {
       expect(testCaseId).toEqual('codeRef[value,valueTwo,valueThree]');
     });
   });
+
+  describe('saveLaunchUuidToFile', () => {
+    it('should call fs.open method with right parameters', () => {
+      spyOn(fs, 'open');
+
+      helpers.saveLaunchUuidToFile('fileOne');
+
+      expect(fs.open).toHaveBeenCalledWith(
+        'rp-launch-uuid-fileOne.tmp',
+        'w',
+        jasmine.any(Function),
+      );
+    });
+  });
 });
