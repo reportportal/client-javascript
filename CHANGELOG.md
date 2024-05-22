@@ -1,3 +1,6 @@
+### Fixed
+- Use correct launch search URL based on config mode while merging launches. Resolves [#200](https://github.com/reportportal/client-javascript/issues/200). Thanks to [hoangthanhtri](https://github.com/hoangthanhtri).
+- Print launch UUID after merging launches. Resolves [#202](https://github.com/reportportal/client-javascript/issues/202). Thanks to [hoangthanhtri](https://github.com/hoangthanhtri).
 
 ## [5.1.3] - 2024-04-11
 ### Added
