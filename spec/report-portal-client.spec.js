@@ -543,7 +543,7 @@ describe('ReportPortal javascript client', () => {
       name: 'Test launch name',
     };
 
-    it('should calls client', (done) => {
+    it('should call rest client with required parameters', async () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -564,16 +564,13 @@ describe('ReportPortal javascript client', () => {
       const promise = client.mergeLaunches();
 
       expect(promise.then).toBeDefined();
-      promise.then(() => {
-        expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, {
-          headers: client.headers,
-        });
-
-        done();
+      await promise;
+      expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, {
+        headers: client.headers,
       });
     });
 
-    it('should not call client if something went wrong', (done) => {
+    it('should not call rest client if something went wrong', async () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -585,13 +582,9 @@ describe('ReportPortal javascript client', () => {
       spyOn(client.restClient, 'retrieveSyncAPI').and.resolveTo();
       spyOn(client.restClient, 'create').and.rejectWith();
 
-      const promise = client.mergeLaunches();
+      await client.mergeLaunches();
 
-      promise.then(() => {
-        expect(client.restClient.create).not.toHaveBeenCalled();
-
-        done();
-      });
+      expect(client.restClient.create).not.toHaveBeenCalled();
     });
 
     it('should return undefined if isLaunchMergeRequired is false', () => {
