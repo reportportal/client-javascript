@@ -136,6 +136,30 @@ describe('ReportPortal javascript client', () => {
 
       return expectAsync(request).toBeResolved();
     });
+
+    it('client should include restClientConfig', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com/v1',
+        restClientConfig: {
+          proxy: false,
+          timeout: 0,
+        }
+      });
+      spyOn(RestClient, 'request');
+
+      client.checkConnect();
+
+      expect(RestClient.request).toHaveBeenCalledWith('GET','https://abc.com/v1/user', {}, {
+         headers: {
+        'User-Agent': 'NodeJS',
+         Authorization: `bearer test`,
+        },
+        proxy: false,
+        timeout: 0,
+      });
+    });
   });
 
   describe('triggerAnalyticsEvent', () => {
