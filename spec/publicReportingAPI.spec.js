@@ -3,7 +3,7 @@ const { EVENTS } = require('../lib/constants/events');
 
 describe('PublicReportingAPI', () => {
   it('setDescription should trigger process.emit with correct parameters', () => {
-    spyOn(process, 'emit');
+    jest.spyOn(process, 'emit').mockImplementation(() => {});
 
     PublicReportingAPI.setDescription('text', 'suite');
 
@@ -14,7 +14,7 @@ describe('PublicReportingAPI', () => {
   });
 
   it('addAttributes should trigger process.emit with correct parameters', () => {
-    spyOn(process, 'emit');
+    jest.spyOn(process, 'emit').mockImplementation(() => {});
 
     PublicReportingAPI.addAttributes([{ value: 'value' }], 'suite');
 
@@ -25,7 +25,7 @@ describe('PublicReportingAPI', () => {
   });
 
   it('addLog should trigger process.emit with correct parameters', () => {
-    spyOn(process, 'emit');
+    jest.spyOn(process, 'emit').mockImplementation(() => {});
 
     PublicReportingAPI.addLog({ level: 'INFO', message: 'message' }, 'suite');
 
@@ -36,7 +36,7 @@ describe('PublicReportingAPI', () => {
   });
 
   it('addLaunchLog should trigger process.emit with correct parameters', () => {
-    spyOn(process, 'emit');
+    jest.spyOn(process, 'emit').mockImplementation(() => {});
 
     PublicReportingAPI.addLaunchLog({ level: 'INFO', message: 'message' });
 
@@ -47,7 +47,7 @@ describe('PublicReportingAPI', () => {
   });
 
   it('setTestCaseId should trigger process.emit with correct parameters', () => {
-    spyOn(process, 'emit');
+    jest.spyOn(process, 'emit').mockImplementation(() => {});
 
     PublicReportingAPI.setTestCaseId('testCaseId', 'suite');
 
@@ -58,7 +58,7 @@ describe('PublicReportingAPI', () => {
   });
 
   it('setLaunchStatus should trigger process.emit with correct parameters', () => {
-    spyOn(process, 'emit');
+    jest.spyOn(process, 'emit').mockImplementation(() => {});
 
     PublicReportingAPI.setLaunchStatus('passed');
 
@@ -66,7 +66,7 @@ describe('PublicReportingAPI', () => {
   });
 
   it('setStatus should trigger process.emit with correct parameters', () => {
-    spyOn(process, 'emit');
+    jest.spyOn(process, 'emit').mockImplementation(() => {});
 
     PublicReportingAPI.setStatus('passed', 'suite');
 
