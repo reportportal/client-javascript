@@ -6,7 +6,6 @@ const RestClient = require('../lib/rest');
 const pjson = require('../package.json');
 
 describe('Helpers', () => {
-
   describe('formatName', () => {
     it('slice last 256 symbols', () => {
       expect(helpers.formatName(`a${'b'.repeat(256)}`)).toBe('b'.repeat(256));

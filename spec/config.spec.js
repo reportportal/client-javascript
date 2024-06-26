@@ -23,19 +23,16 @@ describe('Config commons test suite', () => {
       expect(error).toBeInstanceOf(ReportPortalRequiredOptionError);
     });
 
-    it(
-      'should throw ReportPortalRequiredOptionError in case of option ' + 'not present in options',
-      () => {
-        let error;
-        try {
-          getRequiredOption({ other: 1 }, 'project');
-        } catch (e) {
-          error = e;
-        }
-        expect(error).toBeDefined();
-        expect(error).toBeInstanceOf(ReportPortalRequiredOptionError);
-      },
-    );
+    it('should throw ReportPortalRequiredOptionError in case of option not present in options', () => {
+      let error;
+      try {
+        getRequiredOption({ other: 1 }, 'project');
+      } catch (e) {
+        error = e;
+      }
+      expect(error).toBeDefined();
+      expect(error).toBeInstanceOf(ReportPortalRequiredOptionError);
+    });
   });
 
   describe('getApiKey', () => {

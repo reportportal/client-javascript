@@ -1,6 +1,8 @@
 module.exports = {
   moduleFileExtensions: ['js'],
-  testRegex : '/spec/.*\\.spec\\.(ts|js)$',
-  coverageReporters: ['lcov', 'text'],
+  "testMatch": [
+    "<rootDir>/spec/**/*[sS]pec.js"
+  ],
+  coverageReporters: ["json"],
   bail: false,
 };

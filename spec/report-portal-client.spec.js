@@ -182,7 +182,7 @@ describe('ReportPortal javascript client', () => {
       process.env = OLD_ENV;
     });
 
-    it('should call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is not set', () => {
+    it('should call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is not set', async () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -190,12 +190,12 @@ describe('ReportPortal javascript client', () => {
       });
       jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
 
-      client.triggerStatisticsEvent();
+      await client.triggerStatisticsEvent();
 
       expect(client.statistics.trackEvent).toHaveBeenCalled();
     });
 
-    it('should not call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', () => {
+    it('should not call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', async () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -204,7 +204,7 @@ describe('ReportPortal javascript client', () => {
       process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = true;
       jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
 
-      client.triggerStatisticsEvent();
+      await client.triggerStatisticsEvent();
 
       expect(client.statistics.trackEvent).not.toHaveBeenCalled();
     });
