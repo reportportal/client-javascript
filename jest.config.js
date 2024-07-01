@@ -3,6 +3,6 @@ module.exports = {
   "testMatch": [
     "<rootDir>/spec/**/*[sS]pec.js"
   ],
-  coverageReporters: ["json"],
+  coverageReporters: ["lcov", "text-summary"],
   bail: false,
 };
