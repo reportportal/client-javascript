@@ -6,7 +6,6 @@ const RestClient = require('../lib/rest');
 const pjson = require('../package.json');
 
 describe('Helpers', () => {
-
   describe('formatName', () => {
     it('slice last 256 symbols', () => {
       expect(helpers.formatName(`a${'b'.repeat(256)}`)).toBe('b'.repeat(256));
@@ -30,7 +29,7 @@ describe('Helpers', () => {
 
   describe('getServerResults', () => {
     it('calls RestClient#request', () => {
-      spyOn(RestClient, 'request');
+      jest.spyOn(RestClient, 'request').mockImplementation();
 
       helpers.getServerResult(
         'http://localhost:80/api/v1',
@@ -58,7 +57,7 @@ describe('Helpers', () => {
 
   describe('readLaunchesFromFile', () => {
     it('should return the right ids', () => {
-      spyOn(glob, 'sync').and.returnValue(['rplaunch-fileOne.tmp', 'rplaunch-fileTwo.tmp']);
+      jest.spyOn(glob, 'sync').mockReturnValue(['rplaunch-fileOne.tmp', 'rplaunch-fileTwo.tmp']);
 
       const ids = helpers.readLaunchesFromFile();
 
@@ -68,19 +67,19 @@ describe('Helpers', () => {
 
   describe('saveLaunchIdToFile', () => {
     it('should call fs.open method with right parameters', () => {
-      spyOn(fs, 'open');
+      jest.spyOn(fs, 'open').mockImplementation();
 
       helpers.saveLaunchIdToFile('fileOne');
 
-      expect(fs.open).toHaveBeenCalledWith('rplaunch-fileOne.tmp', 'w', jasmine.any(Function));
+      expect(fs.open).toHaveBeenCalledWith('rplaunch-fileOne.tmp', 'w', expect.any(Function));
     });
   });
 
   describe('getSystemAttribute', () => {
     it('should return correct system attributes', () => {
-      spyOn(os, 'type').and.returnValue('osType');
-      spyOn(os, 'arch').and.returnValue('osArchitecture');
-      spyOn(os, 'totalmem').and.returnValue('1');
+      jest.spyOn(os, 'type').mockReturnValue('osType');
+      jest.spyOn(os, 'arch').mockReturnValue('osArchitecture');
+      jest.spyOn(os, 'totalmem').mockReturnValue('1');
       const nodeVersion = process.version;
       const expectedAttr = [
         {
@@ -146,15 +145,11 @@ describe('Helpers', () => {
 
   describe('saveLaunchUuidToFile', () => {
     it('should call fs.open method with right parameters', () => {
-      spyOn(fs, 'open');
+      jest.spyOn(fs, 'open').mockImplementation();
 
       helpers.saveLaunchUuidToFile('fileOne');
 
-      expect(fs.open).toHaveBeenCalledWith(
-        'rp-launch-uuid-fileOne.tmp',
-        'w',
-        jasmine.any(Function),
-      );
+      expect(fs.open).toHaveBeenCalledWith('rp-launch-uuid-fileOne.tmp', 'w', expect.any(Function));
     });
   });
 });
