@@ -29,7 +29,8 @@
     "glob": "^8.1.0",
     "ini": "^2.0.0",
     "uniqid": "^5.4.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "https-proxy-agent": "7.0.4"
   },
   "license": "Apache-2.0",
   "devDependencies": {
