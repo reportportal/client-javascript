@@ -1,6 +1,5 @@
 const process = require('process');
 const RPClient = require('../lib/report-portal-client');
-const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
 const { OUTPUT_TYPES } = require('../lib/constants/outputs');
 
