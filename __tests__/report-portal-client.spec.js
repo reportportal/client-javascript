@@ -249,14 +249,11 @@ describe('ReportPortal javascript client', () => {
         startTime: time,
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith(
-        'launch',
-        {
-          name: 'Test launch name',
-          startTime: time,
-          attributes: fakeSystemAttr,
-        }
-      );
+      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
+        name: 'Test launch name',
+        startTime: time,
+        attributes: fakeSystemAttr,
+      });
     });
 
     it('should call restClient with suitable parameters, attributes is concatenated', () => {
@@ -282,21 +279,18 @@ describe('ReportPortal javascript client', () => {
         attributes: [{ value: 'value' }],
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith(
-        'launch',
-        {
-          name: 'Test launch name',
-          startTime: time,
-          attributes: [
-            { value: 'value' },
-            {
-              key: 'client',
-              value: 'client-name|1.0',
-              system: true,
-            },
-          ],
-        }
-      );
+      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
+        name: 'Test launch name',
+        startTime: time,
+        attributes: [
+          { value: 'value' },
+          {
+            key: 'client',
+            value: 'client-name|1.0',
+            system: true,
+          },
+        ],
+      });
     });
 
     it('dont start new launch if launchDataRQ.id is not empty', () => {

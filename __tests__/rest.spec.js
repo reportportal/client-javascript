@@ -47,9 +47,9 @@ describe('RestClient', () => {
           debug: true,
         },
       };
-      const restClient = new RestClient(optionsWithLoggerEnabled);
+      const client = new RestClient(optionsWithLoggerEnabled);
 
-      expect(spyLogger).toHaveBeenCalledWith(restClient.axiosInstance);
+      expect(spyLogger).toHaveBeenCalledWith(client.axiosInstance);
     });
   });
 
