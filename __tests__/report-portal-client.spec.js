@@ -1,10 +1,13 @@
 const process = require('process');
 const RPClient = require('../lib/report-portal-client');
-const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
 const { OUTPUT_TYPES } = require('../lib/constants/outputs');
 
 describe('ReportPortal javascript client', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('constructor', () => {
     it('creates the client instance without error', () => {
       const client = new RPClient({
@@ -27,7 +30,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
         debug: true,
       });
-      spyOn(console, 'log');
+      jest.spyOn(console, 'log').mockImplementation();
 
       client.logDebug('message');
 
@@ -41,7 +44,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
         debug: true,
       });
-      spyOn(console, 'log');
+      jest.spyOn(console, 'log').mockImplementation();
 
       client.logDebug('message', { key: 1, value: 2 });
 
@@ -55,7 +58,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
         debug: false,
       });
-      spyOn(console, 'log');
+      jest.spyOn(console, 'log').mockImplementation();
 
       client.logDebug('message');
 
@@ -100,7 +103,7 @@ describe('ReportPortal javascript client', () => {
       const rejectAnswer = client.getRejectAnswer('tempId', 'error');
 
       expect(rejectAnswer.tempId).toEqual('tempId');
-      return expectAsync(rejectAnswer.promise).toBeRejected();
+      return expect(rejectAnswer.promise).rejects.toEqual('error');
     });
   });
 
@@ -130,11 +133,11 @@ describe('ReportPortal javascript client', () => {
         project: 'test',
         endpoint: 'https://abc.com',
       });
-      spyOn(RestClient, 'request').and.returnValue(Promise.resolve('ok'));
+      jest.spyOn(client.restClient, 'request').mockReturnValue(Promise.resolve('ok'));
 
       const request = client.checkConnect();
 
-      return expectAsync(request).toBeResolved();
+      return expect(request).resolves.toBeDefined();
     });
   });
 
@@ -149,29 +152,29 @@ describe('ReportPortal javascript client', () => {
       process.env = OLD_ENV;
     });
 
-    it('should call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is not set', () => {
+    it('should call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is not set', async () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
-      spyOn(client.statistics, 'trackEvent');
+      jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
 
-      client.triggerStatisticsEvent();
+      await client.triggerStatisticsEvent();
 
       expect(client.statistics.trackEvent).toHaveBeenCalled();
     });
 
-    it('should not call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', () => {
+    it('should not call statistics.trackEvent if REPORTPORTAL_CLIENT_JS_NO_ANALYTICS is true', async () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
       process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = true;
-      spyOn(client.statistics, 'trackEvent');
+      jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
 
-      client.triggerStatisticsEvent();
+      await client.triggerStatisticsEvent();
 
       expect(client.statistics.trackEvent).not.toHaveBeenCalled();
     });
@@ -193,7 +196,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.statistics.eventName).toEqual('start_launch');
       expect(client.statistics.eventParams).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           agent_name: agentParams.name,
           agent_version: agentParams.version,
         }),
@@ -209,9 +212,9 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.statistics.eventName).toEqual('start_launch');
       expect(client.statistics.eventParams).not.toEqual(
-        jasmine.objectContaining({
-          agent_name: jasmine.anything(),
-          agent_version: jasmine.anything(),
+        expect.objectContaining({
+          agent_name: expect.anything(),
+          agent_version: expect.anything(),
         }),
       );
     });
@@ -238,22 +241,18 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
-      spyOn(helpers, 'getSystemAttribute').and.returnValue(fakeSystemAttr);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+      jest.spyOn(helpers, 'getSystemAttribute').mockReturnValue(fakeSystemAttr);
 
       client.startLaunch({
         startTime: time,
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith(
-        'launch',
-        {
-          name: 'Test launch name',
-          startTime: time,
-          attributes: fakeSystemAttr,
-        },
-        { headers: client.headers },
-      );
+      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
+        name: 'Test launch name',
+        startTime: time,
+        attributes: fakeSystemAttr,
+      });
     });
 
     it('should call restClient with suitable parameters, attributes is concatenated', () => {
@@ -271,30 +270,26 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
-      spyOn(helpers, 'getSystemAttribute').and.returnValue(fakeSystemAttr);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+      jest.spyOn(helpers, 'getSystemAttribute').mockReturnValue(fakeSystemAttr);
 
       client.startLaunch({
         startTime: time,
         attributes: [{ value: 'value' }],
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith(
-        'launch',
-        {
-          name: 'Test launch name',
-          startTime: time,
-          attributes: [
-            { value: 'value' },
-            {
-              key: 'client',
-              value: 'client-name|1.0',
-              system: true,
-            },
-          ],
-        },
-        { headers: client.headers },
-      );
+      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
+        name: 'Test launch name',
+        startTime: time,
+        attributes: [
+          { value: 'value' },
+          {
+            key: 'client',
+            value: 'client-name|1.0',
+            system: true,
+          },
+        ],
+      });
     });
 
     it('dont start new launch if launchDataRQ.id is not empty', () => {
@@ -306,7 +301,7 @@ describe('ReportPortal javascript client', () => {
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const startTime = 12345734;
       const id = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
 
       client.startLaunch({
         startTime,
@@ -318,7 +313,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should log Launch UUID if enabled', () => {
-      spyOn(OUTPUT_TYPES, 'STDOUT');
+      jest.spyOn(OUTPUT_TYPES, 'STDOUT').mockImplementation();
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -327,7 +322,7 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
       return client
         .startLaunch({
           startTime: time,
@@ -338,7 +333,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should log Launch UUID into STDERR if enabled', () => {
-      spyOn(OUTPUT_TYPES, 'STDERR');
+      jest.spyOn(OUTPUT_TYPES, 'STDERR').mockImplementation();
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -348,7 +343,7 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
       return client
         .startLaunch({
           startTime: time,
@@ -359,7 +354,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should log Launch UUID into STDOUT if invalid output is set', () => {
-      spyOn(OUTPUT_TYPES, 'STDOUT');
+      jest.spyOn(OUTPUT_TYPES, 'STDOUT').mockImplementation();
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -369,7 +364,7 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
       return client
         .startLaunch({
           startTime: time,
@@ -380,7 +375,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should log Launch UUID into ENVIRONMENT if enabled', () => {
-      spyOn(OUTPUT_TYPES, 'ENVIRONMENT');
+      jest.spyOn(OUTPUT_TYPES, 'ENVIRONMENT').mockImplementation();
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -390,7 +385,7 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
       return client
         .startLaunch({
           startTime: time,
@@ -401,7 +396,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should log Launch UUID into FILE if enabled', () => {
-      spyOn(OUTPUT_TYPES, 'FILE');
+      jest.spyOn(OUTPUT_TYPES, 'FILE').mockImplementation();
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -411,7 +406,7 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
       return client
         .startLaunch({
           startTime: time,
@@ -422,7 +417,7 @@ describe('ReportPortal javascript client', () => {
     });
 
     it('should not log Launch UUID if not enabled', () => {
-      spyOn(OUTPUT_TYPES, 'STDOUT');
+      jest.spyOn(OUTPUT_TYPES, 'STDOUT').mockImplementation();
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -430,7 +425,7 @@ describe('ReportPortal javascript client', () => {
       });
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
       return client
         .startLaunch({
           startTime: time,
@@ -449,7 +444,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
 
       client.finishLaunch('id2', { some: 'data' });
 
@@ -459,23 +454,24 @@ describe('ReportPortal javascript client', () => {
       );
     });
 
-    it('should trigger promiseFinish', (done) => {
+    it('should trigger promiseFinish', async () => {
       const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
       client.map = {
         id1: {
           children: ['child1'],
           promiseStart: Promise.resolve(),
+          resolveFinish: jest.fn().mockResolvedValue(),
         },
         child1: {
-          promiseFinish: Promise.resolve(),
+          promiseFinish: jest.fn().mockResolvedValue(),
         },
       };
-      spyOn(client.map.child1, 'promiseFinish').and.resolveTo();
 
-      client.finishLaunch('id1', { some: 'data' });
+      jest.spyOn(client.restClient, 'update').mockResolvedValue({ link: 'link' });
+
+      await client.finishLaunch('id1', { some: 'data' }).promise;
 
       expect(client.map.child1.promiseFinish().then).toBeDefined();
-      done();
     });
   });
 
@@ -497,7 +493,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
         attributes: [{ value: 'value' }],
       });
-      spyOn(client.helpers, 'now').and.returnValue(12345734);
+      jest.spyOn(client.helpers, 'now').mockReturnValue(12345734);
 
       const mergeLaunches = client.getMergeLaunchesRequest(['12345', '12346']);
 
@@ -522,7 +518,7 @@ describe('ReportPortal javascript client', () => {
         launch: 'launch',
         attributes: [{ value: 'value' }],
       });
-      spyOn(client.helpers, 'now').and.returnValue(12345734);
+      jest.spyOn(client.helpers, 'now').mockReturnValue(12345734);
 
       const mergeLaunches = client.getMergeLaunchesRequest(['12345', '12346']);
 
@@ -552,10 +548,10 @@ describe('ReportPortal javascript client', () => {
       });
 
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
-      spyOn(client.restClient, 'create').and.returnValue(myPromise);
-      spyOn(helpers, 'readLaunchesFromFile').and.returnValue(fakeLaunchIds);
-      spyOn(client, 'getMergeLaunchesRequest').and.returnValue(fakeMergeDataRQ);
-      spyOn(client.restClient, 'retrieveSyncAPI').and.returnValue(
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+      jest.spyOn(helpers, 'readLaunchesFromFile').mockReturnValue(fakeLaunchIds);
+      jest.spyOn(client, 'getMergeLaunchesRequest').mockReturnValue(fakeMergeDataRQ);
+      jest.spyOn(client.restClient, 'retrieveSyncAPI').mockReturnValue(
         Promise.resolve({
           content: [{ id: 'id1' }],
         }),
@@ -565,9 +561,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(promise.then).toBeDefined();
       await promise;
-      expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, {
-        headers: client.headers,
-      });
+      expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ);
     });
 
     it('should not call rest client if something went wrong', async () => {
@@ -578,10 +572,9 @@ describe('ReportPortal javascript client', () => {
         isLaunchMergeRequired: true,
       });
 
-      spyOn(client.helpers, 'readLaunchesFromFile').and.returnValue('launchUUid');
-      spyOn(client.restClient, 'retrieveSyncAPI').and.resolveTo();
-      spyOn(client.restClient, 'create').and.rejectWith();
-
+      jest.spyOn(client.helpers, 'readLaunchesFromFile').mockReturnValue('launchUUid');
+      jest.spyOn(client.restClient, 'retrieveSyncAPI').mockResolvedValue();
+      jest.spyOn(client.restClient, 'create').mockRejectedValue();
       await client.mergeLaunches();
 
       expect(client.restClient.create).not.toHaveBeenCalled();
@@ -616,11 +609,10 @@ describe('ReportPortal javascript client', () => {
           promiseFinish: Promise.resolve(),
         },
       };
-      spyOn(client.map.child1, 'promiseFinish');
 
       const promise = client.getPromiseFinishAllItems('id1');
 
-      expect(promise.then).toBeDefined();
+      expect(promise).toBeInstanceOf(Promise);
       done();
     });
   });
@@ -637,7 +629,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
 
       client.updateLaunch('id2', { some: 'data' });
 
@@ -659,12 +651,12 @@ describe('ReportPortal javascript client', () => {
           promiseFinish: Promise.resolve(),
         },
       };
-      spyOn(client.restClient, 'update').and.resolveTo();
+      jest.spyOn(client.restClient, 'update').mockResolvedValue();
 
       const result = client.updateLaunch('id1', { some: 'data' });
 
       expect(result.tempId).toEqual('id1');
-      return expectAsync(result.promise).toBeResolved();
+      return expect(result.promise).resolves.toBeUndefined();
     });
   });
 
@@ -680,7 +672,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
 
       client.startTestItem({}, 'id2');
 
@@ -702,7 +694,7 @@ describe('ReportPortal javascript client', () => {
           finishSend: true,
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
       const error = new Error(
         'Launch with tempId "id1" is already finished, you can not add an item to it',
       );
@@ -726,7 +718,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
       const error = new Error('Item with tempId "id3" not found');
 
       client.startTestItem({ testCaseId: 'testCaseId' }, 'id1', 'id3');
@@ -753,17 +745,17 @@ describe('ReportPortal javascript client', () => {
           promiseStart: Promise.resolve(),
         },
       };
-      spyOn(client.itemRetriesChainMap, 'get').and.resolveTo();
-      spyOn(client.restClient, 'create').and.resolveTo({});
-      spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
+      jest.spyOn(client.itemRetriesChainMap, 'get').mockResolvedValue();
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({});
+      jest.spyOn(client, 'getUniqId').mockReturnValue('4n5pxq24kpiob12og9');
 
       const result = client.startTestItem({ retry: false }, 'id1', 'id');
 
       expect(result.tempId).toEqual('4n5pxq24kpiob12og9');
-      return expectAsync(result.promise).toBeResolved();
+      return expect(result.promise).resolves.toBeDefined();
     });
 
-    it('should get previous try promise from itemRetriesChainMap if retry is true', () => {
+    it('should get previous try promise from itemRetriesChainMap if retry is true', async () => {
       const client = new RPClient({
         apiKey: 'startLaunchTest',
         endpoint: 'https://rp.us/api/v1',
@@ -782,12 +774,12 @@ describe('ReportPortal javascript client', () => {
           promiseStart: Promise.resolve(),
         },
       };
-      spyOn(client, 'calculateItemRetriesChainMapKey').and.returnValue('id1__name__');
-      spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
-      spyOn(client.map['4n5pxq24kpiob12og9'], 'promiseStart').and.resolveTo();
-      spyOn(client.itemRetriesChainMap, 'get');
+      jest.spyOn(client, 'calculateItemRetriesChainMapKey').mockReturnValue('id1__name__');
+      jest.spyOn(client, 'getUniqId').mockReturnValue('4n5pxq24kpiob12og9');
+      jest.spyOn(client.itemRetriesChainMap, 'get').mockImplementation();
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({});
 
-      client.startTestItem({ retry: true }, 'id1');
+      await client.startTestItem({ retry: true }, 'id1').promise;
 
       expect(client.itemRetriesChainMap.get).toHaveBeenCalledWith('id1__name__');
     });
@@ -805,7 +797,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
 
       client.finishTestItem('id2', {});
 
@@ -832,9 +824,9 @@ describe('ReportPortal javascript client', () => {
         },
       };
       client.launchUuid = 'launchUuid';
-      spyOn(client, 'cleanMap');
-      spyOn(client, 'finishTestItemPromiseStart');
-      spyOn(client.helpers, 'now').and.returnValue(1234567);
+      jest.spyOn(client, 'cleanMap').mockImplementation();
+      jest.spyOn(client, 'finishTestItemPromiseStart').mockImplementation();
+      jest.spyOn(client.helpers, 'now').mockReturnValue(1234567);
 
       client.finishTestItem('id', {});
 
@@ -866,9 +858,9 @@ describe('ReportPortal javascript client', () => {
         },
       };
       client.launchUuid = 'launchUuid';
-      spyOn(client, 'cleanMap');
-      spyOn(client, 'finishTestItemPromiseStart');
-      spyOn(client.helpers, 'now').and.returnValue(1234567);
+      jest.spyOn(client, 'cleanMap').mockImplementation();
+      jest.spyOn(client, 'finishTestItemPromiseStart').mockImplementation();
+      jest.spyOn(client.helpers, 'now').mockReturnValue(1234567);
 
       client.finishTestItem('id', {});
 
@@ -892,8 +884,8 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getUniqId').and.returnValue('4n5pxq24kpiob12og9');
-      spyOn(client.restClient, 'create').and.resolveTo();
+      jest.spyOn(client, 'getUniqId').mockReturnValue('4n5pxq24kpiob12og9');
+      jest.spyOn(client.restClient, 'create').mockResolvedValue();
 
       const result = client.saveLog(
         {
@@ -905,14 +897,14 @@ describe('ReportPortal javascript client', () => {
       );
 
       expect(result.tempId).toEqual('4n5pxq24kpiob12og9');
-      return expectAsync(result.promise).toBeResolved();
+      return expect(result.promise).resolves.toBeUndefined();
     });
   });
 
   describe('sendLog', () => {
     it('should return sendLogWithFile if fileObj is not empty', () => {
       const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
-      spyOn(client, 'sendLogWithFile').and.returnValue('sendLogWithFile');
+      jest.spyOn(client, 'sendLogWithFile').mockReturnValue('sendLogWithFile');
 
       const result = client.sendLog('itemTempId', { message: 'message' }, { name: 'name' });
 
@@ -921,7 +913,7 @@ describe('ReportPortal javascript client', () => {
 
     it('should return sendLogWithoutFile if fileObj is empty', () => {
       const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
-      spyOn(client, 'sendLogWithoutFile').and.returnValue('sendLogWithoutFile');
+      jest.spyOn(client, 'sendLogWithoutFile').mockReturnValue('sendLogWithoutFile');
 
       const result = client.sendLog('itemTempId', { message: 'message' });
 
@@ -937,7 +929,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
 
       client.sendLogWithoutFile('itemTempId', {});
 
@@ -954,7 +946,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'saveLog').and.returnValue('saveLog');
+      jest.spyOn(client, 'saveLog').mockReturnValue('saveLog');
 
       const result = client.sendLogWithoutFile('itemTempId', {});
 
@@ -970,7 +962,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'getRejectAnswer');
+      jest.spyOn(client, 'getRejectAnswer').mockImplementation();
 
       client.sendLogWithFile('itemTempId', {});
 
@@ -987,7 +979,7 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'saveLog').and.returnValue('saveLog');
+      jest.spyOn(client, 'saveLog').mockReturnValue('saveLog');
 
       const result = client.sendLogWithFile('itemTempId', {});
 
@@ -1003,12 +995,12 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'buildMultiPartStream').and.returnValue();
-      spyOn(client.restClient, 'create').and.resolveTo();
+      jest.spyOn(client, 'buildMultiPartStream').mockReturnValue();
+      jest.spyOn(client.restClient, 'create').mockResolvedValue('value');
 
       const result = client.getRequestLogWithFile({}, { name: 'name' });
 
-      return expectAsync(result).toBeResolved();
+      return expect(result).resolves.toBe('value');
     });
 
     it('should return restClient.create with error', () => {
@@ -1018,8 +1010,8 @@ describe('ReportPortal javascript client', () => {
           children: ['child1'],
         },
       };
-      spyOn(client, 'buildMultiPartStream').and.returnValue();
-      spyOn(client.restClient, 'create').and.rejectWith();
+      jest.spyOn(client, 'buildMultiPartStream').mockReturnValue();
+      jest.spyOn(client.restClient, 'create').mockRejectedValue();
 
       const result = client.getRequestLogWithFile({}, { name: 'name' });
 

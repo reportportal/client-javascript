@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [12, 14, 16, 18, 20]
+        node: [14, 16, 18, 20, 22]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,8 +50,5 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: Run tests
-        run: npm test
-
-      - name: Check coverage
+      - name: Run tests and check coverage
         run: npm run test:coverage
