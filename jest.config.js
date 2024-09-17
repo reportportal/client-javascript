@@ -11,12 +11,5 @@ module.exports = {
       statements: 80,
     },
   },
-  globals: {
-    'ts-jest': {
-      diagnostics: {
-        pathRegex: '(/__tests__/.*?\\.)\\.js$',
-      },
-    },
-  },
   bail: false,
 };
