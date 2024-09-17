@@ -2,13 +2,14 @@ const nock = require('nock');
 const isEqual = require('lodash/isEqual');
 const http = require('http');
 const RestClient = require('../lib/rest');
+const logger = require('../lib/logger');
 
 describe('RestClient', () => {
   const options = {
     baseURL: 'http://report-portal-host:8080/api/v1',
     headers: {
-      Authorization: 'bearer 00000000-0000-0000-0000-000000000000',
       'User-Agent': 'NodeJS',
+      Authorization: 'Bearer 00000000-0000-0000-0000-000000000000',
     },
     restClientConfig: {
       agent: {
@@ -34,6 +35,21 @@ describe('RestClient', () => {
       expect(restClient.baseURL).toBe(options.baseURL);
       expect(restClient.headers).toEqual(options.headers);
       expect(restClient.restClientConfig).toEqual(options.restClientConfig);
+      expect(restClient.axiosInstance).toBeDefined();
+    });
+
+    it('adds Logger to axios instance if enabled', () => {
+      const spyLogger = jest.spyOn(logger, 'addLogger').mockReturnValue();
+      const optionsWithLoggerEnabled = {
+        ...options,
+        restClientConfig: {
+          ...options.restClientConfig,
+          debug: true,
+        },
+      };
+      const restClient = new RestClient(optionsWithLoggerEnabled);
+
+      expect(spyLogger).toHaveBeenCalledWith(restClient.axiosInstance);
     });
   });
 

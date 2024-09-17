@@ -134,40 +134,11 @@ describe('ReportPortal javascript client', () => {
         project: 'test',
         endpoint: 'https://abc.com',
       });
-      jest.spyOn(RestClient, 'request').mockReturnValue(Promise.resolve('ok'));
+      jest.spyOn(client.restClient, 'request').mockReturnValue(Promise.resolve('ok'));
 
       const request = client.checkConnect();
 
       return expect(request).resolves.toBeDefined();
-    });
-
-    it('client should include restClientConfig', () => {
-      const client = new RPClient({
-        apiKey: 'test',
-        project: 'test',
-        endpoint: 'https://abc.com/v1',
-        restClientConfig: {
-          proxy: false,
-          timeout: 0,
-        },
-      });
-      jest.spyOn(RestClient, 'request').mockImplementation();
-
-      client.checkConnect();
-
-      expect(RestClient.request).toHaveBeenCalledWith(
-        'GET',
-        'https://abc.com/v1/user',
-        {},
-        {
-          headers: {
-            'User-Agent': 'NodeJS',
-            Authorization: `bearer test`,
-          },
-          proxy: false,
-          timeout: 0,
-        },
-      );
     });
   });
 
@@ -284,8 +255,7 @@ describe('ReportPortal javascript client', () => {
           name: 'Test launch name',
           startTime: time,
           attributes: fakeSystemAttr,
-        },
-        { headers: client.headers },
+        }
       );
     });
 
@@ -325,8 +295,7 @@ describe('ReportPortal javascript client', () => {
               system: true,
             },
           ],
-        },
-        { headers: client.headers },
+        }
       );
     });
 
@@ -599,9 +568,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(promise.then).toBeDefined();
       await promise;
-      expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, {
-        headers: client.headers,
-      });
+      expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ);
     });
 
     it('should not call rest client if something went wrong', async () => {
