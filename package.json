@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rimraf ./build",
-    "lint": "eslint ./statistics/**/* ./lib/**/* ./spec/**/*",
+    "lint": "eslint ./statistics/**/* ./lib/**/* ./__tests__/**/*",
     "format": "npm run lint -- --fix",
     "test": "jest",
     "test:coverage": "jest --coverage"
@@ -24,7 +24,7 @@
     "node": ">=14.x"
   },
   "dependencies": {
-    "axios": "^1.6.8",
+    "axios": "^1.7.7",
     "axios-retry": "^4.1.0",
     "glob": "^8.1.0",
     "ini": "^2.0.0",

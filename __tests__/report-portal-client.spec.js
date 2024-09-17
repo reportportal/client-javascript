@@ -1,6 +1,5 @@
 const process = require('process');
 const RPClient = require('../lib/report-portal-client');
-const RestClient = require('../lib/rest');
 const helpers = require('../lib/helpers');
 const { OUTPUT_TYPES } = require('../lib/constants/outputs');
 
@@ -134,40 +133,11 @@ describe('ReportPortal javascript client', () => {
         project: 'test',
         endpoint: 'https://abc.com',
       });
-      jest.spyOn(RestClient, 'request').mockReturnValue(Promise.resolve('ok'));
+      jest.spyOn(client.restClient, 'request').mockReturnValue(Promise.resolve('ok'));
 
       const request = client.checkConnect();
 
       return expect(request).resolves.toBeDefined();
-    });
-
-    it('client should include restClientConfig', () => {
-      const client = new RPClient({
-        apiKey: 'test',
-        project: 'test',
-        endpoint: 'https://abc.com/v1',
-        restClientConfig: {
-          proxy: false,
-          timeout: 0,
-        },
-      });
-      jest.spyOn(RestClient, 'request').mockImplementation();
-
-      client.checkConnect();
-
-      expect(RestClient.request).toHaveBeenCalledWith(
-        'GET',
-        'https://abc.com/v1/user',
-        {},
-        {
-          headers: {
-            'User-Agent': 'NodeJS',
-            Authorization: `bearer test`,
-          },
-          proxy: false,
-          timeout: 0,
-        },
-      );
     });
   });
 
@@ -278,15 +248,11 @@ describe('ReportPortal javascript client', () => {
         startTime: time,
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith(
-        'launch',
-        {
-          name: 'Test launch name',
-          startTime: time,
-          attributes: fakeSystemAttr,
-        },
-        { headers: client.headers },
-      );
+      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
+        name: 'Test launch name',
+        startTime: time,
+        attributes: fakeSystemAttr,
+      });
     });
 
     it('should call restClient with suitable parameters, attributes is concatenated', () => {
@@ -312,22 +278,18 @@ describe('ReportPortal javascript client', () => {
         attributes: [{ value: 'value' }],
       });
 
-      expect(client.restClient.create).toHaveBeenCalledWith(
-        'launch',
-        {
-          name: 'Test launch name',
-          startTime: time,
-          attributes: [
-            { value: 'value' },
-            {
-              key: 'client',
-              value: 'client-name|1.0',
-              system: true,
-            },
-          ],
-        },
-        { headers: client.headers },
-      );
+      expect(client.restClient.create).toHaveBeenCalledWith('launch', {
+        name: 'Test launch name',
+        startTime: time,
+        attributes: [
+          { value: 'value' },
+          {
+            key: 'client',
+            value: 'client-name|1.0',
+            system: true,
+          },
+        ],
+      });
     });
 
     it('dont start new launch if launchDataRQ.id is not empty', () => {
@@ -599,9 +561,7 @@ describe('ReportPortal javascript client', () => {
 
       expect(promise.then).toBeDefined();
       await promise;
-      expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ, {
-        headers: client.headers,
-      });
+      expect(client.restClient.create).toHaveBeenCalledWith('launch/merge', fakeMergeDataRQ);
     });
 
     it('should not call rest client if something went wrong', async () => {

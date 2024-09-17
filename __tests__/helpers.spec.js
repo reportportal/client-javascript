@@ -2,7 +2,6 @@ const os = require('os');
 const fs = require('fs');
 const glob = require('glob');
 const helpers = require('../lib/helpers');
-const RestClient = require('../lib/rest');
 const pjson = require('../package.json');
 
 describe('Helpers', () => {
@@ -24,34 +23,6 @@ describe('Helpers', () => {
   describe('now', () => {
     it('returns milliseconds from unix time', () => {
       expect(new Date() - helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
-    });
-  });
-
-  describe('getServerResults', () => {
-    it('calls RestClient#request', () => {
-      jest.spyOn(RestClient, 'request').mockImplementation();
-
-      helpers.getServerResult(
-        'http://localhost:80/api/v1',
-        { userId: 1 },
-        {
-          headers: {
-            'X-Custom-Header': 'WOW',
-          },
-        },
-        'POST',
-      );
-
-      expect(RestClient.request).toHaveBeenCalledWith(
-        'POST',
-        'http://localhost:80/api/v1',
-        { userId: 1 },
-        {
-          headers: {
-            'X-Custom-Header': 'WOW',
-          },
-        },
-      );
     });
   });
 

@@ -1,7 +1,8 @@
 ### Changed
 - **Breaking change** Drop support of Node.js 12. The version [5.1.4](https://github.com/reportportal/client-javascript/releases/tag/v5.1.4) is the latest that supports it.
+- The client now creates an instance of the `axios` HTTP client in the constructor.
+- The `HOST` HTTP header is added to all requests as it was skipped by the HTTP client.
 ### Fixed
-- Proxy support on HTTPS requests. Resolves [#30](https://github.com/reportportal/client-javascript/issues/30), related to [axios#4531](https://github.com/axios/axios/issues/4531).
 - Allow using `restClientConfig` in `checkConnect()` method. Thanks to [stevez](https://github.com/stevez).
 ### Security
 - Updated versions of vulnerable packages (braces).
