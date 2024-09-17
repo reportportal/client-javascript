@@ -19,6 +19,6 @@
     "outDir": "./build"
   },
   "include": [
-    "statistics/**/*", "lib/**/*"],
+    "statistics/**/*", "lib/**/*", "__tests__/**/*"],
   "exclude": ["node_modules", "__tests__"]
 }
