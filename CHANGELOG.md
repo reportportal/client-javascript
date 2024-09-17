@@ -1,3 +1,5 @@
+
+## [5.2.0] - 2024-09-17
 ### Changed
 - **Breaking change** Drop support of Node.js 12. The version [5.1.4](https://github.com/reportportal/client-javascript/releases/tag/v5.1.4) is the latest that supports it.
 - The client now creates an instance of the `axios` HTTP client in the constructor.
