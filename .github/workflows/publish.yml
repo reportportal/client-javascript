@@ -27,13 +27,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install of node dependencies
+      - name: Install dependencies
         run: npm install
       - name: Run lint
         run: npm run lint
-      - name: Run tests
-        run: npm test
-      - name: Check coverage
+      - name: Run tests and check coverage
         run: npm run test:coverage
 
   publish-to-npm-and-gpr:
@@ -47,7 +45,7 @@ jobs:
         with:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
-      - name: Install of node dependencies
+      - name: Install dependencies
         run: npm install
       - name: Publish to NPM
         run: |

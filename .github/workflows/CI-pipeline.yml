@@ -25,6 +25,9 @@ on:
     branches:
       - develop
       - master
+    paths-ignore:
+      - README.md
+      - CHANGELOG.md
 
 jobs:
   test:
@@ -41,7 +44,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Install of node dependencies
+      - name: Install dependencies
         run: npm install
 
       - name: Build the source code

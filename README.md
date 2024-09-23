@@ -129,13 +129,13 @@ console.log(launchObj.tempId);
 The method takes one argument:
 * launch data object:
 
-| Option      | Necessity | Default                                                        | Description                                                                                                            |
-|-------------|-----------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| startTime   | Optional  | rpClient.helpers.now()                                         | Start time of the launch (unix time).                                                                                  |
-| name        | Optional  | parameter 'launch' specified when creating the client instance | Name of the launch.                                                                                                    |
-| mode        | Optional  | 'DEFAULT'                                                      | 'DEFAULT' - results will be submitted to Launches page, 'DEBUG' - results will be submitted to Debug page.             |
-| description | Optional  | ''                                                             | Description of the launch (supports markdown syntax).                                                                  |
-| attributes  | Optional  | []                                                             | Array of launch attributes (tags).                                                                                     |
+| Option      | Necessity | Default                                                        | Description                                                                                                        |
+|-------------|-----------|----------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| startTime   | Optional  | rpClient.helpers.now()                                         | Start time of the launch (Unix Epoch time, see [time format](#time-format)).                                                                  |
+| name        | Optional  | parameter 'launch' specified when creating the client instance | Name of the launch.                                                                                                |
+| mode        | Optional  | 'DEFAULT'                                                      | 'DEFAULT' - results will be submitted to Launches page, 'DEBUG' - results will be submitted to Debug page.         |
+| description | Optional  | ''                                                             | Description of the launch (supports markdown syntax).                                                              |
+| attributes  | Optional  | []                                                             | Array of launch attributes (tags).                                                                                 |
 | id          | Optional  | Not set                                                        | `ID` of the existing launch in which tests data would be sent, without this param new launch instance will be created. |
 
 To get the real launch `ID` (also known as launch `UUID` from database) wait for the returned promise to finish.
@@ -180,9 +180,9 @@ The method takes two arguments:
 * launch `tempId` (returned by the method `startLaunch`)
 * data object:
 
-|Option | Necessity | Default | Description                                                                                       |
-|--------- |-----------|---------|---------------------------------------------------------------------------------------------------|
-|endTime  | Optional  | rpClient.helpers.now() | End time of the launch.                                                                           |
+|Option | Necessity | Default | Description                                                                                        |
+|--------- |-----------|---------|----------------------------------------------------------------------------------------------------|
+|endTime  | Optional  | rpClient.helpers.now() | End time of the launch (Unix Epoch time, see [time format](#time-format)).                         |
 |status    | Optional   | '' | Status of launch, one of '', 'PASSED', 'FAILED', 'STOPPED', 'SKIPPED', 'INTERRUPTED', 'CANCELLED'. |
 
 ### getPromiseFinishAllItems
@@ -265,7 +265,7 @@ The method takes three arguments:
 |type    | Required  |                        | Test item type, one of 'SUITE', 'STORY', 'TEST', 'SCENARIO', 'STEP', 'BEFORE_CLASS', 'BEFORE_GROUPS','BEFORE_METHOD', 'BEFORE_SUITE', 'BEFORE_TEST', 'AFTER_CLASS', 'AFTER_GROUPS', 'AFTER_METHOD', 'AFTER_SUITE', 'AFTER_TEST' |
 |hasStats  | Optional  | true                   | Changes behavior for test item of type 'STEP'. When set to `true`, step is treaten as a test case (entity containig statistics). When false, step becomes a nested step.                                                        |
 |description  | Optional  |         ''               | Description of the test item (supports markdown syntax).                                                                                                                                                                        |
-|startTime  | Optional  | rpClient.helpers.now() | Start time of the test item (unix time).                                                                                                                                                                                        |
+|startTime  | Optional  | rpClient.helpers.now() | Start time of the test item (Unix Epoch time, see [time format](#time-format)).                                                                                                                                                                                        |
 |attributes  | Optional  | []                     | Array of the test item attributes.                                                                                                                                                                                              |
 
 * launch `tempId` (returned by the method `startLaunch`)
@@ -289,8 +289,8 @@ The method takes two arguments:
 | Option  | Necessity | Default                | Description                                                                                                                              |
 |---------|-----------|------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
 | issue   | Optional  | true                   | Test item issue object. `issueType` is required, allowable values: 'pb***', 'ab***', 'si***', 'ti***', 'nd001'. Where `***` is locator id |
-| status  | Optional  | 'PASSED'               | Test item status, one of '', 'PASSED', 'FAILED', 'STOPPED', 'SKIPPED', 'INTERRUPTED', 'CANCELLED'.                   |
-| endTime | Optional  | rpClient.helpers.now() | End time of the launch (unix time).                                                                                                      |
+| status  | Optional  | 'PASSED'               | Test item status, one of '', 'PASSED', 'FAILED', 'STOPPED', 'SKIPPED', 'INTERRUPTED', 'CANCELLED'.                                       |
+| endTime | Optional  | rpClient.helpers.now() | End time of the launch (Unix Epoch time, see [time format](#time-format)).                           |
 
 Example issue object:
 ```
@@ -325,11 +325,11 @@ The method takes three arguments:
 * test item `tempId` (returned by method `startTestItem`)
 * data object:
 
-| Option  | Necessity | Default                | Description                                                          |
-|---------|-----------|------------------------|----------------------------------------------------------------------|
-| message | Optional  | ''                     | The log message.                                                     |
+| Option  | Necessity | Default                | Description                                                         |
+|---------|-----------|------------------------|---------------------------------------------------------------------|
+| message | Optional  | ''                     | The log message.                                                    |
 | level   | Optional  | ''                     | The log level, one of 'trace', 'debug', 'info', 'warn', 'error', ''. |
-| time    | Optional  | rpClient.helpers.now() | The time of the log.                                                 |
+| time    | Optional  | rpClient.helpers.now() | The time of the log (Unix Epoch time, see [time format](#time-format)).                                               |
 
 * file object (optional):
 
@@ -370,12 +370,22 @@ The method takes one argument:
 |-------------------------|-----------|-----------------------------------------|------------------------------------------------------------------------------------------------------------|
 | description             | Optional  | config.description or 'Merged launch'   | Description of the launch (supports markdown syntax).                                                      |
 | attributes              | Optional  | config.attributes or []                 | Array of launch attributes (tags).                                                                         |
-| endTime                 | Optional  | rpClient.helpers.now()                  | End time of the launch (unix time)                                                                         |
+| endTime                 | Optional  | rpClient.helpers.now()                  | End time of the launch (Unix Epoch time, see [time format](#time-format)).                                 |
 | extendSuitesDescription | Optional  | true                                    | Whether to extend suites description or not.                                                               |
 | launches                | Optional  | ids of the launches saved to filesystem | The array of the real launch ids, not UUIDs                                                                |
 | mergeType               | Optional  | 'BASIC'                                 | The type of the merge operation. Possible values are 'BASIC' or 'DEEP'.                                    |
 | mode                    | Optional  | config.mode or 'DEFAULT'                | 'DEFAULT' - results will be submitted to Launches page, 'DEBUG' - results will be submitted to Debug page. |
 | name                    | Optional  | config.launch or 'Test launch name'     | Name of the launch after merge.                                                                            |
+
+## Time format
+
+The unix Epoch time ISO string.
+
+The [ReportPortal since product version 24.2]() (Service API version 5.12.0) supports the time with microsecond precision in the ISO string format (`2024-09-23T11:10:46.793546Z`).
+Thus, it is recommended to report time in this format to have more accurate logs and test items order on the ReportPortal UI.
+**Note:** Reporting the time in ISO string format with millisecond precision (`2024-09-23T11:10:46.793Z`) or as a number of milliseconds (`1727089846793`) is also acceptable with microseconds automatically added as zeros for backward compatibility.
+
+The client use time with microsecond precision in the ISO string format by default since [version 5.3.0]().
 
 # Copyright Notice
 
