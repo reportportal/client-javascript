@@ -1,5 +1,6 @@
 ### Changed
-- The client now reports the time for launches, test items and logs with microsecond precision in the ISO string. Thus, the `helpers.now` function is adjusted accordingly.
+- The client now expects reporting the time for launches, test items and logs with microsecond precision in the ISO string.
+Thus, the `helpers.now` function is adjusted accordingly.
 For logs, microsecond precision is available on the UI from ReportPortal version 24.2.
 ### Security
 - Updated versions of vulnerable packages (micromatch).
