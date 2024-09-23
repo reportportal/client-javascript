@@ -1,3 +1,5 @@
+
+## [5.3.0] - 2024-09-23
 ### Changed
 - The client now expects reporting the time for launches, test items and logs with microsecond precision in the ISO string format.
 Thus, the `helpers.now` function is adjusted accordingly. Details about [supported](./README.md#time-format) formats.
