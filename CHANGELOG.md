@@ -1,6 +1,6 @@
 ### Changed
 - The client now expects reporting the time for launches, test items and logs with microsecond precision in the ISO string.
-Thus, the `helpers.now` function is adjusted accordingly.
+Thus, the `helpers.now` function is adjusted accordingly. Details about [supported](./README.md#time-format) formats.
 For logs, microsecond precision is available on the UI from ReportPortal version 24.2.
 ### Security
 - Updated versions of vulnerable packages (micromatch).
