@@ -1,6 +1,6 @@
 # ReportPortal js client
 
-This Client is to communicate with the Report Portal on Node.js.
+This Client is to communicate with the ReportPortal on Node.js.
 
 Library is used only for implementors of custom listeners for ReportPortal.
 
