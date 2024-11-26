@@ -383,6 +383,7 @@ The unix Epoch time ISO string.
 
 The [ReportPortal since product version 24.2]() (Service API version 5.12.0) supports the time with microsecond precision in the ISO string format (`2024-09-23T11:10:46.793546Z`).
 Thus, it is recommended to report time in this format to have more accurate logs and test items order on the ReportPortal UI.
+
 **Note:** Reporting the time in ISO string format with millisecond precision (`2024-09-23T11:10:46.793Z`) or as a number of milliseconds (`1727089846793`) is also acceptable with microseconds automatically added as zeros for backward compatibility.
 
 The client use time with microsecond precision in the ISO string format by default since [version 5.3.0]().
