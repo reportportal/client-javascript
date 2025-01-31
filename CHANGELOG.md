@@ -1,3 +1,5 @@
+
+## [5.3.1] - 2025-01-31
 ### Fixed
 - Updated the `checkConnect` method implementation to utilize the `GET launches` API endpoint, ensuring compatibility with both old and new API versions.
 
