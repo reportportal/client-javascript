@@ -1,3 +1,8 @@
+### Changed
+- Revert time format back to milliseconds (based on [#217](https://github.com/reportportal/client-javascript/issues/217#issuecomment-2659843471)).
+  This is also fixing the issue with agent installation on ARM processors.
+### Security
+- Updated versions of vulnerable packages (axios).
 
 ## [5.3.1] - 2025-01-31
 ### Fixed

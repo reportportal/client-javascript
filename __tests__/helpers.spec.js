@@ -1,7 +1,6 @@
 const os = require('os');
 const fs = require('fs');
 const glob = require('glob');
-const microtime = require('microtime');
 const helpers = require('../lib/helpers');
 const pjson = require('../package.json');
 
@@ -21,38 +20,9 @@ describe('Helpers', () => {
     });
   });
 
-  describe('formatMicrosecondsToISOString', () => {
-    test('converts microseconds to ISO string with microseconds precision', () => {
-      const input = 1726842755304456;
-      const expected = '2024-09-20T14:32:35.304456Z';
-      const result = helpers.formatMicrosecondsToISOString(input);
-      expect(result).toBe(expected);
-    });
-
-    test('handles microseconds at the start of the epoch', () => {
-      const input = 654321;
-      const expected = '1970-01-01T00:00:00.654321Z';
-      const result = helpers.formatMicrosecondsToISOString(input);
-      expect(result).toBe(expected);
-    });
-
-    test('handles rounding down of microseconds correctly', () => {
-      const input = 1000001;
-      const expected = '1970-01-01T00:00:01.000001Z';
-      const result = helpers.formatMicrosecondsToISOString(input);
-      expect(result).toBe(expected);
-    });
-  });
-
   describe('now', () => {
-    it('should return the current timestamp with microseconds precision in ISO string format', () => {
-      const spyMicrotime = jest.spyOn(microtime, 'now').mockReturnValue(1726842755304456);
-      const expectedISOString = '2024-09-20T14:32:35.304456Z';
-
-      const result = helpers.now();
-
-      expect(spyMicrotime).toHaveBeenCalled();
-      expect(result).toBe(expectedISOString);
+    it('returns milliseconds from unix time', () => {
+      expect(new Date() - helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
     });
   });
 
