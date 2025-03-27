@@ -1,5 +1,5 @@
 ### Changed
-- Revert time format back to microseconds (based on [#217](https://github.com/reportportal/client-javascript/issues/217#issuecomment-2659843471)).
+- Revert time format back to milliseconds (based on [#217](https://github.com/reportportal/client-javascript/issues/217#issuecomment-2659843471)).
   This is also fixing the issue with agent installation on M-processors.
 ### Security
 - Updated versions of vulnerable packages (axios).
