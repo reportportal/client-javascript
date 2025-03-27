@@ -24,13 +24,12 @@
     "node": ">=14.x"
   },
   "dependencies": {
-    "axios": "^1.7.7",
+    "axios": "^1.8.4",
     "axios-retry": "^4.1.0",
     "glob": "^8.1.0",
     "ini": "^2.0.0",
     "uniqid": "^5.4.0",
-    "uuid": "^9.0.1",
-    "microtime": "^3.1.1"
+    "uuid": "^9.0.1"
   },
   "license": "Apache-2.0",
   "devDependencies": {
