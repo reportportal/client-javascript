@@ -23,19 +23,16 @@ describe('Config commons test suite', () => {
       expect(error).toBeInstanceOf(ReportPortalRequiredOptionError);
     });
 
-    it(
-      'should throw ReportPortalRequiredOptionError in case of option ' + 'not present in options',
-      () => {
-        let error;
-        try {
-          getRequiredOption({ other: 1 }, 'project');
-        } catch (e) {
-          error = e;
-        }
-        expect(error).toBeDefined();
-        expect(error).toBeInstanceOf(ReportPortalRequiredOptionError);
-      },
-    );
+    it('should throw ReportPortalRequiredOptionError in case of option not present in options', () => {
+      let error;
+      try {
+        getRequiredOption({ other: 1 }, 'project');
+      } catch (e) {
+        error = e;
+      }
+      expect(error).toBeDefined();
+      expect(error).toBeInstanceOf(ReportPortalRequiredOptionError);
+    });
   });
 
   describe('getApiKey', () => {
@@ -52,7 +49,7 @@ describe('Config commons test suite', () => {
     });
 
     it('should print warning to console if deprecated token option used', () => {
-      spyOn(console, 'warn');
+      jest.spyOn(console, 'warn').mockImplementation();
 
       getApiKey({ token: '1' });
 
@@ -75,7 +72,7 @@ describe('Config commons test suite', () => {
 
   describe('getClientConfig', () => {
     it('should print ReportPortalValidationError error to the console in case of options is not an object type', () => {
-      spyOn(console, 'dir');
+      jest.spyOn(console, 'dir').mockImplementation();
       getClientConfig('options');
 
       expect(console.dir).toHaveBeenCalledWith(
@@ -84,7 +81,7 @@ describe('Config commons test suite', () => {
     });
 
     it('should print ReportPortalRequiredOptionError to the console in case of "endpoint" option missed', () => {
-      spyOn(console, 'dir');
+      jest.spyOn(console, 'dir').mockImplementation();
       getClientConfig({
         apiKey: '123',
         project: 'prj',
@@ -94,7 +91,7 @@ describe('Config commons test suite', () => {
     });
 
     it('should print ReportPortalRequiredOptionError to the console in case of "project" option missed', () => {
-      spyOn(console, 'dir');
+      jest.spyOn(console, 'dir').mockImplementation();
       getClientConfig({
         apiKey: '123',
         endpoint: 'https://abc.com',
@@ -104,7 +101,7 @@ describe('Config commons test suite', () => {
     });
 
     it('should print ReportPortalRequiredOptionError to the console in case of "apiKey" option missed', () => {
-      spyOn(console, 'dir');
+      jest.spyOn(console, 'dir').mockImplementation();
       getClientConfig({
         project: 'prj',
         endpoint: 'https://abc.com',

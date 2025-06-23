@@ -13,17 +13,17 @@ const eventName = 'start_launch';
 
 const url = `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_KEY}`;
 const baseParamsValidationObject = {
-  interpreter: jasmine.stringMatching(/Node\.js \d{2}\.\d+\.\d+/),
+  interpreter: expect.stringMatching(/Node\.js \d{2}\.\d+\.\d+/),
   client_name: '@reportportal/client-javascript',
-  client_version: jasmine.stringMatching(/\d+\.\d+\.\d+/),
+  client_version: expect.stringMatching(/\d+\.\d+\.\d+/),
 };
 const agentParamsValidationObject = {
   ...baseParamsValidationObject,
   agent_name: agentParams.name,
   agent_version: agentParams.version,
 };
-const baseParamsValidation = jasmine.objectContaining(baseParamsValidationObject);
-const agentParamsValidation = jasmine.objectContaining(agentParamsValidationObject);
+const baseParamsValidation = expect.objectContaining(baseParamsValidationObject);
+const agentParamsValidation = expect.objectContaining(agentParamsValidationObject);
 const baseEventValidationObject = {
   name: eventName,
   params: baseParamsValidation,
@@ -33,25 +33,30 @@ const agentEventValidationObject = {
   params: agentParamsValidation,
 };
 const baseRequestValidationObject = {
-  client_id: jasmine.stringMatching(uuidv4Validation),
-  events: jasmine.arrayContaining([jasmine.objectContaining(baseEventValidationObject)]),
+  client_id: expect.stringMatching(uuidv4Validation),
+  events: expect.arrayContaining([expect.objectContaining(baseEventValidationObject)]),
 };
-const baseRequestValidation = jasmine.objectContaining(baseRequestValidationObject);
-const agentRequestValidation = jasmine.objectContaining({
+const baseRequestValidation = expect.objectContaining(baseRequestValidationObject);
+const agentRequestValidation = expect.objectContaining({
   ...baseRequestValidationObject,
-  events: jasmine.arrayContaining([jasmine.objectContaining(agentEventValidationObject)]),
+  events: expect.arrayContaining([expect.objectContaining(agentEventValidationObject)]),
 });
 
 describe('Statistics', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should send proper event to axios', async () => {
-    spyOn(axios, 'post').and.returnValue({
+    jest.spyOn(axios, 'post').mockReturnValue({
       send: () => {}, // eslint-disable-line
     });
 
     const statistics = new Statistics(eventName, agentParams);
     await statistics.trackEvent();
 
-    expect(axios.post).toHaveBeenCalledOnceWith(url, agentRequestValidation);
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    expect(axios.post).toHaveBeenCalledWith(url, agentRequestValidation);
   });
 
   [
@@ -63,14 +68,27 @@ describe('Statistics', () => {
     },
   ].forEach((params) => {
     it(`should not fail if agent params: ${JSON.stringify(params)}`, async () => {
-      spyOn(axios, 'post').and.returnValue({
+      jest.spyOn(axios, 'post').mockReturnValue({
         send: () => {}, // eslint-disable-line
       });
 
       const statistics = new Statistics(eventName, params);
       await statistics.trackEvent();
 
-      expect(axios.post).toHaveBeenCalledOnceWith(url, baseRequestValidation);
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(url, baseRequestValidation);
+    });
+
+    it('Should properly handle errors if any', async () => {
+      const statistics = new Statistics(eventName, agentParams);
+      const errorMessage = 'Error message';
+
+      jest.spyOn(axios, 'post').mockRejectedValue(new Error(errorMessage));
+      jest.spyOn(console, 'error').mockImplementation();
+
+      await statistics.trackEvent();
+
+      expect(console.error).toHaveBeenCalledWith(errorMessage);
     });
   });
 });

@@ -1,22 +1,23 @@
 # ReportPortal js client
 
-This Client is to communicate with the Report Portal on Node.js.
+This Client is to communicate with the ReportPortal on Node.js.
 
 Library is used only for implementors of custom listeners for ReportPortal.
 
 ## Already implemented listeners:
 
-* [Jest integration](https://github.com/reportportal/agent-js-jest)
-* [Cypress integration](https://github.com/reportportal/agent-js-cypress)
-* [Mocha integration](https://github.com/reportportal/agent-js-mocha)
-* [Jasmine integration](https://github.com/reportportal/agent-js-jasmine)
-* [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
-* [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
-* [Codecept integration](https://github.com/reportportal/agent-js-codecept)
-* [Postman integration](https://github.com/reportportal/agent-js-postman)
-* [TestCafe integration](https://github.com/reportportal/agent-js-testcafe)
-* [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
 * [Playwright integration](https://github.com/reportportal/agent-js-playwright)
+* [Cypress integration](https://github.com/reportportal/agent-js-cypress)
+* [Jest integration](https://github.com/reportportal/agent-js-jest)
+* [Mocha integration](https://github.com/reportportal/agent-js-mocha)
+* [Webdriverio integration](https://github.com/reportportal/agent-js-webdriverio)
+* [Postman integration](https://github.com/reportportal/agent-js-postman)
+* [Cucumber integration](https://github.com/reportportal/agent-js-cucumber)
+* [Vitest integration](https://github.com/reportportal/agent-js-vitest)
+* [Jasmine integration](https://github.com/reportportal/agent-js-jasmine)
+* [TestCafe integration](https://github.com/reportportal/agent-js-testcafe)
+* [Codecept integration](https://github.com/reportportal/agent-js-codecept)
+* [Nightwatch integration](https://github.com/reportportal/agent-js-nightwatch)
 
 Examples for test framework integrations from the list above described in [examples](https://github.com/reportportal/examples-js) repository.
 
@@ -39,9 +40,8 @@ const rpClient = new RPClient({
     project: 'PROJECT_NAME'
 });
 
-rpClient.checkConnect().then((response) => {
+rpClient.checkConnect().then(() => {
     console.log('You have successfully connected to the server.');
-    console.log(`You are using an account: ${response.fullName}`);
 }, (error) => {
     console.log('Error connection to server');
     console.dir(error);
@@ -52,24 +52,24 @@ rpClient.checkConnect().then((response) => {
 
 When creating a client instance, you need to specify the following options:
 
-| Option                | Necessity  | Default  | Description                                                                                                                                                                                  |
-|-----------------------|------------|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| apiKey                | Required   |          | User's reportportal token from which you want to send requests. It can be found on the profile page of this user.                                                                            |
-| endpoint              | Required   |          | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.                                             |
-| launch                | Required   |          | Name of launch at creation.                                                                                                                                                                  |
-| project               | Required   |          | The name of the project in which the launches will be created.                                                                                                                               |
-| headers               | Optional   | {}       | The object with custom headers for internal http client.                                                                                                                                     |
-| debug                 | Optional   | false    | This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                        |
-| isLaunchMergeRequired | Optional   | false    | Allows client to merge launches into one at the end of the run via saving their UUIDs to the file system. At the end of the run launches can be merged using `mergeLaunches` method.         |
-| restClientConfig      | Optional   | Not set  | The object with `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, may contain other client options eg. `timeout`. |
-| launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                    |
-| launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR'. Works only if `launchUuidPrint` set to `true`.                                                                             |
-| token                 | Deprecated | Not set  | Use `apiKey` instead.                                                                                                                                                                        |
+| Option                | Necessity  | Default  | Description                                                                                                                                                                                                                                                                                                                     |
+|-----------------------|------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| apiKey                | Required   |          | User's reportportal token from which you want to send requests. It can be found on the profile page of this user.                                                                                                                                                                                                               |
+| endpoint              | Required   |          | URL of your server. For example, if you visit the page at 'https://server:8080/ui', then endpoint will be equal to 'https://server:8080/api/v1'.                                                                                                                                                                                |
+| launch                | Required   |          | Name of the launch at creation.                                                                                                                                                                                                                                                                                                 |
+| project               | Required   |          | The name of the project in which the launches will be created.                                                                                                                                                                                                                                                                  |
+| headers               | Optional   | {}       | The object with custom headers for internal http client.                                                                                                                                                                                                                                                                        |
+| debug                 | Optional   | false    | This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                                                                                                                                                           |
+| isLaunchMergeRequired | Optional   | false    | Allows client to merge launches into one at the end of the run via saving their UUIDs to the temp files at filesystem. At the end of the run launches can be merged using `mergeLaunches` method. Temp file format: `rplaunch-${launch_uuid}.tmp`.                                                                              |
+| restClientConfig      | Optional   | Not set  | `axios` like http client [config](https://github.com/axios/axios#request-config). May contain `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, and other client options eg. `timeout`. For debugging and displaying logs you can set `debug: true`. |
+| launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                                                                                                                                                       |
+| launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                       |
+| token                 | Deprecated | Not set  | Use `apiKey` instead.                                                                                                                                                                                                                                                                                                           |
 
 ## Asynchronous reporting
 
-The client supports an asynchronous reporting.
-If you want the client to work asynchronously change `v1` to `v2` in addresses in endpoint.
+The client supports an asynchronous reporting (via the ReportPortal asynchronous API).
+If you want the client to report through the asynchronous API, change `v1` to `v2` in the `endpoint` address.
 
 ## API
 
@@ -130,7 +130,7 @@ The method takes one argument:
 
 | Option      | Necessity | Default                                                        | Description                                                                                                            |
 |-------------|-----------|----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| startTime   | Optional  | rpClient.helpers.now()                                         | (optional) start time launch(unix time).                                                                               |
+| startTime   | Optional  | rpClient.helpers.now()                                         | Start time of the launch (unix time).                                                                                  |
 | name        | Optional  | parameter 'launch' specified when creating the client instance | Name of the launch.                                                                                                    |
 | mode        | Optional  | 'DEFAULT'                                                      | 'DEFAULT' - results will be submitted to Launches page, 'DEBUG' - results will be submitted to Debug page.             |
 | description | Optional  | ''                                                             | Description of the launch (supports markdown syntax).                                                                  |
@@ -337,6 +337,44 @@ The method takes three arguments:
 | name    | Required  |         | The name of the file.                                                                                                                                                                               |
 | type    | Required  |         | The file mimeType, example 'image/png' (support types: 'image/*', application/['xml', 'javascript', 'json', 'css', 'php'], other formats will be opened in reportportal in a new browser tab only). |
 | content | Required  |         | base64 encoded file content.                                                                                                                                                                        |
+
+### mergeLaunches
+
+`mergeLaunches` - merges already completed runs into one (useful when running tests in multiple threads on the same machine).
+
+**Note:** Works only if `isLaunchMergeRequired` option is set to `true`.
+
+```javascript
+rpClient.mergeLaunches({
+    description: 'Regression tests',
+    attributes: [
+      {
+        key: 'build',
+        value: '1.0.0'
+      }
+    ],
+    endTime: rpClient.helpers.now(),
+    extendSuitesDescription: false,
+    launches: [1, 2, 3],
+    mergeType: 'BASIC',
+    mode: 'DEFAULT',
+    name: 'Launch name',
+})
+```
+The method takes one argument:
+
+* merge options object (optional):
+
+| Option                  | Necessity | Default                                 | Description                                                                                                |
+|-------------------------|-----------|-----------------------------------------|------------------------------------------------------------------------------------------------------------|
+| description             | Optional  | config.description or 'Merged launch'   | Description of the launch (supports markdown syntax).                                                      |
+| attributes              | Optional  | config.attributes or []                 | Array of launch attributes (tags).                                                                         |
+| endTime                 | Optional  | rpClient.helpers.now()                  | End time of the launch (unix time)                                                                         |
+| extendSuitesDescription | Optional  | true                                    | Whether to extend suites description or not.                                                               |
+| launches                | Optional  | ids of the launches saved to filesystem | The array of the real launch ids, not UUIDs                                                                |
+| mergeType               | Optional  | 'BASIC'                                 | The type of the merge operation. Possible values are 'BASIC' or 'DEEP'.                                    |
+| mode                    | Optional  | config.mode or 'DEFAULT'                | 'DEFAULT' - results will be submitted to Launches page, 'DEBUG' - results will be submitted to Debug page. |
+| name                    | Optional  | config.launch or 'Test launch name'     | Name of the launch after merge.                                                                            |
 
 # Copyright Notice
 

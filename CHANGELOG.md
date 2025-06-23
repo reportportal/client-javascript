@@ -1,7 +1,76 @@
 
+## [5.4.0] - 2025-03-27
+### Changed
+- Revert time format back to milliseconds (based on [#217](https://github.com/reportportal/client-javascript/issues/217#issuecomment-2659843471)).
+  This is also fixing the issue with agent installation on ARM processors.
+### Security
+- Updated versions of vulnerable packages (axios).
+
+## [5.3.1] - 2025-01-31
+### Fixed
+- Updated the `checkConnect` method implementation to utilize the `GET launches` API endpoint, ensuring compatibility with both old and new API versions.
+
+## [5.3.0] - 2024-09-23
+### Changed
+- The client now expects reporting the time for launches, test items and logs with microsecond precision in the ISO string format.
+Thus, the `helpers.now` function is adjusted accordingly. Details about [supported](./README.md#time-format) formats.
+For logs, microsecond precision is available on the UI from ReportPortal version 24.2.
+### Security
+- Updated versions of vulnerable packages (micromatch).
+
+## [5.2.0] - 2024-09-17
+### Changed
+- **Breaking change** Drop support of Node.js 12. The version [5.1.4](https://github.com/reportportal/client-javascript/releases/tag/v5.1.4) is the latest that supports it.
+- The client now creates an instance of the `axios` HTTP client in the constructor.
+- The `HOST` HTTP header is added to all requests as it was skipped by the HTTP client.
+### Fixed
+- Allow using `restClientConfig` in `checkConnect()` method. Thanks to [stevez](https://github.com/stevez).
+### Security
+- Updated versions of vulnerable packages (braces).
+
+## [5.1.4] - 2024-05-22
+### Fixed
+- Use correct launch search URL based on config mode while merging launches. Resolves [#200](https://github.com/reportportal/client-javascript/issues/200). Thanks to [hoangthanhtri](https://github.com/hoangthanhtri).
+- Print launch UUID after merging launches. Resolves [#202](https://github.com/reportportal/client-javascript/issues/202). Thanks to [hoangthanhtri](https://github.com/hoangthanhtri).
+
+## [5.1.3] - 2024-04-11
+### Added
+- Output launch UUID to file and ENV variable, thanks to [artsiomBandarenka](https://github.com/artsiomBandarenka). Addressed [#195](https://github.com/reportportal/client-javascript/issues/195), [#50](https://github.com/reportportal/agent-js-webdriverio/issues/50).
+### Security
+- Updated versions of vulnerable packages (follow-redirects).
+
+## [5.1.2] - 2024-02-20
+### Fixed
+- Execution sequence for retried tests [#134](https://github.com/reportportal/agent-js-playwright/issues/134).
+
+## [5.1.1] - 2024-01-23
+### Added
+- Debug logs for RestClient.
+
+## [5.1.0] - 2024-01-19
+### Changed
+- **Breaking change** Drop support of Node.js 10. The version [5.0.15](https://github.com/reportportal/client-javascript/releases/tag/v5.0.15) is the latest that supports it.
+### Security
+- Updated versions of vulnerable packages (axios, follow-redirects).
+### Deprecated
+- Node.js 12 usage. This minor version is the latest that supports Node.js 12.
+
+## [5.0.15] - 2023-11-20
+### Added
+- Logging link to the launch on its finish.
+### Deprecated
+- Node.js 10 usage. This version is the latest that supports Node.js 10.
+
+## [5.0.14] - 2023-10-05
+### Added
+- `Promise.allSettled` polyfill to support NodeJS 10.
+### Fixed
+- Reporting is down on error with collect request on reporting start.
+- Can not read property `realId` of undefined during reporting, resolves [#99](https://github.com/reportportal/agent-js-playwright/issues/99).
+
 ## [5.0.13] - 2023-08-28
 ### Added
-- `launchUuidPrint` and `launchUuidPrintOutput` configuration options to ease integration with CI tools, by @HardNorth
+- `launchUuidPrint` and `launchUuidPrintOutput` configuration options to ease integration with CI tools, by @HardNorth.
 
 ## [5.0.12] - 2023-06-19
 ### Changed

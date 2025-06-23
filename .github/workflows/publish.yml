@@ -1,4 +1,4 @@
-# Copyright 2020 EPAM Systems
+# Copyright 2024 EPAM Systems
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -22,18 +22,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
-      - name: Install of node dependencies
+          node-version: 20
+      - name: Install dependencies
         run: npm install
       - name: Run lint
         run: npm run lint
-      - name: Run tests
-        run: npm test
-      - name: Check coverage
+      - name: Run tests and check coverage
         run: npm run test:coverage
 
   publish-to-npm-and-gpr:
@@ -41,13 +39,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           registry-url: 'https://registry.npmjs.org'
-      - name: Install of node dependencies
+      - name: Install dependencies
         run: npm install
       - name: Publish to NPM
         run: |
@@ -57,9 +55,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           registry-url: 'https://npm.pkg.github.com'
           scope: '@reportportal'
       - name: Publish to GPR
@@ -69,4 +67,4 @@ jobs:
           npm config list
           npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

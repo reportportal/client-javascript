@@ -1,15 +1,15 @@
 {
   "name": "@reportportal/client-javascript",
-  "version": "5.0.13",
+  "version": "5.4.0",
   "description": "ReportPortal client for Node.js",
   "author": "ReportPortal.io",
   "scripts": {
     "build": "npm run clean && tsc",
     "clean": "rimraf ./build",
-    "lint": "eslint ./statistics/**/* ./lib/**/* ./spec/**/*",
+    "lint": "eslint ./statistics/**/* ./lib/**/* ./__tests__/**/*",
     "format": "npm run lint -- --fix",
-    "test": "nyc ./node_modules/jasmine/bin/jasmine.js",
-    "test:coverage": "nyc report --reporter=lcov --reporter=text-summary"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "directories": {
     "lib": "./lib"
@@ -20,38 +20,38 @@
     "/VERSION"
   ],
   "main": "./lib/report-portal-client",
+  "types": "./index.d.ts",
   "engines": {
-    "node": ">=10.x"
+    "node": ">=14.x"
   },
   "dependencies": {
-    "axios": "^0.27.2",
-    "axios-retry": "^3.4.0",
-    "glob": "^7.2.3",
+    "axios": "^1.8.4",
+    "axios-retry": "^4.1.0",
+    "glob": "^8.1.0",
     "ini": "^2.0.0",
     "uniqid": "^5.4.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/jasmine": "^4.3.1",
-    "@types/node": "^18.14.2",
-    "@typescript-eslint/eslint-plugin": "^5.54.0",
-    "@typescript-eslint/parser": "^5.54.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^18.19.8",
+    "@typescript-eslint/eslint-plugin": "5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-config-prettier": "^8.6.0",
-    "eslint-plugin-import": "^2.27.5",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "jasmine": "^3.10.0",
-    "jasmine-ts": "^0.4.0",
+    "jest": "^29.7.0",
     "lodash": "^4.17.21",
-    "nock": "^13.3.0",
-    "nyc": "^15.1.0",
-    "prettier": "^2.8.4",
+    "nock": "^13.5.0",
+    "prettier": "^2.8.8",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.9.1",
+    "ts-jest": "^29.1.5",
+    "ts-node": "^10.9.2",
     "typescript": "^4.9.5"
   },
   "contributors": [
