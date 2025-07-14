@@ -19,8 +19,24 @@
     "/statistics",
     "/VERSION"
   ],
-  "main": "./lib/report-portal-client",
-  "types": "./index.d.ts",
+  "main": "build/lib/report-portal-client",
+  "types": "build/lib/report-portal-client.d.ts",
+  "exports": {
+    "./helpers":{
+      "node": "./build/lib/helpers.js",
+      "default": "./build/lib/helpers.js",
+      "require": "./build/lib/helpers.js",
+      "import": "./build/lib/helpers.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "helpers": [
+        "./build/lib/helpers.d.ts"
+      ]
+    }
+  },
+  "type": "commonjs",
   "engines": {
     "node": ">=14.x"
   },
@@ -34,8 +50,10 @@
   },
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/glob": "^8.1.0",
     "@types/jest": "^29.5.12",
-    "@types/node": "^18.19.8",
+    "@types/node": "^18.19.112",
+    "@types/uniqid": "^5.3.4",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "eslint": "^7.32.0",
