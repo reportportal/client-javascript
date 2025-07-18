@@ -36,7 +36,7 @@ const getServerResult = (
 const readLaunchesFromFile = (): Array<string> => {
   const files = glob.sync('rplaunch-*.tmp');
   const ids = files.map(getUUIDFromFileName);
-  const validIds = ids.filter((id) => id !== undefined) ?? [];
+  const validIds = ids.filter((id: string | undefined) => id !== undefined) ?? [];
 
   return validIds as Array<string>;
 };
