@@ -1,8 +1,8 @@
-const axios = require('axios');
-const axiosRetry = require('axios-retry').default;
-const http = require('http');
-const https = require('https');
-const logger = require('./logger');
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axiosRetry from 'axios-retry';
+import * as http from 'http';
+import * as https from 'https';
+import { addLogger } from './logger';
 
 const DEFAULT_MAX_CONNECTION_TIME_MS = 30000;
 
@@ -12,8 +12,28 @@ axiosRetry(axios, {
   retryCondition: axiosRetry.isRetryableError,
 });
 
-class RestClient {
-  constructor(options) {
+export interface RestClientOptions {
+  baseURL: string;
+  headers?: Record<string, string>;
+  restClientConfig?: {
+    [key: string]: any;
+    agent?: http.AgentOptions | https.AgentOptions;
+    debug?: boolean;
+  };
+}
+
+export type RequestMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+export default class RestClient {
+  private baseURL: string;
+
+  private headers?: Record<string, string>;
+
+  private restClientConfig?: { [key: string]: any };
+
+  private axiosInstance: AxiosInstance;
+
+  constructor(options: RestClientOptions) {
     this.baseURL = options.baseURL;
     this.headers = options.headers;
     this.restClientConfig = options.restClientConfig;
@@ -21,23 +41,28 @@ class RestClient {
     this.axiosInstance = axios.create({
       timeout: DEFAULT_MAX_CONNECTION_TIME_MS,
       headers: this.headers,
-      ...this.getRestConfig(this.restClientConfig),
+      ...this.getRestConfig(),
     });
 
     if (this.restClientConfig?.debug) {
-      logger.addLogger(this.axiosInstance);
+      addLogger(this.axiosInstance);
     }
   }
 
-  buildPath(path) {
+  private buildPath(path: string): string {
     return [this.baseURL, path].join('/');
   }
 
-  buildPathToSyncAPI(path) {
+  private buildPathToSyncAPI(path: string): string {
     return [this.baseURL.replace('/v2', '/v1'), path].join('/');
   }
 
-  request(method, url, data, options = {}) {
+  request<T = any>(
+    method: RequestMethod,
+    url: string,
+    data?: any,
+    options: AxiosRequestConfig = {},
+  ): Promise<T> {
     return this.axiosInstance
       .request({
         method,
@@ -46,11 +71,11 @@ class RestClient {
         ...options,
         headers: {
           HOST: new URL(url).host,
-          ...options.headers,
+          ...(options.headers || {}),
         },
       })
-      .then((response) => response.data)
-      .catch((error) => {
+      .then((response: AxiosResponse<T>) => response.data)
+      .catch((error: any) => {
         const errorMessage = error.message;
         const responseData = error.response && error.response.data;
         throw new Error(
@@ -65,15 +90,18 @@ method: ${method}`,
       });
   }
 
-  getRestConfig() {
+  private getRestConfig(): Record<string, any> {
     if (!this.restClientConfig) return {};
 
-    const config = Object.keys(this.restClientConfig).reduce((acc, key) => {
-      if (key !== 'agent') {
-        acc[key] = this.restClientConfig[key];
-      }
-      return acc;
-    }, {});
+    const config: Record<string, any> = Object.keys(this.restClientConfig).reduce(
+      (acc: Record<string, any>, key: string) => {
+        if (key !== 'agent') {
+          acc[key] = this.restClientConfig![key];
+        }
+        return acc;
+      },
+      {},
+    );
 
     if ('agent' in this.restClientConfig) {
       const { protocol } = new URL(this.baseURL);
@@ -87,13 +115,13 @@ method: ${method}`,
     return config;
   }
 
-  create(path, data, options = {}) {
+  create<T = any>(path: string, data?: any, options: AxiosRequestConfig = {}): Promise<T> {
     return this.request('POST', this.buildPath(path), data, {
       ...options,
     });
   }
 
-  retrieve(path, options = {}) {
+  retrieve<T = any>(path: string, options: AxiosRequestConfig = {}): Promise<T> {
     return this.request(
       'GET',
       this.buildPath(path),
@@ -104,19 +132,19 @@ method: ${method}`,
     );
   }
 
-  update(path, data, options = {}) {
+  update<T = any>(path: string, data?: any, options: AxiosRequestConfig = {}): Promise<T> {
     return this.request('PUT', this.buildPath(path), data, {
       ...options,
     });
   }
 
-  delete(path, data, options = {}) {
+  delete<T = any>(path: string, data?: any, options: AxiosRequestConfig = {}): Promise<T> {
     return this.request('DELETE', this.buildPath(path), data, {
       ...options,
     });
   }
 
-  retrieveSyncAPI(path, options = {}) {
+  retrieveSyncAPI<T = any>(path: string, options: AxiosRequestConfig = {}): Promise<T> {
     return this.request(
       'GET',
       this.buildPathToSyncAPI(path),
@@ -127,5 +155,3 @@ method: ${method}`,
     );
   }
 }
-
-module.exports = RestClient;
