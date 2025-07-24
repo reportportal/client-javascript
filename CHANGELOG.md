@@ -1,3 +1,7 @@
+### Added
+- TypeScript type definitions. Thanks to [@AlexGalichenko](https://github.com/AlexGalichenko).
+### Security
+- Updated versions of vulnerable packages (form-data).
 
 ## [5.4.0] - 2025-03-27
 ### Changed
