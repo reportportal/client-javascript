@@ -1,5 +1,5 @@
 ### Added
-- TypeScript type definitions.
+- TypeScript type definitions. Thanks to @AlexGalichenko.
 ### Security
 - Updated versions of vulnerable packages (form-data).
 
