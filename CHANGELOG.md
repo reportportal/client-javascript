@@ -1,3 +1,5 @@
+
+## [5.4.1] - 2025-07-24
 ### Added
 - TypeScript type definitions. Thanks to [@AlexGalichenko](https://github.com/AlexGalichenko).
 ### Security
