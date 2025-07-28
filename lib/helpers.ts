@@ -1,53 +1,61 @@
-const fs = require('fs');
-const glob = require('glob');
-const os = require('os');
-const RestClient = require('./rest');
-const pjson = require('../package.json');
+import * as fs from 'fs';
+import * as glob from 'glob';
+import * as os from 'os';
+import RestClient, { RequestMethod } from './rest';
+import pjson from '../package.json';
+import { Attribute } from './types';
 
 const MIN = 3;
 const MAX = 256;
-const PJSON_VERSION = pjson.version;
-const PJSON_NAME = pjson.name;
+const PJSON_VERSION: string = pjson.version;
+const PJSON_NAME: string = pjson.name;
 
-const getUUIDFromFileName = (filename) => filename.match(/rplaunch-(.*)\.tmp/)[1];
+const getUUIDFromFileName = (filename: string): string | undefined => {
+  return filename.match(/rplaunch-(.*)\.tmp/)?.[1];
+};
 
-const formatName = (name) => {
-  const len = name.length;
-  // eslint-disable-next-line no-mixed-operators
+const formatName = (name: string): string => {
+  const len: number = name.length;
   return (len < MIN ? name + new Array(MIN - len + 1).join('.') : name).slice(-MAX);
 };
 
-const now = () => {
+const now = (): number => {
   return new Date().valueOf();
 };
 
 // TODO: deprecate and remove
-const getServerResult = (url, request, options, method) => {
+const getServerResult = (
+  url: string,
+  request: any,
+  options: any,
+  method: RequestMethod,
+): Promise<any> => {
   return new RestClient(options).request(method, url, request, options);
 };
 
-const readLaunchesFromFile = () => {
+const readLaunchesFromFile = (): Array<string> => {
   const files = glob.sync('rplaunch-*.tmp');
   const ids = files.map(getUUIDFromFileName);
+  const validIds = ids.filter((id: string | undefined) => id !== undefined) ?? [];
 
-  return ids;
+  return validIds as Array<string>;
 };
 
-const saveLaunchIdToFile = (launchId) => {
+const saveLaunchIdToFile = (launchId: string): void => {
   const filename = `rplaunch-${launchId}.tmp`;
-  fs.open(filename, 'w', (err) => {
+  fs.open(filename, 'w', (err: NodeJS.ErrnoException | null) => {
     if (err) {
       throw err;
     }
   });
 };
 
-const getSystemAttribute = () => {
+const getSystemAttribute = (): Attribute[] => {
   const osType = os.type();
   const osArchitecture = os.arch();
   const RAMSize = os.totalmem();
   const nodeVersion = process.version;
-  const systemAttr = [
+  return [
     {
       key: 'client',
       value: `${PJSON_NAME}|${PJSON_VERSION}`,
@@ -60,7 +68,7 @@ const getSystemAttribute = () => {
     },
     {
       key: 'RAMSize',
-      value: RAMSize,
+      value: `${RAMSize}`,
       system: true,
     },
     {
@@ -69,11 +77,9 @@ const getSystemAttribute = () => {
       system: true,
     },
   ];
-
-  return systemAttr;
 };
 
-const generateTestCaseId = (codeRef, params) => {
+const generateTestCaseId = (codeRef: string, params?: Attribute[]): string | undefined => {
   if (!codeRef) {
     return;
   }
@@ -82,7 +88,7 @@ const generateTestCaseId = (codeRef, params) => {
     return codeRef;
   }
 
-  const parameters = params.reduce(
+  const parameters = params.reduce<string[]>(
     (result, item) => (item.value ? result.concat(item.value) : result),
     [],
   );
@@ -90,16 +96,16 @@ const generateTestCaseId = (codeRef, params) => {
   return `${codeRef}[${parameters}]`;
 };
 
-const saveLaunchUuidToFile = (launchUuid) => {
+const saveLaunchUuidToFile = (launchUuid: string): void => {
   const filename = `rp-launch-uuid-${launchUuid}.tmp`;
-  fs.open(filename, 'w', (err) => {
+  fs.open(filename, 'w', (err: NodeJS.ErrnoException | null) => {
     if (err) {
       throw err;
     }
   });
 };
 
-module.exports = {
+export {
   formatName,
   now,
   getServerResult,
