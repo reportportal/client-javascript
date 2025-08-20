@@ -68,6 +68,7 @@ function getClientConfig(options: Partial<ClientConfig>): ClientConfig {
       description: options.description,
       launchUuidPrint: options.launchUuidPrint,
       launchUuidPrintOutput,
+      skippedIssue: options.skippedIssue,
     };
   } catch (error) {
     // don't throw the error up to not break the entire process

@@ -1,8 +1,8 @@
-const { getClientConfig, getRequiredOption, getApiKey } = require('../lib/commons/config');
+const { getClientConfig, getRequiredOption, getApiKey } = require('../build/lib/commons/config');
 const {
   ReportPortalRequiredOptionError,
   ReportPortalValidationError,
-} = require('../lib/commons/errors');
+} = require('../build/lib/commons/errors');
 
 describe('Config commons test suite', () => {
   describe('getRequiredOption', () => {

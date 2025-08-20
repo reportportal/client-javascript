@@ -22,6 +22,7 @@ export interface ClientConfig {
   attributes?: Attribute[];
   mode?: string;
   description?: string;
+  skippedIssue?: boolean;
 }
 
 export type AgentParams = {

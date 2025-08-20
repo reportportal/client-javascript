@@ -22,17 +22,59 @@
   "main": "build/lib/report-portal-client",
   "types": "build/lib/report-portal-client.d.ts",
   "exports": {
+    ".": {
+      "node": "./build/lib/report-portal-client.js",
+      "default": "./build/lib/report-portal-client.js",
+      "require": "./build/lib/report-portal-client.js",
+      "import": "./build/lib/report-portal-client.js"
+    },
     "./helpers":{
       "node": "./build/lib/helpers.js",
       "default": "./build/lib/helpers.js",
       "require": "./build/lib/helpers.js",
       "import": "./build/lib/helpers.js"
+    },
+    "./lib/helpers": {
+      "node": "./build/lib/helpers.js",
+      "default": "./build/lib/helpers.js",
+      "require": "./build/lib/helpers.js",
+      "import": "./build/lib/helpers.js"
+    },
+    "./lib/constants/events": {
+      "node": "./build/lib/constants/events.js",
+      "default": "./build/lib/constants/events.js",
+      "require": "./build/lib/constants/events.js",
+      "import": "./build/lib/constants/events.js"
+    },
+    "./lib/constants/statuses": {
+      "node": "./build/lib/constants/statuses.js",
+      "default": "./build/lib/constants/statuses.js",
+      "require": "./build/lib/constants/statuses.js",
+      "import": "./build/lib/constants/statuses.js"
+    },
+    "./lib/publicReportingAPI": {
+      "node": "./build/lib/publicReportingAPI.js",
+      "default": "./build/lib/publicReportingAPI.js",
+      "require": "./build/lib/publicReportingAPI.js",
+      "import": "./build/lib/publicReportingAPI.js"
     }
   },
   "typesVersions": {
     "*": {
       "helpers": [
         "./build/lib/helpers.d.ts"
+      ],
+      "lib/helpers": [
+        "./build/lib/helpers.d.ts"
+      ],
+      "lib/constants/events": [
+        "./build/lib/constants/events.d.ts"
+      ],
+      "lib/constants/statuses": [
+        "./build/lib/constants/statuses.d.ts"
+      ],
+      "lib/publicReportingAPI": [
+        "./build/lib/publicReportingAPI.d.ts"
       ]
     }
   },

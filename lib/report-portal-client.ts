@@ -522,6 +522,10 @@ class RPClient {
       ...finishTestItemRQ,
     };
 
+    if (finishTestItemData.status === RP_STATUSES.SKIPPED && this.config.skippedIssue === false) {
+      finishTestItemData.issue = { issueType: 'NOT_ISSUE' };
+    }
+
     itemObj.finishSend = true;
     this.logDebug(`Finish all children for test item with tempId ${itemTempId}`);
     Promise.allSettled(
