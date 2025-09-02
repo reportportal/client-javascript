@@ -44,6 +44,15 @@ describe('Helpers', () => {
 
       expect(fs.open).toHaveBeenCalledWith('rplaunch-fileOne.tmp', 'w', expect.any(Function));
     });
+
+    it('should throw error when fs.open fails', () => {
+      const mockError = new Error('File system error');
+      jest.spyOn(fs, 'open').mockImplementation(() => {
+        throw mockError;
+      });
+
+      expect(() => helpers.saveLaunchIdToFile('fileOne')).toThrow('File system error');
+    });
   });
 
   describe('getSystemAttribute', () => {
@@ -112,6 +121,19 @@ describe('Helpers', () => {
 
       expect(testCaseId).toEqual('codeRef[value,valueTwo,valueThree]');
     });
+
+    it('should filter out parameters with falsy values', () => {
+      const parameters = [
+        { value: 'value1' },
+        { value: '' },    
+        { value: 'value2' },
+        { value: 'value3' },
+      ];
+
+      const testCaseId = helpers.generateTestCaseId('codeRef', parameters);
+
+      expect(testCaseId).toEqual('codeRef[value1,value2,value3]');
+    });
   });
 
   describe('saveLaunchUuidToFile', () => {
@@ -121,6 +143,15 @@ describe('Helpers', () => {
       helpers.saveLaunchUuidToFile('fileOne');
 
       expect(fs.open).toHaveBeenCalledWith('rp-launch-uuid-fileOne.tmp', 'w', expect.any(Function));
+    });
+
+    it('should throw error when fs.open fails', () => {
+      const mockError = new Error('File system error');
+      jest.spyOn(fs, 'open').mockImplementation(() => {
+        throw mockError;
+      });
+
+      expect(() => helpers.saveLaunchUuidToFile('fileOne')).toThrow('File system error');
     });
   });
 });

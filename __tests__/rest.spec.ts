@@ -47,6 +47,37 @@ describe('RestClient', () => {
 
       expect(spyLogger).toHaveBeenCalled();
     });
+
+    it('creates RestClient instance without restClientConfig', () => {
+      const optionsWithoutConfig = {
+        baseURL: 'http://report-portal-host:8080/api/v1',
+        headers: {
+          'User-Agent': 'NodeJS',
+          Authorization: 'Bearer 00000000-0000-0000-0000-000000000000',
+        },
+      };
+      const client = new RestClient(optionsWithoutConfig);
+
+      expect(client).toBeInstanceOf(RestClient);
+    });
+
+    it('creates RestClient instance with agent configuration', () => {
+      const optionsWithAgent = {
+        baseURL: 'https://report-portal-host:8080/api/v1',
+        headers: {
+          'User-Agent': 'NodeJS',
+          Authorization: 'Bearer 00000000-0000-0000-0000-000000000000',
+        },
+        restClientConfig: {
+          agent: {
+            rejectUnauthorized: false,
+          },
+        },
+      };
+      const client = new RestClient(optionsWithAgent);
+
+      expect(client).toBeInstanceOf(RestClient);
+    });
   });
 
   describe('retrieve', () => {
@@ -139,6 +170,19 @@ describe('RestClient', () => {
 
       restClient.request('POST', fullUrl, userData).then((result) => {
         expect(result).toEqual(userData);
+        expect(scope.isDone()).toBeTruthy();
+
+        done();
+      });
+    });
+
+    it('handles error with non-object response data', (done) => {
+      const scope = nock(options.baseURL).get('/users').reply(500, 'Internal Server Error');
+
+      restClient.request('GET', `${options.baseURL}/users`).catch((error) => {
+        expect(error.message).toContain('Request failed with status code 500');
+        expect(error.message).toContain(`URL: ${options.baseURL}/users`);
+        expect(error.message).toContain('method: GET');
         expect(scope.isDone()).toBeTruthy();
 
         done();
