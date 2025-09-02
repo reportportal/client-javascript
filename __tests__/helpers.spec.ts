@@ -125,7 +125,7 @@ describe('Helpers', () => {
     it('should filter out parameters with falsy values', () => {
       const parameters = [
         { value: 'value1' },
-        { value: '' },    
+        { value: '' },
         { value: 'value2' },
         { value: 'value3' },
       ];
