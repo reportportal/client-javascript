@@ -4,7 +4,7 @@ import { URLSearchParams } from 'url';
 import * as helpers from './helpers';
 import RestClient from './rest';
 import { getClientConfig } from './commons/config';
-import Statistics from '../statistics/statistics';
+import { Statistics } from '../statistics/statistics';
 import { EVENT_NAME } from '../statistics/constants';
 import { RP_STATUSES } from './constants/statuses';
 import {
@@ -19,15 +19,16 @@ import {
   MergeOptions,
   SaveLogRQ,
   TestItemDataRQ,
+  TempIdPromise,
 } from './types';
 
 const MULTIPART_BOUNDARY = Math.floor(Math.random() * 10000000000).toString();
 
 class RPClient {
-  private config: ClientConfig;
-  private debug: boolean;
-  private isLaunchMergeRequired: boolean;
-  private apiKey: string;
+  protected config: ClientConfig;
+  protected debug: boolean;
+  protected isLaunchMergeRequired: boolean;
+  protected apiKey: string;
   private token: string;
   private map: MapType;
   private baseURL: string;
@@ -39,7 +40,7 @@ class RPClient {
   private itemRetriesChainMap: Map<string, Promise<any>>;
   private itemRetriesChainKeyMapByTempId: Map<string, string>;
 
-  constructor(options: Partial<ClientConfig>, agentParams: AgentParams) {
+  constructor(options: Partial<ClientConfig>, agentParams?: AgentParams) {
     this.config = getClientConfig(options);
     this.debug = Boolean(this.config.debug);
     this.isLaunchMergeRequired = Boolean(this.config.isLaunchMergeRequired);
@@ -107,7 +108,7 @@ class RPClient {
     return UniqId();
   }
 
-  getRejectAnswer(tempId: string, error: Error): { tempId: string; promise: Promise<any> } {
+  getRejectAnswer(tempId: string, error: Error): TempIdPromise {
     return {
       tempId,
       promise: Promise.reject(error),
@@ -152,7 +153,7 @@ class RPClient {
   }
 
   async triggerStatisticsEvent(): Promise<void> {
-    if (process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS) {
+    if (process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS === 'true') {
       return;
     }
     await this.statistics.trackEvent();
@@ -356,7 +357,7 @@ class RPClient {
    * it doesn't wait for promise resolve and stop the process. So it better to call
    * this method at the spec's function as @afterAll() and manually resolve this promise.
    */
-  getPromiseFinishAllItems(launchTempId: string): Promise<any[]> {
+  getPromiseFinishAllItems(launchTempId: string) {
     const launchObj = this.map[launchTempId];
     return Promise.all(launchObj.children.map((itemId) => this.map[itemId].promiseFinish));
   }
@@ -413,7 +414,7 @@ class RPClient {
     testItemDataRQ: TestItemDataRQ,
     launchTempId: string,
     parentTempId?: string,
-  ): { tempId: string; promise: Promise<any> } {
+  ): TempIdPromise<any> {
     let parentMapId = launchTempId;
     const launchObj = this.map[launchTempId];
     if (!launchObj) {
@@ -507,7 +508,7 @@ class RPClient {
   finishTestItem(
     itemTempId: string,
     finishTestItemRQ: FinishTestItemRQ,
-  ): { tempId: string; promise: Promise<any> } {
+  ): TempIdPromise<any> {
     const itemObj = this.map[itemTempId];
     if (!itemObj) {
       return this.getRejectAnswer(

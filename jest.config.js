@@ -1,8 +1,8 @@
 module.exports = {
-  moduleFileExtensions: ['js'],
-  testRegex: '/__tests__/.*\\.(test|spec).js$',
+  moduleFileExtensions: ['js', 'ts'],
+  testRegex: '/__tests__/.*\\.(test|spec).(js|ts)$',
   testEnvironment: 'node',
-  collectCoverageFrom: ['lib/**/*.js', '!lib/logger.js'],
+  collectCoverageFrom: ['lib/**/*.ts', '!lib/logger.ts'],
   coverageThreshold: {
     global: {
       branches: 80,
@@ -12,4 +12,7 @@ module.exports = {
     },
   },
   bail: false,
+  transform: {
+    '^.+\\.ts$': 'ts-jest',
+  },
 };

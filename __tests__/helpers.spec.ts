@@ -1,8 +1,8 @@
-const os = require('os');
-const fs = require('fs');
-const glob = require('glob');
-const helpers = require('../build/lib/helpers');
-const pjson = require('../package.json');
+import os from 'os';
+import fs from 'fs';
+import glob from 'glob';
+import * as helpers from '../lib/helpers';
+import pjson from '../package.json';
 
 describe('Helpers', () => {
   describe('formatName', () => {
@@ -22,7 +22,7 @@ describe('Helpers', () => {
 
   describe('now', () => {
     it('returns milliseconds from unix time', () => {
-      expect(new Date() - helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
+      expect(new Date().getTime() - helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
     });
   });
 
@@ -50,7 +50,7 @@ describe('Helpers', () => {
     it('should return correct system attributes', () => {
       jest.spyOn(os, 'type').mockReturnValue('osType');
       jest.spyOn(os, 'arch').mockReturnValue('osArchitecture');
-      jest.spyOn(os, 'totalmem').mockReturnValue('1');
+      jest.spyOn(os, 'totalmem').mockReturnValue(1);
       const nodeVersion = process.version;
       const expectedAttr = [
         {
@@ -83,7 +83,7 @@ describe('Helpers', () => {
 
   describe('generateTestCaseId', () => {
     it('should return undefined if there is no codeRef', () => {
-      const testCaseId = helpers.generateTestCaseId();
+      const testCaseId = helpers.generateTestCaseId('');
 
       expect(testCaseId).toEqual(undefined);
     });
@@ -101,7 +101,7 @@ describe('Helpers', () => {
           value: 'value',
         },
         { value: 'valueTwo' },
-        { key: 'keyTwo' },
+        { key: 'keyTwo', value: '' },
         {
           key: 'keyThree',
           value: 'valueThree',

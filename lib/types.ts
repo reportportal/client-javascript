@@ -14,7 +14,7 @@ export interface ClientConfig {
   debug?: boolean;
   isLaunchMergeRequired?: boolean;
   launchUuidPrint?: boolean;
-  //?
+  
   launchUuidPrintOutput?: string | ((param: string) => void);
   restClientConfig?: Record<string, unknown>;
   token?: string;
@@ -56,7 +56,7 @@ export type TestItemDataRQ = {
   name: string;
   startTime?: number;
   attributes?: Attribute[];
-  type: string;
+  type?: string;
   testCaseId?: string;
   codeRef: string;
   parameters?: any[];
@@ -103,3 +103,9 @@ export type ItemObj = {
 };
 
 export type MapType = { [tempId: string]: ItemObj };
+
+
+export type TempIdPromise<T = any> = {
+  tempId: string;
+  promise: Promise<T>;
+};

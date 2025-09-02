@@ -1,8 +1,8 @@
-const fs = require('fs');
-const util = require('util');
-const ini = require('ini');
-const { v4: uuidv4 } = require('uuid');
-const { ENCODING, CLIENT_ID_KEY, RP_FOLDER_PATH, RP_PROPERTIES_FILE_PATH } = require('./constants');
+import * as fs from 'fs';
+import * as util from 'util';
+import * as ini from 'ini';
+import { v4 as uuidv4 } from 'uuid';
+import { ENCODING, CLIENT_ID_KEY, RP_FOLDER_PATH, RP_PROPERTIES_FILE_PATH } from './constants';
 
 const exists = util.promisify(fs.exists);
 const readFile = util.promisify(fs.readFile);
@@ -18,8 +18,8 @@ async function readClientId() {
   return null;
 }
 
-async function storeClientId(clientId) {
-  const properties = {};
+async function storeClientId(clientId: string) {
+  const properties: Record<string, any> = {};
   if (await exists(RP_PROPERTIES_FILE_PATH)) {
     const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
     Object.assign(properties, ini.parse(propertiesContent));
@@ -30,10 +30,10 @@ async function storeClientId(clientId) {
   await writeFile(RP_PROPERTIES_FILE_PATH, propertiesContent, ENCODING);
 }
 
-async function getClientId() {
+export async function getClientId() {
   let clientId = await readClientId();
   if (!clientId) {
-    clientId = uuidv4(undefined, undefined, 0);
+    clientId = uuidv4();
     try {
       await storeClientId(clientId);
     } catch (ignore) {
@@ -42,5 +42,3 @@ async function getClientId() {
   }
   return clientId;
 }
-
-module.exports = { getClientId };

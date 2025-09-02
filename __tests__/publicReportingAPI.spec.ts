@@ -1,5 +1,5 @@
-const PublicReportingAPI = require('../build/lib/publicReportingAPI').default;
-const { EVENTS } = require('../build/lib/constants/events');
+import PublicReportingAPI from '../lib/publicReportingAPI';
+import { EVENTS } from '../lib/constants/events';
 
 describe('PublicReportingAPI', () => {
   it('setDescription should trigger process.emit with correct parameters', () => {
