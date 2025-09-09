@@ -1,7 +1,8 @@
-const process = require('process');
-const RPClient = require('../lib/report-portal-client');
-const helpers = require('../lib/helpers');
-const { OUTPUT_TYPES } = require('../lib/constants/outputs');
+// @ts-nocheck - Disabling TypeScript checking for test file to allow private property access
+import process from 'process';
+import RPClient from '../lib/report-portal-client';
+import * as helpers from '../lib/helpers';
+import { OUTPUT_TYPES } from '../lib/constants/outputs';
 
 describe('ReportPortal javascript client', () => {
   afterEach(() => {
@@ -10,28 +11,38 @@ describe('ReportPortal javascript client', () => {
 
   describe('constructor', () => {
     it('creates the client instance without error', () => {
-      const client = new RPClient({
-        apiKey: 'test',
-        project: 'test',
-        endpoint: 'https://abc.com',
-      });
+      const client = new RPClient(
+        {
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+        },
+        { name: 'test-agent', version: '1.0.0' },
+      );
 
+      // @ts-ignore - accessing protected property for testing
       expect(client.config.apiKey).toBe('test');
+      // @ts-ignore - accessing protected property for testing
       expect(client.config.project).toBe('test');
+      // @ts-ignore - accessing protected property for testing
       expect(client.config.endpoint).toBe('https://abc.com');
     });
   });
 
   describe('logDebug', () => {
     it('should call console.log with provided message if debug is true', () => {
-      const client = new RPClient({
-        apiKey: 'test',
-        project: 'test',
-        endpoint: 'https://abc.com',
-        debug: true,
-      });
+      const client = new RPClient(
+        {
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          debug: true,
+        },
+        { name: 'test-agent', version: '1.0.0' },
+      );
       jest.spyOn(console, 'log').mockImplementation();
 
+      // @ts-ignore - accessing private method for testing
       client.logDebug('message');
 
       expect(console.log).toHaveBeenCalledWith('message', '');
@@ -100,10 +111,10 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://abc.com',
       });
 
-      const rejectAnswer = client.getRejectAnswer('tempId', 'error');
+      const rejectAnswer = client.getRejectAnswer('tempId', new Error('error'));
 
       expect(rejectAnswer.tempId).toEqual('tempId');
-      return expect(rejectAnswer.promise).rejects.toEqual('error');
+      return expect(rejectAnswer.promise).rejects.toEqual(new Error('error'));
     });
   });
 
@@ -158,6 +169,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
+      // @ts-ignore - accessing private property for testing
       jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
 
       await client.triggerStatisticsEvent();
@@ -171,7 +183,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
-      process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = true;
+      process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = 'true';
       jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
 
       await client.triggerStatisticsEvent();
@@ -192,7 +204,7 @@ describe('ReportPortal javascript client', () => {
         },
         agentParams,
       );
-      process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = false;
+      process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS = 'false';
 
       expect(client.statistics.eventName).toEqual('start_launch');
       expect(client.statistics.eventParams).toEqual(
@@ -460,10 +472,10 @@ describe('ReportPortal javascript client', () => {
         id1: {
           children: ['child1'],
           promiseStart: Promise.resolve(),
-          resolveFinish: jest.fn().mockResolvedValue(),
+          resolveFinish: jest.fn().mockResolvedValue(undefined),
         },
         child1: {
-          promiseFinish: jest.fn().mockResolvedValue(),
+          promiseFinish: jest.fn().mockResolvedValue(undefined),
         },
       };
 
@@ -651,7 +663,7 @@ describe('ReportPortal javascript client', () => {
           promiseFinish: Promise.resolve(),
         },
       };
-      jest.spyOn(client.restClient, 'update').mockResolvedValue();
+      jest.spyOn(client.restClient, 'update').mockResolvedValue(undefined);
 
       const result = client.updateLaunch('id1', { some: 'data' });
 
@@ -721,7 +733,7 @@ describe('ReportPortal javascript client', () => {
       jest.spyOn(client, 'getRejectAnswer').mockImplementation();
       const error = new Error('Item with tempId "id3" not found');
 
-      client.startTestItem({ testCaseId: 'testCaseId' }, 'id1', 'id3');
+      client.startTestItem({ name: 'testCaseId', codeRef: 'ref1' }, 'id1', 'id3');
 
       expect(client.getRejectAnswer).toHaveBeenCalledWith('id1', error);
     });
@@ -745,7 +757,7 @@ describe('ReportPortal javascript client', () => {
           promiseStart: Promise.resolve(),
         },
       };
-      jest.spyOn(client.itemRetriesChainMap, 'get').mockResolvedValue();
+      jest.spyOn(client.itemRetriesChainMap, 'get').mockResolvedValue(undefined);
       jest.spyOn(client.restClient, 'create').mockResolvedValue({});
       jest.spyOn(client, 'getUniqId').mockReturnValue('4n5pxq24kpiob12og9');
 

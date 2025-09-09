@@ -1,6 +1,6 @@
-const axios = require('axios');
-const Statistics = require('../statistics/statistics');
-const { MEASUREMENT_ID, API_KEY } = require('../statistics/constants');
+import axios from 'axios';
+import { Statistics } from '../statistics/statistics';
+import { MEASUREMENT_ID, API_KEY } from '../statistics/constants';
 
 const uuidv4Validation = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 
@@ -48,9 +48,7 @@ describe('Statistics', () => {
   });
 
   it('should send proper event to axios', async () => {
-    jest.spyOn(axios, 'post').mockReturnValue({
-      send: () => {}, // eslint-disable-line
-    });
+    jest.spyOn(axios, 'post').mockResolvedValue({} as any);
 
     const statistics = new Statistics(eventName, agentParams);
     await statistics.trackEvent();
@@ -63,14 +61,12 @@ describe('Statistics', () => {
     undefined,
     {},
     {
-      name: null,
-      version: null,
+      name: undefined,
+      version: undefined,
     },
   ].forEach((params) => {
     it(`should not fail if agent params: ${JSON.stringify(params)}`, async () => {
-      jest.spyOn(axios, 'post').mockReturnValue({
-        send: () => {}, // eslint-disable-line
-      });
+      jest.spyOn(axios, 'post').mockResolvedValue({} as any);
 
       const statistics = new Statistics(eventName, params);
       await statistics.trackEvent();

@@ -1,20 +1,29 @@
-const axios = require('axios');
-const { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } = require('./constants');
-const { getClientId } = require('./client-id');
+import axios from 'axios';
+import { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } from './constants';
+import { getClientId } from './client-id';
 
-const hasOption = (options, optionName) => {
+interface AgentParams {
+  name?: string;
+  version?: string;
+}
+
+const hasOption = (options: any, optionName: string): boolean => {
   return Object.prototype.hasOwnProperty.call(options, optionName);
 };
 
-class Statistics {
-  constructor(eventName, agentParams) {
+export class Statistics {
+  public eventName: string;
+
+  public eventParams: Record<string, string>;
+
+  constructor(eventName: string, agentParams?: AgentParams) {
     this.eventName = eventName;
     this.eventParams = this.getEventParams(agentParams);
   }
 
-  getEventParams(agentParams) {
-    const params = {
-      interpreter: INTERPRETER,
+  private getEventParams(agentParams?: AgentParams): Record<string, string> {
+    const params: Record<string, string> = {
+      interpreter: INTERPRETER || '',
       client_name: PJSON_NAME,
       client_version: PJSON_VERSION,
     };
@@ -27,7 +36,7 @@ class Statistics {
     return params;
   }
 
-  async trackEvent() {
+  async trackEvent(): Promise<void> {
     try {
       const requestBody = {
         client_id: await getClientId(),
@@ -44,9 +53,7 @@ class Statistics {
         requestBody,
       );
     } catch (error) {
-      console.error(error.message);
+      console.error((error as Error).message);
     }
   }
 }
-
-module.exports = Statistics;

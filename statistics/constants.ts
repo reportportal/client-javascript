@@ -1,6 +1,6 @@
-const os = require('os');
-const path = require('path');
-const pjson = require('../package.json');
+import * as os from 'os';
+import * as path from 'path';
+import pjson from '../package.json';
 
 const ENCODING = 'utf-8';
 const PJSON_VERSION = pjson.version;
@@ -17,7 +17,7 @@ const CLIENT_INFO = Buffer.from(
 const [MEASUREMENT_ID, API_KEY] = CLIENT_INFO.split(':');
 const EVENT_NAME = 'start_launch';
 
-function getNodeVersion() {
+function getNodeVersion(): string | null {
   // A workaround to avoid reference error in case this is not a Node.js application
   if (typeof process !== 'undefined') {
     if (process.versions) {
@@ -32,7 +32,7 @@ function getNodeVersion() {
 
 const INTERPRETER = getNodeVersion();
 
-module.exports = {
+export {
   ENCODING,
   EVENT_NAME,
   PJSON_VERSION,

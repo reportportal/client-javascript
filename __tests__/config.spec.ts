@@ -1,8 +1,8 @@
-const { getClientConfig, getRequiredOption, getApiKey } = require('../lib/commons/config');
-const {
+import { getClientConfig, getRequiredOption, getApiKey } from '../lib/commons/config';
+import {
   ReportPortalRequiredOptionError,
   ReportPortalValidationError,
-} = require('../lib/commons/errors');
+} from '../lib/commons/errors';
 
 describe('Config commons test suite', () => {
   describe('getRequiredOption', () => {
@@ -26,7 +26,7 @@ describe('Config commons test suite', () => {
     it('should throw ReportPortalRequiredOptionError in case of option not present in options', () => {
       let error;
       try {
-        getRequiredOption({ other: 1 }, 'project');
+        getRequiredOption({ other: 1 } as any, 'project');
       } catch (e) {
         error = e;
       }
@@ -73,7 +73,7 @@ describe('Config commons test suite', () => {
   describe('getClientConfig', () => {
     it('should print ReportPortalValidationError error to the console in case of options is not an object type', () => {
       jest.spyOn(console, 'dir').mockImplementation();
-      getClientConfig('options');
+      getClientConfig('options' as any);
 
       expect(console.dir).toHaveBeenCalledWith(
         new ReportPortalValidationError('`options` must be an object.'),

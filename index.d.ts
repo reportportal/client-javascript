@@ -23,6 +23,7 @@ declare module '@reportportal/client-javascript' {
     launchUuidPrintOutput?: string;
     restClientConfig?: Record<string, unknown>;
     token?: string;
+    skippedIssue?: boolean;
   }
 
   /**
