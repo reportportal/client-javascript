@@ -36,7 +36,7 @@ describe('Client ID test suite', () => {
     await unlink(clientIdFile);
     const clientId = await getClientId();
     const content = await readFile(clientIdFile, 'utf-8');
-    expect(content).toMatch(new RegExp(`^client\\.id\\s*=\\s*${clientId}\\s*(?:$|\n)`));
+    expect(content).toContain(`client.id=${clientId}`);
   });
 
   it('getClientId should read client ID from ~/.rp/rp.properties', async () => {
