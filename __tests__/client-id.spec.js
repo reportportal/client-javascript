@@ -2,6 +2,7 @@ const fs = require('fs');
 const util = require('util');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+
 const testHomeDir = path.join(__dirname, '__tmp__', 'rp-home');
 process.env.RP_CLIENT_JS_HOME = testHomeDir;
 const { getClientId } = require('../statistics/client-id');

@@ -156,9 +156,7 @@ describe('RestClient', () => {
     });
 
     it('catches NETWORK errors', (done) => {
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .replyWithError(netErrConnectionResetError);
+      const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
       restClient.retrieve('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
@@ -343,9 +341,7 @@ describe('RestClient', () => {
     });
 
     it('catches NETWORK errors', (done) => {
-      const scope = nock(options.baseURL)
-        .get('/users')
-        .replyWithError(netErrConnectionResetError);
+      const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
       restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
