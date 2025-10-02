@@ -19,7 +19,9 @@ describe('RestClient', () => {
     },
   };
   const noOptions = {};
+  const getRetryAttempts = (client) => client.getRetryConfig().retries + 1;
   const restClient = new RestClient(options);
+  const retryAttempts = getRetryAttempts(restClient);
 
   const unathorizedError = {
     error: 'unauthorized',
@@ -50,6 +52,64 @@ describe('RestClient', () => {
       const client = new RestClient(optionsWithLoggerEnabled);
 
       expect(spyLogger).toHaveBeenCalledWith(client.axiosInstance);
+    });
+  });
+
+  describe('retry configuration', () => {
+    it('uses a production-ready retry policy by default', () => {
+      const retryConfig = restClient.getRetryConfig();
+
+      expect(retryConfig.retries).toBe(6);
+      expect(retryAttempts).toBe(retryConfig.retries + 1);
+      expect(retryConfig.shouldResetTimeout).toBe(true);
+      expect(retryConfig.retryDelay(1)).toBe(200);
+      expect(retryConfig.retryDelay(4)).toBe(1600);
+      expect(retryConfig.retryDelay(10)).toBe(5000);
+    });
+
+    it('uses custom retry attempts when a numeric value is provided', (done) => {
+      const customRetries = 2;
+      const client = new RestClient({
+        ...options,
+        restClientConfig: {
+          ...options.restClientConfig,
+          retry: customRetries,
+        },
+      });
+      expect(getRetryAttempts(client)).toBe(customRetries + 1);
+
+      const scope = nock(options.baseURL)
+        .get('/users/custom-retry-number')
+        .replyWithError(netErrConnectionResetError);
+
+      client.retrieve('users/custom-retry-number', noOptions).catch((error) => {
+        expect(error instanceof Error).toBeTruthy();
+        expect(error.message).toMatch(netErrConnectionResetError.message);
+        expect(scope.isDone()).toBeTruthy();
+
+        done();
+      });
+    });
+
+    it('merges retry configuration object from settings', () => {
+      const customDelay = () => 250;
+      const client = new RestClient({
+        ...options,
+        restClientConfig: {
+          ...options.restClientConfig,
+          retry: {
+            retries: 4,
+            retryDelay: customDelay,
+            shouldResetTimeout: true,
+          },
+        },
+      });
+
+      const retryConfig = client.getRetryConfig();
+
+      expect(retryConfig.retries).toBe(4);
+      expect(retryConfig.retryDelay).toBe(customDelay);
+      expect(retryConfig.shouldResetTimeout).toBe(true);
     });
   });
 
@@ -96,7 +156,9 @@ describe('RestClient', () => {
     });
 
     it('catches NETWORK errors', (done) => {
-      const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
+      const scope = nock(options.baseURL)
+        .get('/users')
+        .replyWithError(netErrConnectionResetError);
 
       restClient.retrieve('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
@@ -281,7 +343,9 @@ describe('RestClient', () => {
     });
 
     it('catches NETWORK errors', (done) => {
-      const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
+      const scope = nock(options.baseURL)
+        .get('/users')
+        .replyWithError(netErrConnectionResetError);
 
       restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
