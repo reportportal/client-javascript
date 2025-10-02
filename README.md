@@ -66,10 +66,6 @@ When creating a client instance, you need to specify the following options:
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                       |
 | token                 | Deprecated | Not set  | Use `apiKey` instead.                                                                                                                                                                                                                                                                                                           |
 
-### Client identifier storage
-
-The client persists a generated identifier in the `.rp/rp.properties` file under the user's home directory. Set the `RP_CLIENT_JS_HOME` environment variable if you need to relocate that storage (for example, when running in a sandboxed environment).
-
 ## Asynchronous reporting
 
 The client supports an asynchronous reporting (via the ReportPortal asynchronous API).
