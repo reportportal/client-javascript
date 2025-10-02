@@ -25,8 +25,8 @@
     "node": ">=14.x"
   },
   "dependencies": {
-    "axios": "^1.8.4",
-    "axios-retry": "^4.1.0",
+    "axios": "^1.12.2",
+    "axios-retry": "^4.5.0",
     "glob": "^8.1.0",
     "ini": "^2.0.0",
     "uniqid": "^5.4.0",

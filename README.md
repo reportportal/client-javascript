@@ -61,7 +61,7 @@ When creating a client instance, you need to specify the following options:
 | headers               | Optional   | {}       | The object with custom headers for internal http client.                                                                                                                                                                                                                                                                        |
 | debug                 | Optional   | false    | This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                                                                                                                                                           |
 | isLaunchMergeRequired | Optional   | false    | Allows client to merge launches into one at the end of the run via saving their UUIDs to the temp files at filesystem. At the end of the run launches can be merged using `mergeLaunches` method. Temp file format: `rplaunch-${launch_uuid}.tmp`.                                                                              |
-| restClientConfig      | Optional   | Not set  | `axios` like http client [config](https://github.com/axios/axios#request-config). May contain `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, and other client options eg. `timeout`. For debugging and displaying logs you can set `debug: true`. |
+| restClientConfig      | Optional   | Not set  | `axios` like http client [config](https://github.com/axios/axios#request-config). May contain `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, and other client options eg. `timeout`. For debugging and displaying logs you can set `debug: true`. Use the `retry` property (number or [`axios-retry`](https://github.com/softonic/axios-retry#options) config) to customise automatic retries. |
 | launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                                                                                                                                                       |
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                       |
 | token                 | Deprecated | Not set  | Use `apiKey` instead.                                                                                                                                                                                                                                                                                                           |
@@ -87,6 +87,26 @@ The client works synchronously, so it is not necessary to wait for the end of th
 There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error 'Error: timeout of 30000ms exceeded'.
 
 You can simply change this timeout by adding a `timeout` property to `restClientConfig` with your desired numeric value (in _ms_) or *0* to disable it.
+
+### Retry configuration
+
+The client retries failed HTTP calls up to 6 times with an exponential backoff (starting at 200&nbsp;ms and capping at 5&nbsp;s) and resets the axios timeout before each retry. Provide a `retry` option in `restClientConfig` to change that behaviour. The value can be either a number (overriding just the retry count) or a full [`axios-retry` configuration object](https://github.com/softonic/axios-retry#options):
+
+```javascript
+const axiosRetry = require('axios-retry').default;
+
+const client = new RPClient({
+  // ... other options
+  restClientConfig: {
+    retry: {
+      retries: 5,
+      retryDelay: axiosRetry.exponentialDelay,
+    },
+  },
+});
+```
+
+Setting `retry: 0` disables automatic retries.
 
 ### checkConnect
 
