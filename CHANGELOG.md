@@ -1,3 +1,5 @@
+
+## [5.4.2] - 2025-10-02
 ### Added
 - Allow configuring the HTTP retry strategy via `restClientConfig.retry` and tune the default policy.
 ### Security
