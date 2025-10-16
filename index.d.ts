@@ -2,7 +2,7 @@ declare module '@reportportal/client-javascript' {
   /**
    * Configuration options for initializing the Report Portal client.
    *
-   * @example
+   * @example API Key Authentication
    * ```typescript
    * const rp = new ReportPortalClient({
    *   endpoint: 'https://your.reportportal.server/api/v1',
@@ -10,9 +10,23 @@ declare module '@reportportal/client-javascript' {
    *   apiKey: 'your_api_key',
    * });
    * ```
+   *
+   * @example OAuth 2.0 Authentication
+   * ```typescript
+   * const rp = new ReportPortalClient({
+   *   endpoint: 'https://your.reportportal.server/api/v1',
+   *   project: 'your_project_name',
+   *   tokenEndpoint: 'https://your-oauth-server.com/oauth/token',
+   *   username: 'your-username',
+   *   password: 'your-password',
+   *   clientId: 'your-client-id',
+   *   clientSecret: 'your-client-secret', // optional
+   *   scope: 'reportportal', // optional
+   * });
+   * ```
    */
   export interface ReportPortalConfig {
-    apiKey: string;
+    apiKey?: string;
     endpoint: string;
     launch: string;
     project: string;
@@ -23,6 +37,34 @@ declare module '@reportportal/client-javascript' {
     launchUuidPrintOutput?: string;
     restClientConfig?: Record<string, unknown>;
     token?: string;
+    /**
+     * OAuth 2.0 token endpoint URL for password grant flow.
+     * Required for OAuth authentication.
+     */
+    tokenEndpoint?: string;
+    /**
+     * Username for OAuth 2.0 password grant.
+     * Required for OAuth authentication.
+     */
+    username?: string;
+    /**
+     * Password for OAuth 2.0 password grant.
+     * Required for OAuth authentication.
+     */
+    password?: string;
+    /**
+     * OAuth 2.0 client ID.
+     * Required for OAuth authentication.
+     */
+    clientId?: string;
+    /**
+     * OAuth 2.0 client secret (optional, depending on your OAuth server configuration).
+     */
+    clientSecret?: string;
+    /**
+     * OAuth 2.0 scope (optional, space-separated list of scopes).
+     */
+    scope?: string;
   }
 
   /**
