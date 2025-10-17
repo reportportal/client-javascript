@@ -56,15 +56,17 @@ rpClient.checkConnect().then(() => {
 const RPClient = require('@reportportal/client-javascript');
 
 const rpClient = new RPClient({
-    tokenEndpoint: 'https://your-oauth-server.com/oauth/token',
-    username: 'your-username',
-    password: 'your-password',
-    clientId: 'your-client-id',
-    clientSecret: 'your-client-secret', // optional
-    scope: 'reportportal', // optional
     endpoint: 'http://your-instance.com:8080/api/v1',
     launch: 'LAUNCH_NAME',
-    project: 'PROJECT_NAME'
+    project: 'PROJECT_NAME',
+    oauth: {
+        tokenEndpoint: 'https://your-oauth-server.com/oauth/token',
+        username: 'your-username',
+        password: 'your-password',
+        clientId: 'your-client-id',
+        clientSecret: 'your-client-secret', // optional
+        scope: 'reportportal', // optional
+    }
 });
 
 rpClient.checkConnect().then(() => {
@@ -92,10 +94,18 @@ The client supports two authentication methods:
 | Option                | Necessity  | Default  | Description                                                                                                                                                                                                                                                                                                                     |
 |-----------------------|------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | apiKey                | Required*  |          | User's reportportal token from which you want to send requests. It can be found on the profile page of this user. *Required only if OAuth is not configured.                                                                                                                                                                    |
-| tokenEndpoint         | Optional** |          | OAuth 2.0 token endpoint URL for password grant flow. **Required for OAuth authentication.                                                                                                                                                                                                                                      |
-| username              | Optional** |          | Username for OAuth 2.0 password grant. **Required for OAuth authentication.                                                                                                                                                                                                                                                     |
-| password              | Optional** |          | Password for OAuth 2.0 password grant. **Required for OAuth authentication.                                                                                                                                                                                                                                                     |
-| clientId              | Optional** |          | OAuth 2.0 client ID. **Required for OAuth authentication.                                                                                                                                                                                                                                                                       |
+| oauth                 | Optional   |          | OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key. See OAuth Configuration below.                                                                                                                                                                                             |
+
+#### OAuth Configuration
+
+The `oauth` object supports the following properties:
+
+| Property              | Necessity  | Default  | Description                                                                                                                                                                                                                                                                                                                     |
+|-----------------------|------------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| tokenEndpoint         | Required   |          | OAuth 2.0 token endpoint URL for password grant flow.                                                                                                                                                                                                                                                                           |
+| username              | Required   |          | Username for OAuth 2.0 password grant.                                                                                                                                                                                                                                                                                          |
+| password              | Required   |          | Password for OAuth 2.0 password grant.                                                                                                                                                                                                                                                                                          |
+| clientId              | Required   |          | OAuth 2.0 client ID.                                                                                                                                                                                                                                                                                                            |
 | clientSecret          | Optional   |          | OAuth 2.0 client secret (optional, depending on your OAuth server configuration).                                                                                                                                                                                                                                               |
 | scope                 | Optional   |          | OAuth 2.0 scope (optional, space-separated list of scopes).                                                                                                                                                                                                                                                                     |
 

@@ -1,5 +1,35 @@
 declare module '@reportportal/client-javascript' {
   /**
+   * OAuth 2.0 configuration for password grant flow.
+   */
+  export interface OAuthConfig {
+    /**
+     * OAuth 2.0 token endpoint URL for password grant flow.
+     */
+    tokenEndpoint: string;
+    /**
+     * Username for OAuth 2.0 password grant.
+     */
+    username: string;
+    /**
+     * Password for OAuth 2.0 password grant.
+     */
+    password: string;
+    /**
+     * OAuth 2.0 client ID.
+     */
+    clientId: string;
+    /**
+     * OAuth 2.0 client secret (optional, depending on your OAuth server configuration).
+     */
+    clientSecret?: string;
+    /**
+     * OAuth 2.0 scope (optional, space-separated list of scopes).
+     */
+    scope?: string;
+  }
+
+  /**
    * Configuration options for initializing the Report Portal client.
    *
    * @example API Key Authentication
@@ -16,12 +46,14 @@ declare module '@reportportal/client-javascript' {
    * const rp = new ReportPortalClient({
    *   endpoint: 'https://your.reportportal.server/api/v1',
    *   project: 'your_project_name',
-   *   tokenEndpoint: 'https://your-oauth-server.com/oauth/token',
-   *   username: 'your-username',
-   *   password: 'your-password',
-   *   clientId: 'your-client-id',
-   *   clientSecret: 'your-client-secret', // optional
-   *   scope: 'reportportal', // optional
+   *   oauth: {
+   *     tokenEndpoint: 'https://your-oauth-server.com/oauth/token',
+   *     username: 'your-username',
+   *     password: 'your-password',
+   *     clientId: 'your-client-id',
+   *     clientSecret: 'your-client-secret', // optional
+   *     scope: 'reportportal', // optional
+   *   }
    * });
    * ```
    */
@@ -38,33 +70,9 @@ declare module '@reportportal/client-javascript' {
     restClientConfig?: Record<string, unknown>;
     token?: string;
     /**
-     * OAuth 2.0 token endpoint URL for password grant flow.
-     * Required for OAuth authentication.
+     * OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key.
      */
-    tokenEndpoint?: string;
-    /**
-     * Username for OAuth 2.0 password grant.
-     * Required for OAuth authentication.
-     */
-    username?: string;
-    /**
-     * Password for OAuth 2.0 password grant.
-     * Required for OAuth authentication.
-     */
-    password?: string;
-    /**
-     * OAuth 2.0 client ID.
-     * Required for OAuth authentication.
-     */
-    clientId?: string;
-    /**
-     * OAuth 2.0 client secret (optional, depending on your OAuth server configuration).
-     */
-    clientSecret?: string;
-    /**
-     * OAuth 2.0 scope (optional, space-separated list of scopes).
-     */
-    scope?: string;
+    oauth?: OAuthConfig;
   }
 
   /**
