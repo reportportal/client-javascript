@@ -132,7 +132,7 @@ describe('OAuthInterceptor', () => {
 
   it('logs an error and throws descriptive message when token request fails', async () => {
     const oauthInterceptor = new OAuthInterceptor(baseConfig);
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     axios.post.mockRejectedValue({
       response: {
         status: 400,
@@ -151,7 +151,7 @@ describe('OAuthInterceptor', () => {
   });
 
   it('logs debug messages only when debug mode is enabled', () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     const oauthInterceptor = new OAuthInterceptor({ ...baseConfig, debug: true });
     oauthInterceptor.logDebug('message', { foo: 'bar' });
 
@@ -189,7 +189,7 @@ describe('OAuthInterceptor', () => {
   it('keeps request going when Authorization injection fails', async () => {
     const oauthInterceptor = new OAuthInterceptor(baseConfig);
     const error = new Error('refresh failed');
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     const tokenSpy = jest.spyOn(oauthInterceptor, 'getAccessToken').mockRejectedValue(error);
     let requestHandler;
     const axiosInstance = {
