@@ -215,4 +215,98 @@ describe('OAuthInterceptor', () => {
     consoleSpy.mockRestore();
     tokenSpy.mockRestore();
   });
+
+  it('falls back to password grant when refresh token is expired or invalid', async () => {
+    const baseTime = 1700000500000;
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => baseTime);
+    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const oauthInterceptor = new OAuthInterceptor(baseConfig);
+    oauthInterceptor.accessToken = 'old-token';
+    oauthInterceptor.refreshToken = 'expired-refresh-token';
+    oauthInterceptor.tokenExpiresAt = baseTime - 1000; // Token already expired
+
+    // First call (refresh token) fails
+    axios.post
+      .mockRejectedValueOnce({
+        response: {
+          status: 400,
+          data: { error: 'invalid_grant', error_description: 'refresh token expired' },
+        },
+      })
+      // Second call (password grant fallback) succeeds
+      .mockResolvedValueOnce({
+        data: {
+          access_token: 'new-token-from-password',
+          refresh_token: 'new-refresh-token',
+          expires_in: 3600,
+        },
+      });
+
+    const token = await oauthInterceptor.getAccessToken();
+
+    expect(token).toBe('new-token-from-password');
+    expect(axios.post).toHaveBeenCalledTimes(2);
+
+    // First call should be refresh_token grant
+    const [, firstParams] = axios.post.mock.calls[0];
+    expect(firstParams.get('grant_type')).toBe('refresh_token');
+    expect(firstParams.get('refresh_token')).toBe('expired-refresh-token');
+
+    // Second call should be password grant
+    const [, secondParams] = axios.post.mock.calls[1];
+    expect(secondParams.get('grant_type')).toBe('password');
+    expect(secondParams.get('username')).toBe(baseConfig.username);
+    expect(secondParams.get('password')).toBe(baseConfig.password);
+
+    // Verify new tokens are stored
+    expect(oauthInterceptor.accessToken).toBe('new-token-from-password');
+    expect(oauthInterceptor.refreshToken).toBe('new-refresh-token');
+
+    // Verify warning was logged
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[OAuth] Refresh token expired or invalid, re-authenticating with password grant',
+    );
+
+    nowSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
+  });
+
+  it('throws error when both refresh token and password grant fail', async () => {
+    const baseTime = 1700000600000;
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => baseTime);
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+    const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
+    const oauthInterceptor = new OAuthInterceptor(baseConfig);
+    oauthInterceptor.refreshToken = 'expired-refresh-token';
+    oauthInterceptor.tokenExpiresAt = baseTime - 1000;
+
+    // Both calls fail
+    axios.post
+      .mockRejectedValueOnce({
+        response: {
+          status: 400,
+          data: { error: 'invalid_grant' },
+        },
+      })
+      .mockRejectedValueOnce({
+        response: {
+          status: 401,
+          data: { error: 'invalid_credentials' },
+        },
+      });
+
+    await expect(oauthInterceptor.getAccessToken()).rejects.toThrow(
+      'OAuth password grant fallback failed: 401 - {"error":"invalid_credentials"}',
+    );
+
+    expect(axios.post).toHaveBeenCalledTimes(2);
+    expect(consoleWarnSpy).toHaveBeenCalled();
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      '[OAuth] OAuth password grant fallback failed: 401 - {"error":"invalid_credentials"}',
+    );
+
+    nowSpy.mockRestore();
+    consoleErrorSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
+  });
 });
