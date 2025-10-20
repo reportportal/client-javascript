@@ -1,3 +1,5 @@
+### Added
+- OAuth 2.0 Password Grant authentication, check [Authentication Options](https://github.com/reportportal/client-javascript?tab=readme-ov-file#authentication-options) for more details.
 
 ## [5.4.2] - 2025-10-02
 ### Added
