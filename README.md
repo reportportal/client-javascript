@@ -52,7 +52,7 @@ rpClient.checkConnect().then(() => {
 
 When creating a client instance, you need to specify the following options.
 
-### Authentication Options
+### Authentication options
 
 The client supports two authentication methods:
 1. **API Key Authentication** (default)
@@ -67,7 +67,7 @@ Either API key or complete OAuth 2.0 configuration is required to connect to Rep
 | apiKey | Conditional |         | User's ReportPortal API key from which you want to send requests. It can be found on the profile page of this user. *Required only if OAuth is not configured. |
 | oauth  | Conditional |         | OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key. See OAuth Configuration below.                            |
 
-#### OAuth Configuration
+#### OAuth configuration
 
 The `oauth` object supports the following properties:
 
@@ -109,7 +109,7 @@ rpClient.checkConnect().then(() => {
 });
 ```
 
-### General Options
+### General options
 
 | Option                | Necessity  | Default  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |-----------------------|------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
