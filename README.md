@@ -52,7 +52,7 @@ rpClient.checkConnect().then(() => {
 
 When creating a client instance, you need to specify the following options.
 
-### Authentication Options
+### Authentication options
 
 The client supports two authentication methods:
 1. **API Key Authentication** (default)
@@ -67,7 +67,7 @@ Either API key or complete OAuth 2.0 configuration is required to connect to Rep
 | apiKey | Conditional |         | User's ReportPortal API key from which you want to send requests. It can be found on the profile page of this user. *Required only if OAuth is not configured. |
 | oauth  | Conditional |         | OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key. See OAuth Configuration below.                            |
 
-#### OAuth Configuration
+#### OAuth configuration
 
 The `oauth` object supports the following properties:
 
@@ -109,7 +109,7 @@ rpClient.checkConnect().then(() => {
 });
 ```
 
-### General Options
+### General options
 
 | Option                | Necessity  | Default  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |-----------------------|------------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -119,7 +119,7 @@ rpClient.checkConnect().then(() => {
 | headers               | Optional   | {}       | The object with custom headers for internal http client.                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | debug                 | Optional   | false    | This flag allows seeing the logs of the client. Useful for debugging.                                                                                                                                                                                                                                                                                                                                                                                                        |
 | isLaunchMergeRequired | Optional   | false    | Allows client to merge launches into one at the end of the run via saving their UUIDs to the temp files at filesystem. At the end of the run launches can be merged using `mergeLaunches` method. Temp file format: `rplaunch-${launch_uuid}.tmp`.                                                                                                                                                                                                                           |
-| restClientConfig      | Optional   | Not set  | `axios` like http client [config](https://github.com/axios/axios#request-config). May contain `agent` property for configure [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client, and other client options eg. `timeout`. For debugging and displaying logs you can set `debug: true`. Use the `retry` property (number or [`axios-retry`](https://github.com/softonic/axios-retry#options) config) to customise automatic retries. |
+| restClientConfig      | Optional   | Not set  | `axios` like http client [config](https://github.com/axios/axios#request-config). Supports `proxy` and `noProxy` for proxy configuration (see [Proxy configuration](#proxy-configuration)), `agent` property for [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) client options, `timeout`, `debug: true` for debugging, and `retry` property (number or [`axios-retry`](https://github.com/softonic/axios-retry#options) config) for automatic retries. |
 | launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                                                                                                                                                                    |
 | token                 | Deprecated | Not set  | Use `apiKey` or `oauth` instead.                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -165,6 +165,169 @@ const client = new RPClient({
 ```
 
 Setting `retry: 0` disables automatic retries.
+
+### Proxy configuration
+
+The client supports comprehensive proxy configuration for both HTTP and HTTPS requests, including ReportPortal API calls and OAuth token requests. Proxy settings can be configured via `restClientConfig` or environment variables.
+
+#### Basic proxy configuration
+
+##### Via configuration object
+
+```javascript
+const RPClient = require('@reportportal/client-javascript');
+
+const rpClient = new RPClient({
+    apiKey: 'your_api_key',
+    endpoint: 'http://your-instance.com:8080/api/v1',
+    launch: 'LAUNCH_NAME',
+    project: 'PROJECT_NAME',
+    restClientConfig: {
+        proxy: {
+            protocol: 'https',  // 'http' or 'https'
+            host: '127.0.0.1',
+            port: 8080,
+            // Optional authentication
+            auth: {
+                username: 'proxy-user',
+                password: 'proxy-password'
+            }
+        }
+    }
+});
+```
+
+##### Via proxy URL string
+
+```javascript
+const rpClient = new RPClient({
+    // ... other options
+    restClientConfig: {
+        proxy: 'https://127.0.0.1:8080'
+    }
+});
+```
+
+##### Via environment variables
+
+The client automatically detects and uses proxy environment variables:
+
+```bash
+export HTTPS_PROXY=https://127.0.0.1:8080
+export HTTP_PROXY=http://127.0.0.1:8080
+export NO_PROXY=localhost,127.0.0.1,.local
+```
+
+#### Bypassing proxy for specific domains (noProxy)
+
+Use the `noProxy` option to exclude specific domains from being proxied. This is useful when some services are accessible directly while others require a proxy.
+
+```javascript
+const rpClient = new RPClient({
+    // ... other options
+    restClientConfig: {
+        proxy: {
+            protocol: 'https',
+            host: '127.0.0.1',
+            port: 8080
+        },
+        // Bypass proxy for these domains
+        noProxy: 'localhost,127.0.0.1,internal.company.com,.local.domain'
+    }
+});
+```
+
+**noProxy format:**
+- Exact hostname: `example.com` - matches `example.com` and `sub.example.com`
+- Leading dot: `.example.com` - matches only subdomains like `sub.example.com` (not `example.com` itself)
+- Wildcard: `*` - bypass proxy for all requests
+- Multiple entries: Comma-separated list
+
+**Priority:** Configuration `noProxy` takes precedence over `NO_PROXY` environment variable.
+
+#### Proxy with OAuth authentication
+
+When using OAuth authentication, the proxy configuration is automatically applied to both:
+- OAuth token endpoint requests
+- ReportPortal API requests
+
+```javascript
+const rpClient = new RPClient({
+    endpoint: 'http://your-instance.com:8080/api/v1',
+    project: 'PROJECT_NAME',
+    oauth: {
+        tokenEndpoint: 'https://login.microsoftonline.com/.../oauth2/v2.0/token',
+        username: 'your-username',
+        password: 'your-password',
+        clientId: 'your-client-id'
+    },
+    restClientConfig: {
+        proxy: {
+            protocol: 'https',
+            host: '127.0.0.1',
+            port: 8080
+        },
+        // Example: Use proxy for OAuth, bypass for ReportPortal
+        noProxy: 'your-instance.com'
+    }
+});
+```
+
+#### Advanced proxy scenarios
+
+##### Disable proxy explicitly
+
+```javascript
+restClientConfig: {
+    proxy: false  // Disable proxy even if environment variables are set
+}
+```
+
+##### Debug proxy configuration
+
+Enable debug mode to see detailed proxy decision logs:
+
+```javascript
+restClientConfig: {
+    proxy: { /* ... */ },
+    noProxy: 'localhost,.local',
+    debug: true  // See proxy-related logs
+}
+```
+
+Debug output example:
+```
+[ProxyHelper] getProxyConfig called:
+  URL: https://login.microsoftonline.com/oauth2/v2.0/token
+  Hostname: login.microsoftonline.com
+  noProxy from config: localhost,.local
+  Should bypass proxy: false
+[ProxyHelper] Creating proxy agent:
+  URL: https://login.microsoftonline.com/oauth2/v2.0/token
+  Protocol: https:
+  Proxy URL: https://127.0.0.1:8080
+```
+
+#### Proxy configuration options
+
+| Option              | Type                         | Description                                                                                     |
+|---------------------|------------------------------|-------------------------------------------------------------------------------------------------|
+| `proxy`             | `false \| string \| object`  | Proxy configuration. Can be `false` (disable), URL string, or configuration object (see below) |
+| `proxy.protocol`    | `string`                     | Proxy protocol: `'http'` or `'https'`                                                          |
+| `proxy.host`        | `string`                     | Proxy host address                                                                              |
+| `proxy.port`        | `number`                     | Proxy port number                                                                               |
+| `proxy.auth`        | `object`                     | Optional proxy authentication                                                                   |
+| `proxy.auth.username` | `string`                   | Proxy username                                                                                  |
+| `proxy.auth.password` | `string`                   | Proxy password                                                                                  |
+| `noProxy`           | `string`                     | Comma-separated list of domains to bypass proxy                                                 |
+
+#### How proxy handling works
+
+1. **Per-request proxy decision:** Each request (API or OAuth) determines its proxy configuration based on the target URL
+2. **noProxy checking:** URLs matching `noProxy` patterns bypass the proxy and connect directly
+3. **Default agents for bypassed URLs:** When a URL bypasses proxy, a default HTTP/HTTPS agent is used to prevent automatic proxy detection
+4. **Environment variable support:** `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` are automatically detected and used if no explicit configuration is provided
+5. **Priority:** Explicit configuration takes precedence over environment variables
 
 ### checkConnect
 
