@@ -1,5 +1,6 @@
 const axios = require('axios');
 const OAuthInterceptor = require('../lib/oauth');
+const { HttpsProxyAgent } = require('https-proxy-agent');
 
 jest.mock('axios', () => ({
   post: jest.fn(),
@@ -47,9 +48,8 @@ describe('OAuthInterceptor', () => {
     expect(params.get('client_id')).toBe(baseConfig.clientId);
     expect(params.get('client_secret')).toBe(baseConfig.clientSecret);
     expect(params.get('scope')).toBe(baseConfig.scope);
-    expect(config).toEqual({
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
+    expect(config.headers).toEqual({ 'Content-Type': 'application/x-www-form-urlencoded' });
+    expect(config.httpsAgent).toBeDefined(); // Default agent added
     expect(oauthInterceptor.refreshToken).toBe('refresh-123');
     expect(oauthInterceptor.tokenExpiresAt).toBe(baseTime + 120000);
 
@@ -308,5 +308,76 @@ describe('OAuthInterceptor', () => {
     nowSpy.mockRestore();
     consoleErrorSpy.mockRestore();
     consoleWarnSpy.mockRestore();
+  });
+
+  it('uses proxy configuration for token requests', async () => {
+    const baseTime = 1700000700000;
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => baseTime);
+    const configWithProxy = {
+      ...baseConfig,
+      restClientConfig: {
+        proxy: {
+          protocol: 'https',
+          host: '127.0.0.1',
+          port: 9000,
+        },
+      },
+    };
+    const oauthInterceptor = new OAuthInterceptor(configWithProxy);
+    axios.post.mockResolvedValue({
+      data: {
+        access_token: 'token-with-proxy',
+        expires_in: 120,
+      },
+    });
+
+    const token = await oauthInterceptor.getAccessToken();
+
+    expect(token).toBe('token-with-proxy');
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    const [url, params, config] = axios.post.mock.calls[0];
+
+    expect(url).toBe(baseConfig.tokenEndpoint);
+    expect(config.headers).toEqual({ 'Content-Type': 'application/x-www-form-urlencoded' });
+    expect(config.httpsAgent).toBeInstanceOf(HttpsProxyAgent);
+
+    nowSpy.mockRestore();
+  });
+
+  it('bypasses proxy for token endpoint when in noProxy list', async () => {
+    const baseTime = 1700000800000;
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => baseTime);
+    const configWithNoProxy = {
+      ...baseConfig,
+      restClientConfig: {
+        proxy: {
+          protocol: 'https',
+          host: '127.0.0.1',
+          port: 9000,
+        },
+        noProxy: 'auth.example.com',
+      },
+    };
+    const oauthInterceptor = new OAuthInterceptor(configWithNoProxy);
+    axios.post.mockResolvedValue({
+      data: {
+        access_token: 'token-no-proxy',
+        expires_in: 120,
+      },
+    });
+
+    const token = await oauthInterceptor.getAccessToken();
+
+    expect(token).toBe('token-no-proxy');
+    expect(axios.post).toHaveBeenCalledTimes(1);
+    const [url, params, config] = axios.post.mock.calls[0];
+
+    expect(url).toBe(baseConfig.tokenEndpoint);
+    expect(config.headers).toEqual({ 'Content-Type': 'application/x-www-form-urlencoded' });
+    // Should use default agent, not proxy agent
+    expect(config.httpsAgent).toBeDefined();
+    expect(config.httpsAgent.constructor.name).toBe('Agent');
+
+    nowSpy.mockRestore();
   });
 });
