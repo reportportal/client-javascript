@@ -338,7 +338,7 @@ describe('OAuthInterceptor', () => {
 
     expect(token).toBe('token-with-proxy');
     expect(axios.post).toHaveBeenCalledTimes(1);
-    const [url, params, config] = axios.post.mock.calls[0];
+    const [url, , config] = axios.post.mock.calls[0];
 
     expect(url).toBe(baseConfig.tokenEndpoint);
     expect(config.headers).toEqual({ 'Content-Type': 'application/x-www-form-urlencoded' });
@@ -373,7 +373,7 @@ describe('OAuthInterceptor', () => {
 
     expect(token).toBe('token-no-proxy');
     expect(axios.post).toHaveBeenCalledTimes(1);
-    const [url, params, config] = axios.post.mock.calls[0];
+    const [url, , config] = axios.post.mock.calls[0];
 
     expect(url).toBe(baseConfig.tokenEndpoint);
     expect(config.headers).toEqual({ 'Content-Type': 'application/x-www-form-urlencoded' });
