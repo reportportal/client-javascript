@@ -1,3 +1,5 @@
+### Added
+- Full http/https proxy support with `noProxy` configuration, check [Authentication Options](https://github.com/reportportal/client-javascript?tab=readme-ov-file#proxy-configuration-options) for more details.
 
 ## [5.4.3] - 2025-10-20
 ### Added
