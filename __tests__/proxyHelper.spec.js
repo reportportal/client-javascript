@@ -109,7 +109,6 @@ describe('proxyHelper', () => {
       const result = getProxyConfig('http://target.com', config);
       expect(result).toEqual({
         proxyUrl: 'http://proxy.example.com:8080',
-        fromConfig: true,
       });
     });
 
@@ -124,7 +123,6 @@ describe('proxyHelper', () => {
       const result = getProxyConfig('http://target.com', config);
       expect(result).toEqual({
         proxyUrl: 'https://proxy.example.com:8080',
-        fromConfig: true,
       });
     });
 
@@ -143,7 +141,6 @@ describe('proxyHelper', () => {
       const result = getProxyConfig('http://target.com', config);
       expect(result).toEqual({
         proxyUrl: 'http://user:pass@proxy.example.com:8080',
-        fromConfig: true,
       });
     });
 
@@ -157,7 +154,6 @@ describe('proxyHelper', () => {
       const result = getProxyConfig('http://target.com', config);
       expect(result).toEqual({
         proxyUrl: 'http://proxy.example.com:8080',
-        fromConfig: true,
       });
     });
 
@@ -166,7 +162,6 @@ describe('proxyHelper', () => {
       const result = getProxyConfig('https://target.com', {});
       expect(result).toEqual({
         proxyUrl: 'http://proxy.example.com:8080',
-        fromConfig: false,
       });
     });
 
@@ -175,7 +170,6 @@ describe('proxyHelper', () => {
       const result = getProxyConfig('http://target.com', {});
       expect(result).toEqual({
         proxyUrl: 'http://proxy.example.com:8080',
-        fromConfig: false,
       });
     });
 
@@ -192,7 +186,6 @@ describe('proxyHelper', () => {
       const result = getProxyConfig('https://target.com', config);
       expect(result).toEqual({
         proxyUrl: 'http://config-proxy.com:9090',
-        fromConfig: true,
       });
     });
   });
