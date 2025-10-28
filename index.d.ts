@@ -30,6 +30,75 @@ declare module '@reportportal/client-javascript' {
   }
 
   /**
+   * Proxy configuration object.
+   */
+  export interface ProxyConfig {
+    /**
+     * Protocol for the proxy (http or https).
+     */
+    protocol?: string;
+    /**
+     * Proxy host.
+     */
+    host: string;
+    /**
+     * Proxy port.
+     */
+    port: number;
+    /**
+     * Optional authentication for the proxy.
+     */
+    auth?: {
+      username: string;
+      password: string;
+    };
+  }
+
+  /**
+   * REST client configuration options.
+   */
+  export interface RestClientConfig {
+    /**
+     * Request timeout in milliseconds.
+     */
+    timeout?: number;
+    /**
+     * Proxy configuration. Can be:
+     * - false: Disable proxy
+     * - string: Proxy URL (e.g., 'http://proxy.example.com:8080')
+     * - ProxyConfig object: Detailed proxy configuration
+     */
+    proxy?: false | string | ProxyConfig;
+    /**
+     * Comma-separated list of domains to bypass proxy.
+     * Example: 'localhost,127.0.0.1,.example.com'
+     * This takes precedence over NO_PROXY environment variable.
+     */
+    noProxy?: string;
+    /**
+     * Custom HTTP agent options.
+     */
+    agent?: Record<string, unknown>;
+    /**
+     * Retry configuration.
+     */
+    retry?: number | {
+      retries?: number;
+      retryDelay?: (retryCount: number) => number;
+      retryCondition?: (error: any) => boolean;
+      shouldResetTimeout?: boolean;
+    };
+    /**
+     * Enable debug logging.
+     */
+    debug?: boolean;
+    /**
+     * Any other axios configuration options.
+     */
+    [key: string]: unknown;
+  }
+
+  /**
    * Configuration options for initializing the Report Portal client.
    *
    * @example API Key Authentication
@@ -56,6 +125,23 @@ declare module '@reportportal/client-javascript' {
    *   }
    * });
    * ```
+   *
+   * @example With Proxy Configuration
+   * ```typescript
+   * const rp = new ReportPortalClient({
+   *   endpoint: 'https://your.reportportal.server/api/v1',
+   *   project: 'your_project_name',
+   *   apiKey: 'your_api_key',
+   *   restClientConfig: {
+   *     proxy: {
+   *       protocol: 'https',
+   *       host: '127.0.0.1',
+   *       port: 8080,
+   *     },
+   *     noProxy: 'localhost,.local.domain',
+   *   }
+   * });
+   * ```
    */
   export interface ReportPortalConfig {
     apiKey?: string;
@@ -67,7 +153,7 @@ declare module '@reportportal/client-javascript' {
     isLaunchMergeRequired?: boolean;
     launchUuidPrint?: boolean;
     launchUuidPrintOutput?: string;
-    restClientConfig?: Record<string, unknown>;
+    restClientConfig?: RestClientConfig;
     token?: string;
     /**
      * OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key.
