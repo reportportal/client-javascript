@@ -1,6 +1,6 @@
 const axios = require('axios');
-const OAuthInterceptor = require('../lib/oauth');
 const { HttpsProxyAgent } = require('https-proxy-agent');
+const OAuthInterceptor = require('../lib/oauth');
 
 jest.mock('axios', () => ({
   post: jest.fn(),
@@ -152,7 +152,10 @@ describe('OAuthInterceptor', () => {
 
   it('logs debug messages only when debug mode is enabled', () => {
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-    const oauthInterceptor = new OAuthInterceptor({ ...baseConfig, debug: true });
+    const oauthInterceptor = new OAuthInterceptor({
+      ...baseConfig,
+      restClientConfig: { debug: true },
+    });
     oauthInterceptor.logDebug('message', { foo: 'bar' });
 
     expect(consoleSpy).toHaveBeenCalledWith('[OAuth] message', { foo: 'bar' });
