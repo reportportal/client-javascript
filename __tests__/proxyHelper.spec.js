@@ -267,4 +267,72 @@ describe('proxyHelper', () => {
       expect(agents.httpAgent.constructor.name).toBe('Agent');
     });
   });
+
+  describe('credential sanitization in debug logs', () => {
+    let consoleLogSpy;
+
+    beforeEach(() => {
+      consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+    });
+
+    afterEach(() => {
+      consoleLogSpy.mockRestore();
+    });
+
+    it('sanitizes proxy credentials in debug logs when using proxy config object', () => {
+      const config = {
+        proxy: {
+          protocol: 'https',
+          host: 'proxy.example.com',
+          port: 8080,
+          auth: {
+            username: 'secretuser',
+            password: 'secretpass',
+          },
+        },
+        debug: true,
+      };
+
+      getProxyAgentForUrl('http://target.com', config);
+
+      // Check that logs were called
+      expect(consoleLogSpy).toHaveBeenCalled();
+
+      // Check that credentials are not exposed in any log
+      const allLogs = consoleLogSpy.mock.calls.flat().join(' ');
+      expect(allLogs).not.toContain('secretuser');
+      expect(allLogs).not.toContain('secretpass');
+      // [REDACTED] gets URL-encoded to %5BREDACTED%5D
+      expect(allLogs).toMatch(/\[REDACTED\]|%5BREDACTED%5D/);
+    });
+
+    it('sanitizes proxy credentials in debug logs when using proxy URL string', () => {
+      const config = {
+        proxy: 'https://myuser:mypassword@proxy.example.com:8080',
+        debug: true,
+      };
+
+      getProxyAgentForUrl('http://target.com', config);
+
+      // Check that credentials are not exposed in any log
+      const allLogs = consoleLogSpy.mock.calls.flat().join(' ');
+      expect(allLogs).not.toContain('myuser');
+      expect(allLogs).not.toContain('mypassword');
+      // [REDACTED] gets URL-encoded to %5BREDACTED%5D
+      expect(allLogs).toMatch(/\[REDACTED\]|%5BREDACTED%5D/);
+    });
+
+    it('logs proxy URL normally when no credentials are present', () => {
+      const config = {
+        proxy: 'https://proxy.example.com:8080',
+        debug: true,
+      };
+
+      getProxyAgentForUrl('http://target.com', config);
+
+      const allLogs = consoleLogSpy.mock.calls.flat().join(' ');
+      expect(allLogs).toContain('https://proxy.example.com:8080');
+      expect(allLogs).not.toContain('[REDACTED]');
+    });
+  });
 });
