@@ -1,3 +1,5 @@
+
+## [5.5.2] - 2025-10-29
 ### Fixed
 - Disable axios default proxy in case of custom proxy agent used.
 
