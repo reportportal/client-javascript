@@ -27,7 +27,7 @@
   "dependencies": {
     "axios": "^1.12.2",
     "axios-retry": "^4.5.0",
-    "glob": "11.0.3",
+    "glob": "^11.0.3",
     "http-proxy-agent": "^7.0.2",
     "https-proxy-agent": "^7.0.6",
     "ini": "^2.0.0",
