@@ -1,3 +1,5 @@
+### Changed
+- Updated the version of `glob` to 11.0.3 to avoid unsupported dependencies.
 
 ## [5.5.2] - 2025-10-29
 ### Fixed
