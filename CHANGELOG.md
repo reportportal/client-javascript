@@ -1,3 +1,5 @@
+
+## [5.5.4] - 2025-11-13
 ### Fixed
 - The default agent params overriding via `restClientConfig.agent`. Fixes [agent-js-playwright#193](https://github.com/reportportal/agent-js-playwright/issues/193).
 
