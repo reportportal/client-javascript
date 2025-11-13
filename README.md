@@ -124,9 +124,9 @@ rpClient.checkConnect().then(() => {
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                                                                                                                                                                    |
 | token                 | Deprecated | Not set  | Use `apiKey` or `oauth` instead.                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
-### HTTP client config
+### HTTP client options
 
-`axios` like http client [config](https://github.com/axios/axios#request-config)
+`axios` like http client [config](https://github.com/axios/axios#request-config).
 
 #### Timeout (30000ms) on axios requests
 
