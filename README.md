@@ -124,26 +124,26 @@ rpClient.checkConnect().then(() => {
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                                                                                                                                                                    |
 | token                 | Deprecated | Not set  | Use `apiKey` or `oauth` instead.                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
-#### HTTP client config
+### HTTP client config
 
 `axios` like http client [config](https://github.com/axios/axios#request-config)
 
-### Timeout (30000ms) on axios requests
+#### Timeout (30000ms) on axios requests
 
 There is a timeout on axios requests. If for instance the server your making a request to is taking too long to load, then axios timeout will work and you will see the error 'Error: timeout of 30000ms exceeded'.
 
 You can simply change this timeout by adding a `timeout` property to `restClientConfig` with your desired numeric value (in _ms_) or *0* to disable it.
 
-### Debug
+#### Debug
 
 Use `debug: true` for debugging.
 
-### Agent
+#### Agent
 
 Use `agent` property to provide [http(s)](https://nodejs.org/api/https.html#https_https_request_url_options_callback) agent options.
 Use this property in case the direct `httpAgent/httpsAgent` instance property cannot be used due to config serializations.
 
-### Retry configuration
+#### Retry configuration
 
 The client retries failed HTTP calls up to 6 times with an exponential backoff (starting at 200&nbsp;ms and capping at 5&nbsp;s) and resets the axios timeout before each retry. Provide a `retry` option in `restClientConfig` to change that behaviour. The value can be either a number (overriding just the retry count) or a full [`axios-retry` configuration object](https://github.com/softonic/axios-retry#options):
 
@@ -163,13 +163,13 @@ const client = new RPClient({
 
 Setting `retry: 0` disables automatic retries.
 
-### Proxy configuration
+#### Proxy configuration
 
 The client supports comprehensive proxy configuration for both HTTP and HTTPS requests, including ReportPortal API calls and OAuth token requests. Proxy settings can be configured via `restClientConfig` or environment variables.
 
-#### Basic proxy configuration
+##### Basic proxy configuration
 
-##### Via configuration object
+###### Via configuration object
 
 ```javascript
 const RPClient = require('@reportportal/client-javascript');
@@ -194,7 +194,7 @@ const rpClient = new RPClient({
 });
 ```
 
-##### Via proxy URL string
+###### Via proxy URL string
 
 ```javascript
 const rpClient = new RPClient({
@@ -205,7 +205,7 @@ const rpClient = new RPClient({
 });
 ```
 
-##### Via environment variables
+###### Via environment variables
 
 The client automatically detects and uses proxy environment variables:
 
@@ -215,7 +215,7 @@ export HTTP_PROXY=http://127.0.0.1:8080
 export NO_PROXY=localhost,127.0.0.1,.local
 ```
 
-#### Bypassing proxy for specific domains (noProxy)
+##### Bypassing proxy for specific domains (noProxy)
 
 Use the `noProxy` option to exclude specific domains from being proxied. This is useful when some services are accessible directly while others require a proxy.
 
@@ -242,7 +242,7 @@ const rpClient = new RPClient({
 
 **Priority:** Configuration `noProxy` takes precedence over `NO_PROXY` environment variable.
 
-#### Proxy with OAuth authentication
+##### Proxy with OAuth authentication
 
 When using OAuth authentication, the proxy configuration is automatically applied to both:
 - OAuth token endpoint requests
@@ -270,9 +270,9 @@ const rpClient = new RPClient({
 });
 ```
 
-#### Advanced proxy scenarios
+##### Advanced proxy scenarios
 
-##### Disable proxy explicitly
+###### Disable proxy explicitly
 
 ```javascript
 restClientConfig: {
@@ -280,7 +280,7 @@ restClientConfig: {
 }
 ```
 
-##### Debug proxy configuration
+###### Debug proxy configuration
 
 Enable debug mode to see detailed proxy decision logs:
 
@@ -305,7 +305,7 @@ Debug output example:
   Proxy URL: https://127.0.0.1:8080
 ```
 
-#### Proxy configuration options
+##### Proxy configuration options
 
 | Option              | Type                         | Description                                                                                     |
 |---------------------|------------------------------|-------------------------------------------------------------------------------------------------|
@@ -318,7 +318,7 @@ Debug output example:
 | `proxy.auth.password` | `string`                   | Proxy password                                                                                  |
 | `noProxy`           | `string`                     | Comma-separated list of domains to bypass proxy                                                 |
 
-#### How proxy handling works
+##### How proxy handling works
 
 1. **Per-request proxy decision:** Each request (API or OAuth) determines its proxy configuration based on the target URL
 2. **noProxy checking:** URLs matching `noProxy` patterns bypass the proxy and connect directly
