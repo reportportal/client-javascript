@@ -21,6 +21,13 @@ describe('RestClient', () => {
   const noOptions = {};
   const getRetryAttempts = (client) => client.getRetryConfig().retries + 1;
   const restClient = new RestClient(options);
+  const restClientNoRetry = new RestClient({
+    ...options,
+    restClientConfig: {
+      ...options.restClientConfig,
+      retry: 0,
+    },
+  });
   const retryAttempts = getRetryAttempts(restClient);
 
   const unathorizedError = {
@@ -58,13 +65,20 @@ describe('RestClient', () => {
   describe('retry configuration', () => {
     it('uses a production-ready retry policy by default', () => {
       const retryConfig = restClient.getRetryConfig();
+      const mathRandomSpy = jest.spyOn(Math, 'random').mockImplementationOnce(() => 0);
 
       expect(retryConfig.retries).toBe(6);
       expect(retryAttempts).toBe(retryConfig.retries + 1);
       expect(retryConfig.shouldResetTimeout).toBe(true);
       expect(retryConfig.retryDelay(1)).toBe(200);
-      expect(retryConfig.retryDelay(4)).toBe(1600);
+
+      mathRandomSpy.mockImplementationOnce(() => 1);
+      expect(retryConfig.retryDelay(4)).toBeCloseTo(1600 * 0.6);
+
+      mathRandomSpy.mockImplementationOnce(() => 0);
       expect(retryConfig.retryDelay(10)).toBe(5000);
+
+      mathRandomSpy.mockRestore();
     });
 
     it('uses custom retry attempts when a numeric value is provided', (done) => {
@@ -80,6 +94,7 @@ describe('RestClient', () => {
 
       const scope = nock(options.baseURL)
         .get('/users/custom-retry-number')
+        .times(getRetryAttempts(client))
         .replyWithError(netErrConnectionResetError);
 
       client.retrieve('users/custom-retry-number', noOptions).catch((error) => {
@@ -111,6 +126,14 @@ describe('RestClient', () => {
       expect(retryConfig.retryDelay).toBe(customDelay);
       expect(retryConfig.shouldResetTimeout).toBe(true);
     });
+
+    it('retries axios timeout errors even without ECONNABORTED code', () => {
+      const retryConfig = restClient.getRetryConfig();
+      const timeoutError = {
+        message: 'timeout of 1ms exceeded',
+      };
+      expect(retryConfig.retryCondition(timeoutError)).toBe(true);
+    });
   });
 
   describe('buildPath', () => {
@@ -122,22 +145,32 @@ describe('RestClient', () => {
   });
 
   describe('getRestConfig', () => {
-    it("return {} in case agent property is doesn't exist", () => {
-      restClient.restClientConfig = {};
-      expect(restClient.getRestConfig()).toEqual({});
+    it("return {} in case agent property doesn't exist", () => {
+      const client = new RestClient({
+        ...options,
+        restClientConfig: {},
+      });
+
+      expect(client.getRestConfig()).toEqual({});
     });
 
     it('creates object with correct properties with http(s) agent', () => {
-      restClient.restClientConfig = {
-        agent: {
-          rejectUnauthorized: false,
+      const client = new RestClient({
+        ...options,
+        restClientConfig: {
+          agent: {
+            rejectUnauthorized: false,
+          },
+          timeout: 10000,
         },
-        timeout: 10000,
-      };
-      expect(restClient.getRestConfig().httpAgent).toBeDefined();
-      expect(restClient.getRestConfig().httpAgent).toBeInstanceOf(http.Agent);
-      expect(restClient.getRestConfig().timeout).toBe(10000);
-      expect(restClient.getRestConfig().agent).toBeUndefined();
+      });
+
+      const config = client.getRestConfig();
+
+      expect(config.httpAgent).toBeDefined();
+      expect(config.httpAgent).toBeInstanceOf(http.Agent);
+      expect(config.timeout).toBe(10000);
+      expect(config.agent).toBeUndefined();
     });
   });
 
@@ -147,7 +180,7 @@ describe('RestClient', () => {
 
       const scope = nock(options.baseURL).get('/users').reply(200, listOfUsers);
 
-      restClient.retrieve('users').then((result) => {
+      restClientNoRetry.retrieve('users').then((result) => {
         expect(result).toEqual(listOfUsers);
         expect(scope.isDone()).toBeTruthy();
 
@@ -158,7 +191,7 @@ describe('RestClient', () => {
     it('catches NETWORK errors', (done) => {
       const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
-      restClient.retrieve('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieve('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -170,7 +203,7 @@ describe('RestClient', () => {
     it('catches API errors', (done) => {
       const scope = nock(options.baseURL).get('/users').reply(403, unathorizedError);
 
-      restClient.retrieve('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieve('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -189,7 +222,7 @@ describe('RestClient', () => {
         .post('/users', (body) => isEqual(body, newUser))
         .reply(201, userCreated);
 
-      restClient.create('users', newUser).then((result) => {
+      restClientNoRetry.create('users', newUser).then((result) => {
         expect(result).toEqual(userCreated);
         expect(scope.isDone()).toBeTruthy();
 
@@ -204,7 +237,7 @@ describe('RestClient', () => {
         .post('/users', (body) => isEqual(body, newUser))
         .replyWithError(netErrConnectionResetError);
 
-      restClient.create('users', newUser, noOptions).catch((error) => {
+      restClientNoRetry.create('users', newUser, noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -220,7 +253,7 @@ describe('RestClient', () => {
         .post('/users', (body) => isEqual(body, newUser))
         .reply(403, unathorizedError);
 
-      restClient.create('users', newUser, noOptions).catch((error) => {
+      restClientNoRetry.create('users', newUser, noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -239,7 +272,7 @@ describe('RestClient', () => {
         .put('/users/1', (body) => isEqual(body, newUserInfo))
         .reply(200, userUpdated);
 
-      restClient.update('users/1', newUserInfo).then((result) => {
+      restClientNoRetry.update('users/1', newUserInfo).then((result) => {
         expect(result).toEqual(userUpdated);
         expect(scope.isDone()).toBeTruthy();
 
@@ -254,7 +287,7 @@ describe('RestClient', () => {
         .put('/users/1', (body) => isEqual(body, newUserInfo))
         .replyWithError(netErrConnectionResetError);
 
-      restClient.update('users/1', newUserInfo, noOptions).catch((error) => {
+      restClientNoRetry.update('users/1', newUserInfo, noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -270,7 +303,7 @@ describe('RestClient', () => {
         .put('/users/1', (body) => isEqual(body, newUserInfo))
         .reply(403, unathorizedError);
 
-      restClient.update('users/1', newUserInfo, noOptions).catch((error) => {
+      restClientNoRetry.update('users/1', newUserInfo, noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -287,7 +320,7 @@ describe('RestClient', () => {
 
       const scope = nock(options.baseURL).delete('/users/1').reply(200, userDeleted);
 
-      restClient.delete('users/1', emptyBody).then((result) => {
+      restClientNoRetry.delete('users/1', emptyBody).then((result) => {
         expect(result).toEqual(userDeleted);
         expect(scope.isDone()).toBeTruthy();
 
@@ -302,7 +335,7 @@ describe('RestClient', () => {
         .delete('/users/1')
         .replyWithError(netErrConnectionResetError);
 
-      restClient.delete('users/1', emptyBody, noOptions).catch((error) => {
+      restClientNoRetry.delete('users/1', emptyBody, noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -316,7 +349,7 @@ describe('RestClient', () => {
 
       const scope = nock(options.baseURL).delete('/users/1').reply(403, unathorizedError);
 
-      restClient.delete('users/1', emptyBody, noOptions).catch((error) => {
+      restClientNoRetry.delete('users/1', emptyBody, noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -332,7 +365,7 @@ describe('RestClient', () => {
 
       const scope = nock(options.baseURL).get('/users').reply(200, listOfUsers);
 
-      restClient.retrieveSyncAPI('users').then((result) => {
+      restClientNoRetry.retrieveSyncAPI('users').then((result) => {
         expect(result).toEqual(listOfUsers);
         expect(scope.isDone()).toBeTruthy();
 
@@ -343,7 +376,7 @@ describe('RestClient', () => {
     it('catches NETWORK errors', (done) => {
       const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
-      restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieveSyncAPI('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -355,7 +388,7 @@ describe('RestClient', () => {
     it('catches API errors', (done) => {
       const scope = nock(options.baseURL).get('/users').reply(403, unathorizedError);
 
-      restClient.retrieveSyncAPI('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieveSyncAPI('users', noOptions).catch((error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
