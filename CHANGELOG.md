@@ -1,3 +1,5 @@
+### Security
+- Updated versions of vulnerable packages (glob).
 
 ## [5.5.5] - 2025-11-18
 ### Changed
