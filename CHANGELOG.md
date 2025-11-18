@@ -1,3 +1,7 @@
+### Changed
+- HTTP retries delay calculation to use exponential backoff strategy with jitter.
+- HTTP retries condition to retry on axios timeout errors.
+- http/https agents now use `keep-alive` by default.
 
 ## [5.5.4] - 2025-11-13
 ### Fixed
