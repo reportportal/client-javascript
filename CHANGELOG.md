@@ -1,3 +1,5 @@
+
+## [5.5.5] - 2025-11-18
 ### Changed
 - HTTP retries delay calculation to use exponential backoff strategy with jitter.
 - HTTP retries condition to retry on axios timeout errors.
