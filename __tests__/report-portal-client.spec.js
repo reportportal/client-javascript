@@ -877,15 +877,20 @@ describe('ReportPortal javascript client', () => {
   });
 
   it('should automatically add NOT_ISSUE when status is SKIPPED and skippedIssue is false', function (done) {
-    const mockClient = new RPClient({
-      apiKey: 'test',
-      endpoint: 'https://reportportal-stub-url',
-      launch: 'test launch',
-      project: 'test project',
-      skippedIssue: false,
-    }, { name: 'test', version: '1.0.0' });
+    const mockClient = new RPClient(
+      {
+        apiKey: 'test',
+        endpoint: 'https://reportportal-stub-url',
+        launch: 'test launch',
+        project: 'test project',
+        skippedIssue: false,
+      },
+      { name: 'test', version: '1.0.0' },
+    );
 
-    const spyFinishTestItemPromiseStart = jest.spyOn(mockClient, 'finishTestItemPromiseStart').mockImplementation(() => {});
+    const spyFinishTestItemPromiseStart = jest
+      .spyOn(mockClient, 'finishTestItemPromiseStart')
+      .mockImplementation(() => {});
 
     mockClient.map = {
       testItemId: {
@@ -909,22 +914,27 @@ describe('ReportPortal javascript client', () => {
         expect.objectContaining({
           status: 'skipped',
           issue: { issueType: 'NOT_ISSUE' },
-        })
+        }),
       );
       done();
     }, 50);
   });
 
   it('should not add NOT_ISSUE when status is SKIPPED and skippedIssue is true', function (done) {
-    const mockClient = new RPClient({
-      apiKey: 'test',
-      endpoint: 'https://reportportal-stub-url',
-      launch: 'test launch',
-      project: 'test project',
-      skippedIssue: true,
-    }, { name: 'test', version: '1.0.0' });
+    const mockClient = new RPClient(
+      {
+        apiKey: 'test',
+        endpoint: 'https://reportportal-stub-url',
+        launch: 'test launch',
+        project: 'test project',
+        skippedIssue: true,
+      },
+      { name: 'test', version: '1.0.0' },
+    );
 
-    const spyFinishTestItemPromiseStart = jest.spyOn(mockClient, 'finishTestItemPromiseStart').mockImplementation(() => {});
+    const spyFinishTestItemPromiseStart = jest
+      .spyOn(mockClient, 'finishTestItemPromiseStart')
+      .mockImplementation(() => {});
 
     mockClient.map = {
       testItemId: {
@@ -947,18 +957,17 @@ describe('ReportPortal javascript client', () => {
         'testItemId',
         expect.objectContaining({
           status: 'skipped',
-        })
+        }),
       );
       expect(spyFinishTestItemPromiseStart).not.toHaveBeenCalledWith(
         expect.any(Object),
         'testItemId',
         expect.objectContaining({
           issue: expect.anything(),
-        })
+        }),
       );
       done();
     }, 100);
-
   });
 
   describe('saveLog', () => {
