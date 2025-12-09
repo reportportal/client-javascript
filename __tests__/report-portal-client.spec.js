@@ -908,15 +908,19 @@ describe('ReportPortal javascript client', () => {
     mockClient.finishTestItem('testItemId', finishTestItemRQ);
 
     setTimeout(() => {
-      expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
-        expect.any(Object),
-        'testItemId',
-        expect.objectContaining({
-          status: 'skipped',
-          issue: { issueType: 'NOT_ISSUE' },
-        }),
-      );
-      done();
+      try {
+        expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
+          expect.any(Object),
+          'testItemId',
+          expect.objectContaining({
+            status: 'skipped',
+            issue: { issueType: 'NOT_ISSUE' },
+          }),
+        );
+        done();
+      } catch (error) {
+        done(error);
+      }
     }, 50);
   });
 
@@ -952,21 +956,25 @@ describe('ReportPortal javascript client', () => {
     mockClient.finishTestItem('testItemId', finishTestItemRQ);
 
     setTimeout(() => {
-      expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
-        expect.any(Object),
-        'testItemId',
-        expect.objectContaining({
-          status: 'skipped',
-        }),
-      );
-      expect(spyFinishTestItemPromiseStart).not.toHaveBeenCalledWith(
-        expect.any(Object),
-        'testItemId',
-        expect.objectContaining({
-          issue: expect.anything(),
-        }),
-      );
-      done();
+      try {
+        expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
+          expect.any(Object),
+          'testItemId',
+          expect.objectContaining({
+            status: 'skipped',
+          }),
+        );
+        expect(spyFinishTestItemPromiseStart).not.toHaveBeenCalledWith(
+          expect.any(Object),
+          'testItemId',
+          expect.objectContaining({
+            issue: expect.anything(),
+          }),
+        );
+        done();
+      } catch (error) {
+        done(error);
+      }
     }, 100);
   });
 
