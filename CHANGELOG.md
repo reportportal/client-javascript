@@ -1,3 +1,5 @@
+
+## [5.5.7] - 2025-12-09
 ### Changed
 - Launch start debug logging improved.
 
