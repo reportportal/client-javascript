@@ -1,3 +1,5 @@
+### Changed
+- Launch start debug logging improved.
 
 ## [5.5.6] - 2025-11-18
 ### Security
