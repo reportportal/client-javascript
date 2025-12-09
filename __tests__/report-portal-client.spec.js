@@ -876,14 +876,14 @@ describe('ReportPortal javascript client', () => {
     });
   });
 
-  it('should automatically add NOT_ISSUE when status is SKIPPED and skippedIssue is false', function (done) {
+  it('should automatically add NOT_ISSUE when status is SKIPPED and skippedIsNotIssue is true', function (done) {
     const mockClient = new RPClient(
       {
         apiKey: 'test',
         endpoint: 'https://reportportal-stub-url',
         launch: 'test launch',
         project: 'test project',
-        skippedIssue: false,
+        skippedIsNotIssue: true,
       },
       { name: 'test', version: '1.0.0' },
     );
@@ -920,14 +920,54 @@ describe('ReportPortal javascript client', () => {
     }, 50);
   });
 
-  it('should not add NOT_ISSUE when status is SKIPPED and skippedIssue is true', function (done) {
+  it('should support legacy skippedIssue config option', function (done) {
     const mockClient = new RPClient(
       {
         apiKey: 'test',
         endpoint: 'https://reportportal-stub-url',
         launch: 'test launch',
         project: 'test project',
-        skippedIssue: true,
+        skippedIssue: false,
+      },
+      { name: 'test', version: '1.0.0' },
+    );
+
+    const spyFinishTestItemPromiseStart = jest
+      .spyOn(mockClient, 'finishTestItemPromiseStart')
+      .mockImplementation(() => {});
+
+    mockClient.map = {
+      testItemId: {
+        children: [],
+        finishSend: false,
+        promiseFinish: Promise.resolve(),
+        resolveFinish: () => {},
+      },
+    };
+
+    mockClient.finishTestItem('testItemId', { status: 'skipped' });
+
+    setTimeout(() => {
+      expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
+        expect.any(Object),
+        'testItemId',
+        expect.objectContaining({
+          status: 'skipped',
+          issue: { issueType: 'NOT_ISSUE' },
+        }),
+      );
+      done();
+    }, 50);
+  });
+
+  it('should not add NOT_ISSUE when status is SKIPPED and skippedIsNotIssue is false', function (done) {
+    const mockClient = new RPClient(
+      {
+        apiKey: 'test',
+        endpoint: 'https://reportportal-stub-url',
+        launch: 'test launch',
+        project: 'test project',
+        skippedIsNotIssue: false,
       },
       { name: 'test', version: '1.0.0' },
     );
