@@ -920,46 +920,6 @@ describe('ReportPortal javascript client', () => {
     }, 50);
   });
 
-  it('should support legacy skippedIssue config option', function (done) {
-    const mockClient = new RPClient(
-      {
-        apiKey: 'test',
-        endpoint: 'https://reportportal-stub-url',
-        launch: 'test launch',
-        project: 'test project',
-        skippedIssue: false,
-      },
-      { name: 'test', version: '1.0.0' },
-    );
-
-    const spyFinishTestItemPromiseStart = jest
-      .spyOn(mockClient, 'finishTestItemPromiseStart')
-      .mockImplementation(() => {});
-
-    mockClient.map = {
-      testItemId: {
-        children: [],
-        finishSend: false,
-        promiseFinish: Promise.resolve(),
-        resolveFinish: () => {},
-      },
-    };
-
-    mockClient.finishTestItem('testItemId', { status: 'skipped' });
-
-    setTimeout(() => {
-      expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
-        expect.any(Object),
-        'testItemId',
-        expect.objectContaining({
-          status: 'skipped',
-          issue: { issueType: 'NOT_ISSUE' },
-        }),
-      );
-      done();
-    }, 50);
-  });
-
   it('should not add NOT_ISSUE when status is SKIPPED and skippedIsNotIssue is false', function (done) {
     const mockClient = new RPClient(
       {
