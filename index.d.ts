@@ -155,6 +155,7 @@ declare module '@reportportal/client-javascript' {
     launchUuidPrintOutput?: string;
     restClientConfig?: RestClientConfig;
     token?: string;
+    skippedIsNotIssue?: boolean;
     /**
      * OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key.
      */
