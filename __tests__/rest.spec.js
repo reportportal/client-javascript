@@ -134,6 +134,26 @@ describe('RestClient', () => {
       };
       expect(retryConfig.retryCondition(timeoutError)).toBe(true);
     });
+
+    it('handles undefined restClientConfig without crashing during retries', () => {
+      const client = new RestClient({
+        baseURL: options.baseURL,
+        headers: options.headers,
+        restClientConfig: undefined,
+      });
+
+      const retryConfig = client.getRetryConfig();
+      expect(retryConfig.retries).toBe(6);
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+      const onRetry = retryConfig.onRetry;
+      
+      expect(() => {
+        onRetry(1, { code: 'ECONNABORTED' }, { method: 'GET', url: 'http://test.com' });
+      }).not.toThrow();
+
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('buildPath', () => {
