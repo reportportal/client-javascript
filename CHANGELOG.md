@@ -1,3 +1,7 @@
+### Added
+- `skippedIsNotIssue` option to not mark skipped tests as 'To Investigate' in ReportPortal.
+### Fixed
+- Error for empty `restClientConfig` while using HTTP retries.
 
 ## [5.5.7] - 2025-12-09
 ### Changed
