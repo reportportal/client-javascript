@@ -1,3 +1,5 @@
+
+## [5.5.8] - 2025-12-19
 ### Added
 - `skippedIsNotIssue` option to not mark skipped tests as 'To Investigate' in ReportPortal.
 ### Fixed
