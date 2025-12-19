@@ -122,10 +122,7 @@ rpClient.checkConnect().then(() => {
 | restClientConfig      | Optional   | Not set  | Check the details in the [HTTP client config](#http-client-options). |
 | launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                                                                                                                                                                    |
-| skippedIsNotIssue                 | Optional | False  | ReportPortal provides feature to mark skipped tests as not 'To Investigate'.
-Option could be equal boolean values:
-`true` - skipped tests will not be marked as 'To Investigate' on application. 
-`false` - skipped tests considered as issues and will be marked as 'To Investigate' on application.                                                                                                                                                                                                                  |
+| skippedIsNotIssue                 | Optional | False  | ReportPortal provides feature to mark skipped tests as not 'To Investigate'. Option could be equal boolean values: `true` - skipped tests will not be marked as 'To Investigate' on application. `false` - skipped tests considered as issues and will be marked as 'To Investigate' on application.                                                                                                                                                                                                                  |
 
 ### HTTP client options
 
