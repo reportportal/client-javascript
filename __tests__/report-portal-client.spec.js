@@ -1370,6 +1370,7 @@ describe('ReportPortal javascript client', () => {
           endpoint: 'https://abc.com',
           batchLogs: true,
           batchLogsSize: 2,
+          batchRetryCount: 0,
         });
         const itemTempId = 'itemTempId';
         client.map = {
@@ -1383,7 +1384,7 @@ describe('ReportPortal javascript client', () => {
 
         const testError = new Error('Network error');
         jest.spyOn(client.restClient, 'create').mockRejectedValue(testError);
-        jest.spyOn(console, 'dir').mockImplementation();
+        jest.spyOn(console, 'error').mockImplementation();
 
         const log1 = client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
         const log2 = client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
@@ -1485,7 +1486,8 @@ describe('ReportPortal javascript client', () => {
 
         client.sendLog(itemTempId, { message: 'log3', level: 'INFO' });
         client.sendLog(itemTempId, { message: 'log4', level: 'INFO' });
-        expect(client.logBuffer.length).toBe(2);
+        expect(client.batchQueue.length).toBe(1);
+        expect(client.batchQueue[0].length).toBe(2);
 
         resolveFirstBatch({ responses: [] });
         await new Promise((resolve) => setImmediate(resolve));
@@ -1493,6 +1495,7 @@ describe('ReportPortal javascript client', () => {
 
         expect(client.restClient.create).toHaveBeenCalledTimes(2);
         expect(client.logBuffer.length).toBe(0);
+        expect(client.batchQueue.length).toBe(0);
       });
     });
 
@@ -1521,6 +1524,143 @@ describe('ReportPortal javascript client', () => {
         expect(console.warn).toHaveBeenCalledWith(
           expect.stringContaining('exceeds batchPayloadLimit'),
         );
+      });
+    });
+
+    describe('batch retry mechanism', () => {
+      it('should retry failed batch requests and succeed on retry', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 2,
+          batchRetryCount: 3,
+          batchRetryDelay: 10,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+
+        let callCount = 0;
+        jest.spyOn(client.restClient, 'create').mockImplementation(() => {
+          callCount++;
+          if (callCount < 3) {
+            return Promise.reject(new Error('Network error'));
+          }
+          return Promise.resolve({ responses: [] });
+        });
+
+        client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
+        client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        expect(client.restClient.create).toHaveBeenCalledTimes(3);
+        expect(client.logBuffer.length).toBe(0);
+      });
+
+      it('should log error and reject resolvers after all retries fail', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 2,
+          batchRetryCount: 2,
+          batchRetryDelay: 10,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+
+        const networkError = new Error('Network error');
+        jest.spyOn(client.restClient, 'create').mockRejectedValue(networkError);
+        jest.spyOn(console, 'error').mockImplementation();
+
+        const log1 = client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
+        const log2 = client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
+
+        // Catch the promiseFinish rejections to avoid unhandled rejections
+        const log1Obj = client.map[log1.tempId];
+        const log2Obj = client.map[log2.tempId];
+        log1Obj.promiseFinish.catch(() => {});
+        log2Obj.promiseFinish.catch(() => {});
+
+        await expect(log1.promise).rejects.toThrow('Network error');
+        await expect(log2.promise).rejects.toThrow('Network error');
+
+        expect(client.restClient.create).toHaveBeenCalledTimes(3); // 1 initial + 2 retries
+        expect(console.error).toHaveBeenCalledWith(
+          expect.stringContaining('Failed to send batch'),
+          expect.any(Error),
+        );
+      });
+
+      it('should continue processing subsequent batches after one fails', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 2,
+          batchRetryCount: 0,
+          batchRetryDelay: 10,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+
+        let callCount = 0;
+        jest.spyOn(client.restClient, 'create').mockImplementation(() => {
+          callCount++;
+          if (callCount === 1) {
+            return Promise.reject(new Error('First batch failed'));
+          }
+          return Promise.resolve({ responses: [] });
+        });
+        jest.spyOn(console, 'error').mockImplementation();
+
+        // First batch (will fail)
+        const log1 = client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
+        const log2 = client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
+
+        // Catch the promiseFinish rejections to avoid unhandled rejections
+        const log1Obj = client.map[log1.tempId];
+        const log2Obj = client.map[log2.tempId];
+        log1Obj.promiseFinish.catch(() => {});
+        log2Obj.promiseFinish.catch(() => {});
+
+        // Wait for first batch to fail
+        await expect(log1.promise).rejects.toThrow('First batch failed');
+        await expect(log2.promise).rejects.toThrow('First batch failed');
+
+        // Second batch (should succeed)
+        const { promise: logPromise3 } = client.sendLog(itemTempId, { message: 'log3', level: 'INFO' });
+        const { promise: logPromise4 } = client.sendLog(itemTempId, { message: 'log4', level: 'INFO' });
+
+        await expect(logPromise3).resolves.toBeDefined();
+        await expect(logPromise4).resolves.toBeDefined();
+
+        expect(client.restClient.create).toHaveBeenCalledTimes(2);
       });
     });
   });

@@ -126,6 +126,8 @@ rpClient.checkConnect().then(() => {
 | batchLogs           | Optional  | false    | Enable batch logging mode. When enabled, logs are buffered and sent in batches instead of individually, reducing HTTP overhead.                                                                                                                                                                                                                                                                                                                                                                                         |
 | batchLogsSize       | Optional  | 10       | Maximum number of logs to buffer before sending a batch. Only applicable when `batchLogs` is `true`.                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | batchPayloadLimit   | Optional  | 65011712 | Maximum payload size in bytes (default 62MB) before sending a batch. Only applicable when `batchLogs` is `true`.                                                                                                                                                                                                                                                                                                                                                                                                         |
+| batchRetryCount     | Optional  | 5        | Number of retry attempts for failed batch requests. Only applicable when `batchLogs` is `true`.                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| batchRetryDelay     | Optional  | 2000     | Delay in milliseconds between retry attempts. Only applicable when `batchLogs` is `true`.                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ### HTTP client options
 
@@ -602,6 +604,8 @@ When `batchLogs` is enabled, logs are buffered and sent in batches to reduce HTT
 - The buffer payload exceeds `batchPayloadLimit` bytes
 - `finishLaunch` is called (all buffered logs are flushed before finishing)
 
+Failed batch requests are automatically retried up to `batchRetryCount` times with a delay of `batchRetryDelay` milliseconds between attempts. If all retries fail, an error is logged and the batch is discarded.
+
 ```javascript
 const rpClient = new RPClient({
     apiKey: 'your_api_key',
@@ -610,7 +614,9 @@ const rpClient = new RPClient({
     project: 'PROJECT_NAME',
     batchLogs: true,
     batchLogsSize: 10,        // default: 10
-    batchPayloadLimit: 65011712 // default: 62MB
+    batchPayloadLimit: 65011712, // default: 62MB
+    batchRetryCount: 5,       // default: 5
+    batchRetryDelay: 2000     // default: 2000ms
 });
 ```
 

@@ -179,6 +179,18 @@ declare module '@reportportal/client-javascript' {
      * Default: 65011712 (62MB)
      */
     batchPayloadLimit?: number;
+    /**
+     * Number of retry attempts for failed batch requests.
+     * Only applicable when batchLogs is true.
+     * Default: 5
+     */
+    batchRetryCount?: number;
+    /**
+     * Delay in milliseconds between retry attempts.
+     * Only applicable when batchLogs is true.
+     * Default: 2000 (2 seconds)
+     */
+    batchRetryDelay?: number;
   }
 
   /**
