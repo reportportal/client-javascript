@@ -123,6 +123,9 @@ rpClient.checkConnect().then(() => {
 | launchUuidPrint       | Optional   | false    | Whether to print the current launch UUID.                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | launchUuidPrintOutput | Optional   | 'STDOUT' | Launch UUID printing output. Possible values: 'STDOUT', 'STDERR', 'FILE', 'ENVIRONMENT'. Works only if `launchUuidPrint` set to `true`. File format: `rp-launch-uuid-${launch_uuid}.tmp`. Env variable: `RP_LAUNCH_UUID`.                                                                                                                                                                                                                                                    |
 | skippedIsNotIssue                 | Optional | False  | ReportPortal provides feature to mark skipped tests as not 'To Investigate'. Option could be equal boolean values: `true` - skipped tests will not be marked as 'To Investigate' on application. `false` - skipped tests considered as issues and will be marked as 'To Investigate' on application.                                                                                                                                                                                                                  |
+| batchLogs           | Optional  | false    | Enable batch logging mode. When enabled, logs are buffered and sent in batches instead of individually, reducing HTTP overhead.                                                                                                                                                                                                                                                                                                                                                                                         |
+| batchLogsSize       | Optional  | 10       | Maximum number of logs to buffer before sending a batch. Only applicable when `batchLogs` is `true`.                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| batchPayloadLimit   | Optional  | 65011712 | Maximum payload size in bytes (default 62MB) before sending a batch. Only applicable when `batchLogs` is `true`.                                                                                                                                                                                                                                                                                                                                                                                                         |
 
 ### HTTP client options
 
@@ -591,6 +594,36 @@ The method takes three arguments:
 | name    | Required  |         | The name of the file.                                                                                                                                                                               |
 | type    | Required  |         | The file mimeType, example 'image/png' (support types: 'image/*', application/['xml', 'javascript', 'json', 'css', 'php'], other formats will be opened in reportportal in a new browser tab only). |
 | content | Required  |         | base64 encoded file content.                                                                                                                                                                        |
+
+#### Batch logging mode
+
+When `batchLogs` is enabled, logs are buffered and sent in batches to reduce HTTP overhead. Batches are automatically sent when:
+- The buffer reaches `batchLogsSize` entries
+- The buffer payload exceeds `batchPayloadLimit` bytes
+- `finishLaunch` is called (all buffered logs are flushed before finishing)
+
+```javascript
+const rpClient = new RPClient({
+    apiKey: 'your_api_key',
+    endpoint: 'http://your-instance.com:8080/api/v1',
+    launch: 'LAUNCH_NAME',
+    project: 'PROJECT_NAME',
+    batchLogs: true,
+    batchLogsSize: 10,        // default: 10
+    batchPayloadLimit: 65011712 // default: 62MB
+});
+```
+
+### flushLogs
+
+`flushLogs` - manually flush all buffered logs to the server. Only applicable when `batchLogs` is enabled.
+
+```javascript
+// Manually flush logs before a critical checkpoint
+await rpClient.flushLogs();
+```
+
+This method is called automatically when the buffer reaches its limits or before `finishLaunch` completes.
 
 ### mergeLaunches
 

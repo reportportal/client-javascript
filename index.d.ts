@@ -160,6 +160,25 @@ declare module '@reportportal/client-javascript' {
      * OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key.
      */
     oauth?: OAuthConfig;
+    /**
+     * Enable batch logging mode. When enabled, logs are buffered and sent in batches
+     * instead of being sent individually. This can improve performance by reducing
+     * the number of HTTP requests.
+     * Default: false
+     */
+    batchLogs?: boolean;
+    /**
+     * Maximum number of logs to collect before sending a batch.
+     * Only applicable when batchLogs is true.
+     * Default: 10
+     */
+    batchLogsSize?: number;
+    /**
+     * Maximum payload size in bytes before sending a batch.
+     * Only applicable when batchLogs is true.
+     * Default: 65011712 (62MB)
+     */
+    batchPayloadLimit?: number;
   }
 
   /**
@@ -388,6 +407,20 @@ declare module '@reportportal/client-javascript' {
      * ```
      */
     sendLog(itemId: string, options: LogOptions): Promise<any>;
+
+    /**
+     * Manually flush all buffered logs to the server.
+     * Only applicable when batchLogs is enabled.
+     * This is called automatically when the buffer reaches batchLogsSize or batchPayloadLimit,
+     * and also before finishLaunch completes.
+     * @returns Promise that resolves when all buffered logs are sent.
+     * @example
+     * ```typescript
+     * // Manually flush logs before a critical checkpoint
+     * await rpClient.flushLogs();
+     * ```
+     */
+    flushLogs(): Promise<void>;
 
     /**
      * Waits for all test items to be finished.

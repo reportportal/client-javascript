@@ -1120,4 +1120,408 @@ describe('ReportPortal javascript client', () => {
       expect(result.catch).toBeDefined();
     });
   });
+
+  describe('batch logging', () => {
+    describe('configuration', () => {
+      it('should have batchLogs disabled by default', () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+        });
+
+        expect(client.config.batchLogs).toBe(false);
+        expect(client.config.batchLogsSize).toBe(10);
+        expect(client.config.batchPayloadLimit).toBe(65011712);
+      });
+
+      it('should respect custom batch config', () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 20,
+          batchPayloadLimit: 1000000,
+        });
+
+        expect(client.config.batchLogs).toBe(true);
+        expect(client.config.batchLogsSize).toBe(20);
+        expect(client.config.batchPayloadLimit).toBe(1000000);
+      });
+    });
+
+    describe('batch send by length', () => {
+      it('should send batch when buffer reaches batchLogsSize', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 3,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ responses: [] });
+
+        client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
+        client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
+        expect(client.restClient.create).not.toHaveBeenCalled();
+
+        client.sendLog(itemTempId, { message: 'log3', level: 'INFO' });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(client.restClient.create).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not send batch when buffer is below batchLogsSize', () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 10,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({});
+
+        for (let i = 0; i < 9; i++) {
+          client.sendLog(itemTempId, { message: `log${i}`, level: 'INFO' });
+        }
+
+        expect(client.logBuffer.length).toBe(9);
+        expect(client.restClient.create).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('batch send by payload size', () => {
+      it('should flush previous logs when new log exceeds payload limit', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 100,
+          batchPayloadLimit: 100,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ responses: [] });
+
+        client.sendLog(itemTempId, { message: 'small log', level: 'INFO' });
+        expect(client.restClient.create).not.toHaveBeenCalled();
+
+        const largeMessage = 'x'.repeat(200);
+        client.sendLog(itemTempId, { message: largeMessage, level: 'INFO' });
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(client.restClient.create).toHaveBeenCalled();
+      });
+    });
+
+    describe('batch send with files', () => {
+      it('should send batch with file attachments using multipart', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 2,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ responses: [] });
+
+        const fileObj = { name: 'test.png', type: 'image/png', content: 'dGVzdA==' };
+        client.sendLog(itemTempId, { message: 'log with file', level: 'INFO' }, fileObj);
+        client.sendLog(itemTempId, { message: 'log without file', level: 'INFO' });
+
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(client.restClient.create).toHaveBeenCalledWith(
+          'log',
+          expect.any(Buffer),
+          expect.objectContaining({
+            headers: expect.objectContaining({
+              'Content-Type': expect.stringContaining('multipart/form-data'),
+            }),
+          }),
+        );
+      });
+    });
+
+    describe('backward compatibility', () => {
+      it('should send immediately when batchLogs is disabled', () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: false,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({});
+
+        client.sendLog(itemTempId, { message: 'test message', level: 'INFO' });
+
+        expect(client.logBuffer.length).toBe(0);
+      });
+    });
+
+    describe('batch send on stop', () => {
+      it('should flush logs when finishLaunch is called', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 100,
+        });
+
+        const launchTempId = 'launchTempId';
+        const itemTempId = 'itemTempId';
+        let launchResolveFinish;
+        const launchPromiseFinish = new Promise((resolve) => {
+          launchResolveFinish = resolve;
+        });
+        let itemResolveFinish;
+        const itemPromiseFinish = new Promise((resolve) => {
+          itemResolveFinish = resolve;
+        });
+
+        client.map = {
+          [launchTempId]: {
+            children: [itemTempId],
+            promiseStart: Promise.resolve(),
+            realId: 'realLaunchId',
+            promiseFinish: launchPromiseFinish,
+            resolveFinish: launchResolveFinish,
+            rejectFinish: jest.fn(),
+          },
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+            promiseFinish: itemPromiseFinish,
+            resolveFinish: itemResolveFinish,
+            rejectFinish: jest.fn(),
+          },
+        };
+        client.launchUuid = 'launchUuid';
+
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ responses: [] });
+        jest.spyOn(client.restClient, 'update').mockResolvedValue({ link: 'http://link' });
+        jest.spyOn(console, 'log').mockImplementation();
+
+        client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
+        client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
+        expect(client.logBuffer.length).toBe(2);
+        expect(client.restClient.create).not.toHaveBeenCalled();
+
+        itemResolveFinish();
+        const { promise } = client.finishLaunch(launchTempId, {});
+        await promise;
+
+        expect(client.restClient.create).toHaveBeenCalled();
+        expect(client.logBuffer.length).toBe(0);
+      });
+    });
+
+    describe('error handling', () => {
+      it('should reject log promise when batch send fails', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 2,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+
+        const testError = new Error('Network error');
+        jest.spyOn(client.restClient, 'create').mockRejectedValue(testError);
+        jest.spyOn(console, 'dir').mockImplementation();
+
+        const log1 = client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
+        const log2 = client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
+
+        const log1Obj = client.map[log1.tempId];
+        const log2Obj = client.map[log2.tempId];
+        log1Obj.promiseFinish.catch(() => {});
+        log2Obj.promiseFinish.catch(() => {});
+
+        await expect(log1.promise).rejects.toThrow('Network error');
+        await expect(log2.promise).rejects.toThrow('Network error');
+      });
+    });
+
+    describe('multiple files in batch', () => {
+      it('should correctly associate multiple files with their log entries', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 3,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ responses: [] });
+
+        const file1 = { name: 'file1.png', type: 'image/png', content: 'Y29udGVudDE=' };
+        const file2 = { name: 'file2.jpg', type: 'image/jpeg', content: 'Y29udGVudDI=' };
+        client.sendLog(itemTempId, { message: 'log with file1', level: 'INFO' }, file1);
+        client.sendLog(itemTempId, { message: 'log without file', level: 'INFO' });
+        client.sendLog(itemTempId, { message: 'log with file2', level: 'INFO' }, file2);
+
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(client.restClient.create).toHaveBeenCalledWith(
+          'log',
+          expect.any(Buffer),
+          expect.objectContaining({
+            headers: expect.objectContaining({
+              'Content-Type': expect.stringContaining('multipart/form-data'),
+            }),
+          }),
+        );
+
+        const callArgs = client.restClient.create.mock.calls[0];
+        const multipartBuffer = callArgs[1].toString();
+        expect(multipartBuffer).toContain('file1.png');
+        expect(multipartBuffer).toContain('file2.jpg');
+        expect(multipartBuffer).toContain('log with file1');
+        expect(multipartBuffer).toContain('log with file2');
+      });
+    });
+
+    describe('concurrent flush', () => {
+      it('should send logs added during flush in next batch', async () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchLogsSize: 2,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        client.launchUuid = 'launchUuid';
+
+        let resolveFirstBatch;
+        const firstBatchPromise = new Promise((resolve) => {
+          resolveFirstBatch = resolve;
+        });
+        let createCallCount = 0;
+        jest.spyOn(client.restClient, 'create').mockImplementation(() => {
+          createCallCount++;
+          if (createCallCount === 1) {
+            return firstBatchPromise;
+          }
+          return Promise.resolve({ responses: [] });
+        });
+
+        client.sendLog(itemTempId, { message: 'log1', level: 'INFO' });
+        client.sendLog(itemTempId, { message: 'log2', level: 'INFO' });
+
+        await new Promise((resolve) => setImmediate(resolve));
+        expect(client.restClient.create).toHaveBeenCalledTimes(1);
+
+        client.sendLog(itemTempId, { message: 'log3', level: 'INFO' });
+        client.sendLog(itemTempId, { message: 'log4', level: 'INFO' });
+        expect(client.logBuffer.length).toBe(2);
+
+        resolveFirstBatch({ responses: [] });
+        await new Promise((resolve) => setImmediate(resolve));
+        await new Promise((resolve) => setImmediate(resolve));
+
+        expect(client.restClient.create).toHaveBeenCalledTimes(2);
+        expect(client.logBuffer.length).toBe(0);
+      });
+    });
+
+    describe('oversized log warning', () => {
+      it('should warn when single log exceeds payload limit', () => {
+        const client = new RPClient({
+          apiKey: 'test',
+          project: 'test',
+          endpoint: 'https://abc.com',
+          batchLogs: true,
+          batchPayloadLimit: 100,
+        });
+        const itemTempId = 'itemTempId';
+        client.map = {
+          [itemTempId]: {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'realItemId',
+          },
+        };
+        jest.spyOn(console, 'warn').mockImplementation();
+
+        const largeMessage = 'x'.repeat(200);
+        client.sendLog(itemTempId, { message: largeMessage, level: 'INFO' });
+
+        expect(console.warn).toHaveBeenCalledWith(
+          expect.stringContaining('exceeds batchPayloadLimit'),
+        );
+      });
+    });
+  });
 });
