@@ -124,12 +124,12 @@ describe('LogBatcher', () => {
       expect(result1).toBeNull();
       expect(batcher.batchSize).toBe(1);
 
-      // Add an oversized log - should return the existing batch
+      // Add an oversized log - should return the existing batch and queue the oversized log
       const result2 = batcher.append(oversizedLog);
       expect(result2).toBeInstanceOf(Array);
       expect(result2).toHaveLength(1);
       expect(result2[0]).toBe(normalLog);
-      expect(batcher.batchSize).toBe(0);
+      expect(batcher.batchSize).toBe(1); // oversized log is queued for next flush
     });
 
     it('should return oversized log as single-item batch when batch is empty', () => {
