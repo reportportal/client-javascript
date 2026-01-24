@@ -1140,7 +1140,8 @@ describe('ReportPortal javascript client', () => {
       jest.spyOn(client, 'sendLogBatch').mockResolvedValue({ success: true });
       jest.spyOn(client, 'getUniqId').mockReturnValue('logTempId');
 
-      const result = await client.sendLogViaBatcher(itemObj, { message: 'test' }, null);
+      const result = client.sendLogViaBatcher(itemObj, { message: 'test' }, null);
+      await result.promise;
 
       expect(client.logBatcher.append).toHaveBeenCalledWith({
         payload: expect.objectContaining({
@@ -1171,7 +1172,8 @@ describe('ReportPortal javascript client', () => {
       jest.spyOn(client, 'sendLogBatch').mockResolvedValue({ success: true });
       jest.spyOn(client, 'getUniqId').mockReturnValue('logTempId');
 
-      const result = await client.sendLogViaBatcher(itemObj, { message: 'test' }, null);
+      const result = client.sendLogViaBatcher(itemObj, { message: 'test' }, null);
+      await result.promise;
 
       expect(client.sendLogBatch).not.toHaveBeenCalled();
       expect(result.tempId).toEqual('logTempId');

@@ -104,6 +104,7 @@ describe('LogBatcher', () => {
 
   describe('oversized log handling', () => {
     it('should return existing batch when adding an oversized log', () => {
+      jest.spyOn(console, 'warn').mockImplementation();
       const batcher = new LogBatcher(10, 300);
 
       const normalLog = {
@@ -126,6 +127,9 @@ describe('LogBatcher', () => {
 
       // Add an oversized log - should return the existing batch and queue the oversized log
       const result2 = batcher.append(oversizedLog);
+      expect(console.warn).toHaveBeenCalledWith(
+        expect.stringContaining('exceeds payload limit'),
+      );
       expect(result2).toBeInstanceOf(Array);
       expect(result2).toHaveLength(1);
       expect(result2[0]).toBe(normalLog);
