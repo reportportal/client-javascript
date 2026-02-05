@@ -17,7 +17,8 @@
   "files": [
     "/lib",
     "/statistics",
-    "/VERSION"
+    "/VERSION",
+    "index.d.ts"
   ],
   "main": "./lib/report-portal-client",
   "types": "./index.d.ts",
@@ -27,7 +28,7 @@
   "dependencies": {
     "axios": "^1.12.2",
     "axios-retry": "^4.5.0",
-    "glob": "^11.1.0",
+    "glob": "^13.0.1",
     "http-proxy-agent": "^7.0.2",
     "https-proxy-agent": "^7.0.6",
     "ini": "^2.0.0",
