@@ -17,7 +17,8 @@
   "files": [
     "/lib",
     "/statistics",
-    "/VERSION"
+    "/VERSION",
+    "index.d.ts"
   ],
   "main": "./lib/report-portal-client",
   "types": "./index.d.ts",
