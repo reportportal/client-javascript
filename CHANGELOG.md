@@ -1,3 +1,5 @@
+### Fixed
+- TS definitions provided, addresses [#252](https://github.com/reportportal/client-javascript/issues/252).
 ### Security
 - Updated versions of vulnerable packages (glob - [CVE-2026-25547](https://www.cve.org/CVERecord?id=CVE-2026-25547), diff, lodash).
 
