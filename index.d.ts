@@ -52,6 +52,10 @@ declare module '@reportportal/client-javascript' {
       username: string;
       password: string;
     };
+    /**
+     * Optional debug logs for the proxy.
+     */
+    debug?: boolean;
   }
 
   /**
@@ -78,16 +82,11 @@ declare module '@reportportal/client-javascript' {
     /**
      * Custom HTTP agent options.
      */
-    agent?: Record<string, unknown>;
+    agent?: any;
     /**
      * Retry configuration.
      */
-    retry?: number | {
-      retries?: number;
-      retryDelay?: (retryCount: number) => number;
-      retryCondition?: (error: any) => boolean;
-      shouldResetTimeout?: boolean;
-    };
+    retry?: number | any;
     /**
      * Enable debug logging.
      */
@@ -95,7 +94,7 @@ declare module '@reportportal/client-javascript' {
     /**
      * Any other axios configuration options.
      */
-    [key: string]: unknown;
+    [key: string]: any;
   }
 
   /**
@@ -175,9 +174,9 @@ declare module '@reportportal/client-javascript' {
    */
   export interface LaunchOptions {
     name?: string;
-    startTime?: string;
+    startTime?: string | number;
     description?: string;
-    attributes?: Array<{ key: string; value?: string } | string>;
+    attributes?: Array<{ key?: string; value?: string } | string>;
     mode?: string;
     id?: string;
   }
@@ -198,8 +197,8 @@ declare module '@reportportal/client-javascript' {
     name: string;
     type: string;
     description?: string;
-    startTime?: string;
-    attributes?: Array<{ key: string; value?: string } | string>;
+    startTime?: string | number;
+    attributes?: Array<{ key?: string; value?: string } | string>;
     hasStats?: boolean;
   }
 
@@ -218,7 +217,7 @@ declare module '@reportportal/client-javascript' {
   export interface LogOptions {
     level?: string;
     message?: string;
-    time?: string;
+    time?: string | number;
     file?: {
       name: string;
       content: string;
@@ -239,11 +238,11 @@ declare module '@reportportal/client-javascript' {
    */
   export interface FinishTestItemOptions {
     status?: string;
-    endTime?: string;
+    endTime?: string | number;
     issue?: {
       issueType: string;
       comment?: string;
-      externalSystemIssues?: Array<any>
+      externalSystemIssues?: Array<any>;
     };
   }
 
@@ -258,7 +257,7 @@ declare module '@reportportal/client-javascript' {
    * ```
    */
   export interface FinishLaunchOptions {
-    endTime?: string;
+    endTime?: string | number;
     status?: string;
   }
 
@@ -269,7 +268,7 @@ declare module '@reportportal/client-javascript' {
     /**
      * Initializes a new Report Portal client.
      */
-    constructor(config: ReportPortalConfig);
+    constructor(config: ReportPortalConfig, agentInfo?: { name?: string; version?: string });
 
     /**
      * Starts a new launch.
@@ -306,7 +305,10 @@ declare module '@reportportal/client-javascript' {
      * await launchFinishObj.promise;
      * ```
      */
-    finishLaunch(launchId: string, options?: FinishLaunchOptions): Promise<any>;
+    finishLaunch(
+      launchId: string,
+      options?: FinishLaunchOptions,
+    ): { tempId: string; promise: Promise<any> };
 
     /**
      * Update the launch data
@@ -331,7 +333,10 @@ declare module '@reportportal/client-javascript' {
      * await updateLaunch.promise;
      * ```
      */
-    updateLaunch(options: LaunchOptions): { tempId: string; promise: Promise<any> };
+    updateLaunch(
+      launchId: string,
+      options: LaunchOptions,
+    ): { tempId: string; promise: Promise<any> };
 
     /**
      * Starts a new test item under a launch or parent item.
@@ -360,34 +365,47 @@ declare module '@reportportal/client-javascript' {
      * }, launchObj.tempId, suiteObj.tempId);
      * ```
      */
-    startTestItem(options: StartTestItemOptions, launchId: string, parentId?: string): {
+    startTestItem(
+      options: StartTestItemOptions,
+      launchId: string,
+      parentId?: string,
+    ): {
       tempId: string;
-      promise: Promise<any>
+      promise: Promise<any>;
     };
 
     /**
      * Finishes a test item.
      * @example
      * ```typescript
-     * rpClient.finishTestItem(itemObj.tempId, {
+     * const finishObj = rpClient.finishTestItem(itemObj.tempId, {
      *     status: 'failed'
      * });
+     * await finishObj.promise;
      * ```
      */
-    finishTestItem(itemId: string, options: FinishTestItemOptions): Promise<any>;
+    finishTestItem(
+      itemId: string,
+      options: FinishTestItemOptions,
+    ): { tempId: string; promise: Promise<any> };
 
     /**
      * Sends a log entry to a test item.
      * @example
      * ```typescript
-     * await rpClient.sendLog(stepObj.tempId, {
+     * const logObj = rpClient.sendLog(stepObj.tempId, {
      *     level: 'INFO',
      *     message: 'User clicks login button',
      *     time: rpClient.helpers.now()
      * });
+     * await logObj.promise;
      * ```
      */
-    sendLog(itemId: string, options: LogOptions): Promise<any>;
+    sendLog(
+      itemId: string,
+      options: LogOptions,
+      file?: { name: string; content: string | Buffer; type: string },
+    ): { tempId: string; promise: Promise<any> };
 
     /**
      * Waits for all test items to be finished.
@@ -419,7 +437,7 @@ declare module '@reportportal/client-javascript' {
        * });
        * ```
        */
-      now(): string
-    }
+      now(): string;
+    };
   }
 }
