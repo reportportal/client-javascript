@@ -1,5 +1,5 @@
 ### Security
-- Updated versions of vulnerable packages (glob, diff, lodash).
+- Updated versions of vulnerable packages (glob - [CVE-2026-25547](https://www.cve.org/CVERecord?id=CVE-2026-25547), diff, lodash).
 
 ## [5.5.8] - 2025-12-19
 ### Added
