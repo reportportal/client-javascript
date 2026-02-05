@@ -1,3 +1,5 @@
+### Security
+- Updated versions of vulnerable packages (glob, diff, lodash).
 
 ## [5.5.8] - 2025-12-19
 ### Added
