@@ -1,3 +1,5 @@
+
+## [5.5.9] - 2026-02-05
 ### Fixed
 - TS definitions provided, addresses [#252](https://github.com/reportportal/client-javascript/issues/252).
 ### Security
