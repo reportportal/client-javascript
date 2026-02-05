@@ -1,3 +1,5 @@
+
+## [5.5.10] - 2026-02-05
 ### Fixed
 - TS definitions actualized with recent changes in client.
 
