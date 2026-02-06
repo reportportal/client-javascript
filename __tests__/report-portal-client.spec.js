@@ -1120,4 +1120,207 @@ describe('ReportPortal javascript client', () => {
       expect(result.catch).toBeDefined();
     });
   });
+
+  describe('batch logging', () => {
+    it('should send batch when logBatcher returns a full batch', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+      });
+      client.launchUuid = 'launchUuid';
+      const itemObj = {
+        promiseStart: Promise.resolve({ id: 'itemId' }),
+        children: [],
+      };
+      // When logBatcher.append returns a non-null batch, it means the batch is full
+      const batch = [{ payload: { message: 'test' } }];
+      jest.spyOn(client.logBatcher, 'append').mockReturnValue(batch);
+      jest.spyOn(client, 'sendLogBatch').mockResolvedValue({ success: true });
+      jest.spyOn(client, 'getUniqId').mockReturnValue('logTempId');
+
+      const result = client.sendLogViaBatcher(itemObj, { message: 'test' }, null);
+      await result.promise;
+
+      expect(client.logBatcher.append).toHaveBeenCalledWith({
+        payload: expect.objectContaining({
+          message: 'test',
+          launchUuid: 'launchUuid',
+          itemUuid: 'itemId',
+        }),
+        file: null,
+      });
+      expect(client.sendLogBatch).toHaveBeenCalledWith(batch);
+      expect(result.tempId).toEqual('logTempId');
+    });
+
+    it('should queue log when batch is not full', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+      });
+      client.launchUuid = 'launchUuid';
+      const itemObj = {
+        promiseStart: Promise.resolve({ id: 'itemId' }),
+        children: [],
+      };
+      // When logBatcher.append returns null, it means the batch is not full yet
+      jest.spyOn(client.logBatcher, 'append').mockReturnValue(null);
+      jest.spyOn(client, 'sendLogBatch').mockResolvedValue({ success: true });
+      jest.spyOn(client, 'getUniqId').mockReturnValue('logTempId');
+
+      const result = client.sendLogViaBatcher(itemObj, { message: 'test' }, null);
+      await result.promise;
+
+      expect(client.sendLogBatch).not.toHaveBeenCalled();
+      expect(result.tempId).toEqual('logTempId');
+    });
+
+    it('should send batch to server with correct parameters', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+      });
+      const batch = [{ payload: { message: 'test1' } }, { payload: { message: 'test2' } }];
+      jest.spyOn(client, 'buildBatchMultiPartStream').mockReturnValue(Buffer.from('data'));
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ success: true });
+
+      await client.sendLogBatch(batch);
+
+      expect(client.buildBatchMultiPartStream).toHaveBeenCalledWith(batch, expect.any(String));
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        'log',
+        expect.any(Buffer),
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'Content-Type': expect.stringContaining('multipart/form-data; boundary='),
+          }),
+        }),
+      );
+    });
+
+    it('should return early when batch is empty', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+      });
+      jest.spyOn(client.restClient, 'create');
+
+      await client.sendLogBatch([]);
+
+      expect(client.restClient.create).not.toHaveBeenCalled();
+    });
+
+    it('should flush pending logs', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+      });
+      const batch = [{ payload: { message: 'test' } }];
+      jest.spyOn(client.logBatcher, 'flush').mockReturnValue(batch);
+      jest.spyOn(client, 'sendLogBatch').mockResolvedValue({ success: true });
+
+      await client.flushLogs();
+
+      expect(client.logBatcher.flush).toHaveBeenCalled();
+      expect(client.sendLogBatch).toHaveBeenCalledWith(batch);
+    });
+
+    it('should resolve immediately when flushing without batcher', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: false,
+      });
+      jest.spyOn(client, 'sendLogBatch');
+
+      const result = await client.flushLogs();
+
+      expect(result).toBeUndefined();
+      expect(client.sendLogBatch).not.toHaveBeenCalled();
+    });
+
+    it('should use batcher when enabled', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+      });
+      client.map = {
+        itemTempId: {
+          promiseStart: Promise.resolve({ id: 'itemId' }),
+          children: [],
+        },
+      };
+      jest.spyOn(client, 'sendLogViaBatcher').mockReturnValue({ tempId: 'logId', promise: Promise.resolve() });
+
+      const result = client.sendLogWithoutFile('itemTempId', { message: 'test' });
+
+      expect(client.sendLogViaBatcher).toHaveBeenCalledWith(
+        client.map.itemTempId,
+        { message: 'test' },
+        null,
+      );
+      expect(result.tempId).toEqual('logId');
+      expect(result.promise).toBeDefined();
+    });
+
+    it('should build multipart stream with file attachments', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
+      const logRequests = [
+        {
+          payload: { message: 'test1', launchUuid: 'uuid', file: { name: 'test.png' } },
+          file: { name: 'test.png', content: 'base64content', type: 'image/png' },
+        },
+      ];
+
+      const result = client.buildBatchMultiPartStream(logRequests, 'boundary123');
+
+      expect(result).toBeInstanceOf(Buffer);
+      expect(result.toString()).toContain('test.png');
+      expect(result.toString()).toContain('boundary123');
+      expect(result.toString()).toContain('Content-Type: image/png');
+    });
+
+    it('should build multipart stream with multiple logs', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
+      const logRequests = [
+        {
+          payload: { message: 'test1', launchUuid: 'uuid' },
+          file: null,
+        },
+        {
+          payload: { message: 'test2', launchUuid: 'uuid', file: { name: 'screenshot.png' } },
+          file: { name: 'screenshot.png', content: 'base64data', type: 'image/png' },
+        },
+      ];
+
+      const result = client.buildBatchMultiPartStream(logRequests, 'boundary456');
+
+      expect(result).toBeInstanceOf(Buffer);
+      const resultStr = result.toString();
+      expect(resultStr).toContain('test1');
+      expect(resultStr).toContain('test2');
+      expect(resultStr).toContain('screenshot.png');
+    });
+  });
 });

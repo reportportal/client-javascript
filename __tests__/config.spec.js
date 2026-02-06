@@ -109,5 +109,33 @@ describe('Config commons test suite', () => {
 
       expect(console.dir).toHaveBeenCalledWith(new ReportPortalRequiredOptionError('apiKey'));
     });
+
+    it('should fall back to defaults for invalid batch options', () => {
+      const config = getClientConfig({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+        batchLogsSize: 0,
+        batchPayloadLimit: -1,
+      });
+
+      expect(config.batchLogsSize).toBe(20);
+      expect(config.batchPayloadLimit).toBe(64 * 1024 * 1024);
+    });
+
+    it('should fall back to defaults for non-number batch options', () => {
+      const config = getClientConfig({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+        batchLogs: true,
+        batchLogsSize: 'abc',
+        batchPayloadLimit: 'def',
+      });
+
+      expect(config.batchLogsSize).toBe(20);
+      expect(config.batchPayloadLimit).toBe(64 * 1024 * 1024);
+    });
   });
 });

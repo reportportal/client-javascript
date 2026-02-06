@@ -159,6 +159,21 @@ declare module '@reportportal/client-javascript' {
      * OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key.
      */
     oauth?: OAuthConfig;
+    /**
+     * Enable batch logging to optimize network requests by grouping multiple logs into a single request.
+     * @default false
+     */
+    batchLogs?: boolean;
+    /**
+     * Maximum number of logs in a single batch.
+     * @default 20
+     */
+    batchLogsSize?: number;
+    /**
+     * Maximum batch payload size in bytes.
+     * @default 67108864 (64MB)
+     */
+    batchPayloadLimit?: number;
   }
 
   /**
@@ -406,6 +421,43 @@ declare module '@reportportal/client-javascript' {
       options: LogOptions,
       file?: { name: string; content: string | Buffer; type: string },
     ): { tempId: string; promise: Promise<any> };
+
+    /**
+     * Flushes all pending logs from the batch queue.
+     * This method is only relevant when batch logging is enabled (batchLogs: true).
+     * It sends any accumulated logs immediately, without waiting for the batch to fill.
+     *
+     * @returns Promise that resolves when all pending logs are sent
+     *
+     * @example
+     * ```typescript
+     * // Enable batch logging in config
+     * const rpClient = new ReportPortalClient({
+     *   endpoint: 'https://your.reportportal.server/api/v1',
+     *   project: 'your_project_name',
+     *   apiKey: 'your_api_key',
+     *   batchLogs: true,
+     *   batchLogsSize: 20
+     * });
+     *
+     * // Send multiple logs (they will be batched)
+     * await rpClient.sendLog(testItem.tempId, {
+     *   level: 'INFO',
+     *   message: 'First log',
+     *   time: rpClient.helpers.now()
+     * });
+     *
+     * await rpClient.sendLog(testItem.tempId, {
+     *   level: 'INFO',
+     *   message: 'Second log',
+     *   time: rpClient.helpers.now()
+     * });
+     *
+     * // Manually flush remaining logs before finishing
+     * await rpClient.flushLogs();
+     * ```
+     */
+    flushLogs(): Promise<void>;
 
     /**
      * Waits for all test items to be finished.
