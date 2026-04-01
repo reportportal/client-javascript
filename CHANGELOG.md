@@ -1,5 +1,5 @@
 ### Added
-- `instanceID` property for Google Analytics events.
+- Google Analytics improvements.
 
 ## [5.5.10] - 2026-02-05
 ### Fixed
