@@ -158,6 +158,7 @@ describe('ReportPortal javascript client', () => {
         endpoint: 'https://rp.us/api/v1',
         project: 'tst',
       });
+      jest.spyOn(client, 'fetchServerInfo').mockResolvedValue({});
       jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
 
       await client.triggerStatisticsEvent();
@@ -217,6 +218,101 @@ describe('ReportPortal javascript client', () => {
           agent_version: expect.anything(),
         }),
       );
+    });
+
+    it('should fetch server info and set instanceID before tracking event', async () => {
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const serverInfoResponse = {
+        extensions: {
+          result: {
+            'server.details.instance': 'test-instance-123',
+          },
+        },
+      };
+      jest.spyOn(client, 'fetchServerInfo').mockResolvedValue(serverInfoResponse);
+      jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
+      jest.spyOn(client.statistics, 'setInstanceID');
+
+      await client.triggerStatisticsEvent();
+
+      expect(client.fetchServerInfo).toHaveBeenCalled();
+      expect(client.statistics.setInstanceID).toHaveBeenCalledWith('test-instance-123');
+      expect(client.statistics.trackEvent).toHaveBeenCalled();
+    });
+
+    it('should still track event with not_set instanceID if fetchServerInfo fails', async () => {
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      jest.spyOn(client, 'fetchServerInfo').mockRejectedValue(new Error('Network error'));
+      jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
+      jest.spyOn(client.statistics, 'setInstanceID');
+
+      await client.triggerStatisticsEvent();
+
+      expect(client.statistics.setInstanceID).toHaveBeenCalledWith('not_set');
+      expect(client.statistics.trackEvent).toHaveBeenCalled();
+    });
+
+    it('should not set instanceID if server info does not contain it', async () => {
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      jest.spyOn(client, 'fetchServerInfo').mockResolvedValue({});
+      jest.spyOn(client.statistics, 'trackEvent').mockImplementation();
+      jest.spyOn(client.statistics, 'setInstanceID');
+
+      await client.triggerStatisticsEvent();
+
+      expect(client.statistics.setInstanceID).not.toHaveBeenCalled();
+      expect(client.statistics.trackEvent).toHaveBeenCalled();
+    });
+  });
+
+  describe('getServerInfoUrl', () => {
+    it('should return correct info URL for v1 endpoint', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://rp.us/api/v1',
+      });
+
+      expect(client.getServerInfoUrl()).toBe('https://rp.us/api/info');
+    });
+
+    it('should return correct info URL for v2 endpoint', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://rp.us/api/v2',
+      });
+
+      expect(client.getServerInfoUrl()).toBe('https://rp.us/api/info');
+    });
+  });
+
+  describe('fetchServerInfo', () => {
+    it('should call restClient.request with correct URL', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://rp.us/api/v1',
+      });
+      const serverInfo = { extensions: { result: {} } };
+      jest.spyOn(client.restClient, 'request').mockResolvedValue(serverInfo);
+
+      const result = await client.fetchServerInfo();
+
+      expect(client.restClient.request).toHaveBeenCalledWith('GET', 'https://rp.us/api/info', {});
+      expect(result).toEqual(serverInfo);
     });
   });
 

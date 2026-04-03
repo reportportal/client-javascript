@@ -91,4 +91,43 @@ describe('Statistics', () => {
       expect(console.error).toHaveBeenCalledWith(errorMessage);
     });
   });
+
+  describe('setInstanceID', () => {
+    it('should set instanceID in event params', async () => {
+      jest.spyOn(axios, 'post').mockReturnValue({
+        send: () => {}, // eslint-disable-line
+      });
+
+      const statistics = new Statistics(eventName, agentParams);
+      statistics.setInstanceID('test-instance-id');
+      await statistics.trackEvent();
+
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(axios.post).toHaveBeenCalledWith(
+        url,
+        expect.objectContaining({
+          events: expect.arrayContaining([
+            expect.objectContaining({
+              params: expect.objectContaining({
+                instanceID: 'test-instance-id',
+              }),
+            }),
+          ]),
+        }),
+      );
+    });
+
+    it('should not include instanceID if setInstanceID was not called', async () => {
+      jest.spyOn(axios, 'post').mockReturnValue({
+        send: () => {}, // eslint-disable-line
+      });
+
+      const statistics = new Statistics(eventName, agentParams);
+      await statistics.trackEvent();
+
+      expect(axios.post).toHaveBeenCalledTimes(1);
+      const callArgs = axios.post.mock.calls[0][1];
+      expect(callArgs.events[0].params).not.toHaveProperty('instanceID');
+    });
+  });
 });

@@ -27,6 +27,10 @@ class Statistics {
     return params;
   }
 
+  setInstanceID(instanceID) {
+    this.eventParams.instanceID = instanceID;
+  }
+
   async trackEvent() {
     try {
       const requestBody = {
