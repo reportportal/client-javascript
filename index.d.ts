@@ -268,7 +268,7 @@ declare module '@reportportal/client-javascript' {
     /**
      * Initializes a new Report Portal client.
      */
-    constructor(config: ReportPortalConfig, agentInfo?: { name?: string; version?: string });
+    constructor(config: ReportPortalConfig, agentInfo?: { name?: string; version?: string; framework_version?: string });
 
     /**
      * Starts a new launch.
