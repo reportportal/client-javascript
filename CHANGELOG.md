@@ -1,7 +1,7 @@
 ### Added
 - Google Analytics improvements.
 ### Security
-- Updated versions of vulnerable packages (glob - [CVE-2026-25547](https://www.cve.org/CVERecord?id=CVE-2026-25547), axios - [CVE-2026-25639](https://www.cve.org/CVERecord?id=CVE-2026-25639), diff, lodash).
+- Updated versions of vulnerable packages (glob (minimatch ReDoS - [CWE-1333](https://cwe.mitre.org/data/definitions/1333.html), [CWE-407](https://cwe.mitre.org/data/definitions/407.html)), axios - [CVE-2026-25639](https://www.cve.org/CVERecord?id=CVE-2026-25639), diff, lodash).
 
 ## [5.5.10] - 2026-02-05
 ### Fixed
