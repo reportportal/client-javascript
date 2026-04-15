@@ -200,6 +200,12 @@ declare module '@reportportal/client-javascript' {
     startTime?: string | number;
     attributes?: Array<{ key?: string; value?: string } | string>;
     hasStats?: boolean;
+    retry?: boolean;
+    retryOf?: string;
+    codeRef?: string;
+    parameters?: Array<{ key: string; value: string }>;
+    uniqueId?: string;
+    testCaseId?: string;
   }
 
   /**
@@ -239,6 +245,8 @@ declare module '@reportportal/client-javascript' {
   export interface FinishTestItemOptions {
     status?: string;
     endTime?: string | number;
+    retry?: boolean;
+    retryOf?: string;
     issue?: {
       issueType: string;
       comment?: string;

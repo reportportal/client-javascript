@@ -1,4 +1,5 @@
 ### Added
+- `retryOf` property automatically populated with the UUID of the previous retry attempt when starting a retried test item.
 - Google Analytics improvements.
 
 ## [5.5.10] - 2026-02-05
