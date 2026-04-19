@@ -159,6 +159,34 @@ declare module '@reportportal/client-javascript' {
      * OAuth 2.0 configuration object. When provided, OAuth authentication will be used instead of API key.
      */
     oauth?: OAuthConfig;
+    /**
+     * Truncate test item attributes to default maximum length (128 chars). Default: true.
+     */
+    truncateAttributes?: boolean;
+    /**
+     * Truncate request fields (name, description) to configured limits. Default: true.
+     */
+    truncateFields?: boolean;
+    /**
+     * Replace binary control characters with the Unicode replacement character (U+FFFD). Default: true.
+     */
+    replaceBinaryChars?: boolean;
+    /**
+     * Maximum allowed launch name length. Default: 256.
+     */
+    launchNameLengthLimit?: number;
+    /**
+     * Maximum allowed test item name length. Default: 1024.
+     */
+    itemNameLengthLimit?: number;
+    /**
+     * Maximum allowed launch description length. Default: 2048.
+     */
+    launchDescriptionLengthLimit?: number;
+    /**
+     * Maximum allowed test item description length. Default: 65536.
+     */
+    itemDescriptionLengthLimit?: number;
   }
 
   /**
