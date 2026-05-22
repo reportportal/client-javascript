@@ -1,3 +1,5 @@
+
+## [5.5.11] - 2026-05-22
 ### Added
 - Google Analytics improvements.
 ### Security
