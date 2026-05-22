@@ -24,7 +24,18 @@ class Statistics {
     if (agentParams && hasOption(agentParams, 'version') && agentParams.version) {
       params.agent_version = agentParams.version;
     }
+    if (
+      agentParams &&
+      hasOption(agentParams, 'framework_version') &&
+      agentParams.framework_version
+    ) {
+      params.framework_version = agentParams.framework_version;
+    }
     return params;
+  }
+
+  setInstanceID(instanceID) {
+    this.eventParams.instanceID = instanceID;
   }
 
   async trackEvent() {
