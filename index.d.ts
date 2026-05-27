@@ -200,6 +200,18 @@ declare module '@reportportal/client-javascript' {
     startTime?: string | number;
     attributes?: Array<{ key?: string; value?: string } | string>;
     hasStats?: boolean;
+    /**
+     * Set to true when this item is a retry of a previous attempt.
+     * The client will automatically populate `retry_of` with the UUID of the
+     * previous attempt.
+     */
+    retry?: boolean;
+    /**
+     * UUID of the immediately-preceding retry attempt.
+     * Populated automatically by the client when `retry: true` and a previous
+     * attempt exists. Do not set manually.
+     */
+    retry_of?: string;
   }
 
   /**
