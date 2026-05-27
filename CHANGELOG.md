@@ -1,4 +1,11 @@
 
+## [Unreleased]
+### Added
+- `retry_of` property is now automatically included in the `startTestItem`
+  request payload when `retry: true` and a previous attempt exists in the
+  retry chain. This allows the ReportPortal backend to link retry chains
+  efficiently, improving query performance for large test runs.
+
 ## [5.5.11] - 2026-05-22
 ### Added
 - Google Analytics improvements.
