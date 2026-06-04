@@ -200,6 +200,18 @@ declare module '@reportportal/client-javascript' {
     startTime?: string | number;
     attributes?: Array<{ key?: string; value?: string } | string>;
     hasStats?: boolean;
+    /**
+     * Marks the test item as a retry of a previous attempt with the same
+     * `name`/`uniqueId` under the same parent. The client uses this flag to
+     * link the new attempt to the previous one via the `retryOf` field.
+     */
+    retry?: boolean;
+    /**
+     * UUID of the previous retry attempt that this item is a retry of.
+     * Populated automatically by the client when `retry: true` and the
+     * previous attempt's UUID is known; can also be supplied explicitly.
+     */
+    retryOf?: string;
   }
 
   /**

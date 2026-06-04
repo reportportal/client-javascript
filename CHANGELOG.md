@@ -1,4 +1,8 @@
 
+## [Unreleased]
+### Added
+- `retryOf` property on test item start payload. When a test item is reported with `retry: true`, the client now includes the UUID of the previous retry attempt in the request, allowing the ReportPortal server to link retries without recomputing the chain. Improves backend ingestion performance.
+
 ## [5.5.11] - 2026-05-22
 ### Added
 - Google Analytics improvements.
