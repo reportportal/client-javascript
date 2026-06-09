@@ -1,4 +1,8 @@
 
+## [Unreleased]
+### Added
+- `retry_of` property support for test item start request to link retried test items to their predecessors in the hierarchy, improving performance tracking and metrics accuracy.
+
 ## [5.5.11] - 2026-05-22
 ### Added
 - Google Analytics improvements.

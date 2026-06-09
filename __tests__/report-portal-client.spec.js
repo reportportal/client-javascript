@@ -879,6 +879,86 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.itemRetriesChainMap.get).toHaveBeenCalledWith('id1__name__');
     });
+
+    it('should add retry_of property when retrying an item', async () => {
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      client.map = {
+        launchId: {
+          children: ['tempId1', 'tempId2'],
+          promiseStart: Promise.resolve(),
+          realId: 'launchRealId',
+        },
+        tempId1: {
+          children: [],
+          promiseStart: Promise.resolve(),
+          realId: 'item1RealId',
+        },
+        tempId2: {
+          children: [],
+          promiseStart: Promise.resolve(),
+        },
+      };
+      const itemKey = 'launchId__name__';
+      jest.spyOn(client, 'calculateItemRetriesChainMapKey').mockReturnValue(itemKey);
+      jest.spyOn(client, 'getUniqId').mockReturnValue('tempId2');
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'item2RealId' });
+
+      // First item - store it in the retry chain map
+      client.itemRetriesChainMap.set(itemKey, client.map.tempId1);
+
+      // Now retry with second item
+      const result = client.startTestItem({ name: 'test', type: 'TEST', retry: true }, 'launchId');
+      await result.promise;
+
+      // Verify the API was called with retry_of in the payload
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        'item/',
+        expect.objectContaining({
+          retry_of: 'item1RealId',
+        }),
+      );
+    });
+
+    it('should not add retry_of if previous item not in chain map', async () => {
+      const client = new RPClient({
+        apiKey: 'startLaunchTest',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      client.map = {
+        launchId: {
+          children: ['tempId1'],
+          promiseStart: Promise.resolve(),
+          realId: 'launchRealId',
+        },
+        tempId1: {
+          children: [],
+          promiseStart: Promise.resolve(),
+        },
+      };
+      const itemKey = 'launchId__name__';
+      jest.spyOn(client, 'calculateItemRetriesChainMapKey').mockReturnValue(itemKey);
+      jest.spyOn(client, 'getUniqId').mockReturnValue('tempId1');
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'item1RealId' });
+
+      // Manually clear the retry chain map
+      client.itemRetriesChainMap.clear();
+
+      const result = client.startTestItem({ name: 'test', type: 'TEST', retry: true }, 'launchId');
+      await result.promise;
+
+      // Verify the API was called WITHOUT retry_of
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        'item/',
+        expect.not.objectContaining({
+          retry_of: expect.anything(),
+        }),
+      );
+    });
   });
 
   describe('finishTestItem', () => {

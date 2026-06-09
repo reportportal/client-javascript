@@ -1,0 +1,5 @@
+
+> @reportportal/client-javascript@5.5.11 test
+> jest
+
+sh: 1: jest: not found
