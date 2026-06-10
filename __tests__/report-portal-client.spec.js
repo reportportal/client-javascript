@@ -126,6 +126,66 @@ describe('ReportPortal javascript client', () => {
     });
   });
 
+  describe('cleanItemRetriesChain', () => {
+    it('should delete entries from all retry tracking maps', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
+
+      const tempId1 = 'temp-id-1';
+      const tempId2 = 'temp-id-2';
+      const itemKey = 'launch__parent__name__';
+
+      // Setup maps as if a retry chain was created
+      client.itemRetriesChainKeyMapByTempId.set(tempId1, itemKey);
+      client.itemRetriesChainKeyMapByTempId.set(tempId2, itemKey);
+      client.itemRetriesChainMap.set(itemKey, Promise.resolve());
+      client.itemRetriesChainLatestTempIdMap.set(itemKey, tempId2);
+      client.previousItemUuidMap.set(tempId2, tempId1);
+
+      // Clean up
+      client.cleanItemRetriesChain([tempId1, tempId2]);
+
+      // Verify all maps are cleaned
+      expect(client.itemRetriesChainKeyMapByTempId.has(tempId1)).toBe(false);
+      expect(client.itemRetriesChainKeyMapByTempId.has(tempId2)).toBe(false);
+      expect(client.itemRetriesChainMap.has(itemKey)).toBe(false);
+      expect(client.itemRetriesChainLatestTempIdMap.has(itemKey)).toBe(false);
+      expect(client.previousItemUuidMap.has(tempId2)).toBe(false);
+    });
+
+    it('should clean previousItemUuidMap entries for cleaned tempIds', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        project: 'test',
+        endpoint: 'https://abc.com',
+      });
+
+      const tempId1 = 'temp-id-1';
+      const tempId2 = 'temp-id-2';
+      const tempId3 = 'temp-id-3';
+      const itemKey = 'launch__parent__name__';
+
+      // Setup maps with a chain of retries
+      client.itemRetriesChainKeyMapByTempId.set(tempId1, itemKey);
+      client.itemRetriesChainKeyMapByTempId.set(tempId2, itemKey);
+      client.itemRetriesChainKeyMapByTempId.set(tempId3, 'different-key');
+      client.previousItemUuidMap.set(tempId2, tempId1);
+      client.previousItemUuidMap.set(tempId3, 'some-other-id');
+
+      // Clean only tempId2
+      client.cleanItemRetriesChain([tempId2]);
+
+      // Verify tempId2 entries are removed
+      expect(client.previousItemUuidMap.has(tempId2)).toBe(false);
+      // Verify other entries remain
+      expect(client.previousItemUuidMap.has(tempId3)).toBe(true);
+      expect(client.itemRetriesChainKeyMapByTempId.has(tempId3)).toBe(true);
+    });
+  });
+
   describe('checkConnect', () => {
     it('should return promise', () => {
       const client = new RPClient({
@@ -879,6 +939,120 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.itemRetriesChainMap.get).toHaveBeenCalledWith('id1__name__');
     });
+
+    describe('retry tracking in startTestItem', () => {
+      it('should track previous item tempId when retry is true', async () => {
+        const client = new RPClient({
+          apiKey: 'startLaunchTest',
+          endpoint: 'https://rp.us/api/v1',
+          project: 'tst',
+        });
+
+        const launchTempId = 'launch-id';
+        const parentTempId = 'parent-id';
+        const previousItemTempId = 'previous-temp-id';
+        const newItemTempId = 'new-temp-id';
+        const itemKey = 'launch-id__parent-id__testName__';
+
+        client.map = {
+          'launch-id': {
+            children: ['parent-id'],
+            promiseStart: Promise.resolve(),
+          },
+          'parent-id': {
+            children: [],
+            promiseStart: Promise.resolve(),
+          },
+          'previous-temp-id': {
+            children: [],
+            promiseStart: Promise.resolve(),
+            realId: 'previous-real-id',
+          },
+        };
+
+        // Setup: previousItem already tracked as latest
+        client.itemRetriesChainLatestTempIdMap.set(itemKey, previousItemTempId);
+        client.itemRetriesChainKeyMapByTempId.set(previousItemTempId, itemKey);
+
+        jest.spyOn(client, 'calculateItemRetriesChainMapKey').mockReturnValue(itemKey);
+        jest.spyOn(client, 'getUniqId').mockReturnValue(newItemTempId);
+        jest.spyOn(client.itemRetriesChainMap, 'get').mockReturnValue(Promise.resolve());
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'new-real-id' });
+
+        client.startTestItem({ name: 'testName', retry: true }, launchTempId, parentTempId);
+
+        // Verify: previousItemUuidMap should be set mapping newItem -> previousItem
+        expect(client.previousItemUuidMap.get(newItemTempId)).toBe(previousItemTempId);
+      });
+
+      it('should update itemRetriesChainLatestTempIdMap when new item is started', async () => {
+        const client = new RPClient({
+          apiKey: 'startLaunchTest',
+          endpoint: 'https://rp.us/api/v1',
+          project: 'tst',
+        });
+
+        const launchTempId = 'launch-id';
+        const parentTempId = 'parent-id';
+        const newItemTempId = 'new-temp-id';
+        const itemKey = 'launch-id__parent-id__testName__';
+
+        client.map = {
+          'launch-id': {
+            children: ['parent-id'],
+            promiseStart: Promise.resolve(),
+          },
+          'parent-id': {
+            children: [],
+            promiseStart: Promise.resolve(),
+          },
+        };
+
+        jest.spyOn(client, 'calculateItemRetriesChainMapKey').mockReturnValue(itemKey);
+        jest.spyOn(client, 'getUniqId').mockReturnValue(newItemTempId);
+        jest.spyOn(client.itemRetriesChainMap, 'get').mockReturnValue(Promise.resolve());
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'new-real-id' });
+
+        client.startTestItem({ name: 'testName', retry: false }, launchTempId, parentTempId);
+
+        // Verify: itemRetriesChainLatestTempIdMap should track the new item as latest
+        expect(client.itemRetriesChainLatestTempIdMap.get(itemKey)).toBe(newItemTempId);
+      });
+
+      it('should not track previous item when retry is false', async () => {
+        const client = new RPClient({
+          apiKey: 'startLaunchTest',
+          endpoint: 'https://rp.us/api/v1',
+          project: 'tst',
+        });
+
+        const launchTempId = 'launch-id';
+        const parentTempId = 'parent-id';
+        const newItemTempId = 'new-temp-id';
+        const itemKey = 'launch-id__parent-id__testName__';
+
+        client.map = {
+          'launch-id': {
+            children: ['parent-id'],
+            promiseStart: Promise.resolve(),
+          },
+          'parent-id': {
+            children: [],
+            promiseStart: Promise.resolve(),
+          },
+        };
+
+        jest.spyOn(client, 'calculateItemRetriesChainMapKey').mockReturnValue(itemKey);
+        jest.spyOn(client, 'getUniqId').mockReturnValue(newItemTempId);
+        jest.spyOn(client.itemRetriesChainMap, 'get').mockReturnValue(Promise.resolve());
+        jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'new-real-id' });
+
+        client.startTestItem({ name: 'testName', retry: false }, launchTempId, parentTempId);
+
+        // Verify: previousItemUuidMap should NOT have entry for non-retried item
+        expect(client.previousItemUuidMap.has(newItemTempId)).toBe(false);
+      });
+    });
   });
 
   describe('finishTestItem', () => {
@@ -969,6 +1143,214 @@ describe('ReportPortal javascript client', () => {
         );
         done();
       }, 100);
+    });
+
+    describe('retry_of property', () => {
+      it('should include retry_of property when item is retried', (done) => {
+        const client = new RPClient({
+          apiKey: 'startLaunchTest',
+          endpoint: 'https://rp.us/api/v1',
+          project: 'tst',
+        });
+
+        // Setup items
+        const item1TempId = 'item1';
+        const item1RealId = 'uuid-item-1-real';
+        const item2TempId = 'item2';
+
+        client.map = {};
+        client.map[item1TempId] = {
+          children: [],
+          promiseFinish: Promise.resolve(),
+          realId: item1RealId,
+        };
+        client.map[item2TempId] = {
+          children: [],
+          promiseFinish: Promise.resolve(),
+          realId: 'uuid-item-2-real',
+        };
+
+        // Setup tracking maps to simulate a retry
+        client.previousItemUuidMap.set(item2TempId, item1TempId);
+        client.launchUuid = 'launchUuid';
+
+        const spyFinishTestItemPromiseStart = jest
+          .spyOn(client, 'finishTestItemPromiseStart')
+          .mockImplementation(() => {});
+        jest.spyOn(client, 'cleanMap').mockImplementation();
+        jest.spyOn(client.helpers, 'now').mockReturnValue(1234567);
+
+        // Finish the retried item
+        client.finishTestItem(item2TempId, {});
+
+        setTimeout(() => {
+          try {
+            expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
+              expect.any(Object),
+              item2TempId,
+              expect.objectContaining({
+                retry_of: item1RealId,
+                launchUuid: 'launchUuid',
+              }),
+            );
+            done();
+          } catch (error) {
+            done(error);
+          }
+        }, 50);
+      });
+
+      it('should not include retry_of property when item is not retried', (done) => {
+        const client = new RPClient({
+          apiKey: 'startLaunchTest',
+          endpoint: 'https://rp.us/api/v1',
+          project: 'tst',
+        });
+
+        const itemTempId = 'item1';
+        client.map = {};
+        client.map[itemTempId] = {
+          children: [],
+          promiseFinish: Promise.resolve(),
+          realId: 'uuid-item-1-real',
+        };
+
+        client.launchUuid = 'launchUuid';
+        const spyFinishTestItemPromiseStart = jest
+          .spyOn(client, 'finishTestItemPromiseStart')
+          .mockImplementation(() => {});
+        jest.spyOn(client, 'cleanMap').mockImplementation();
+        jest.spyOn(client.helpers, 'now').mockReturnValue(1234567);
+
+        // Finish a non-retried item (previousItemUuidMap should not have entry)
+        client.finishTestItem(itemTempId, {});
+
+        setTimeout(() => {
+          try {
+            expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
+              expect.any(Object),
+              itemTempId,
+              expect.not.objectContaining({
+                retry_of: expect.anything(),
+              }),
+            );
+            done();
+          } catch (error) {
+            done(error);
+          }
+        }, 50);
+      });
+
+      it('should reference immediate previous item in multi-retry chain', (done) => {
+        const client = new RPClient({
+          apiKey: 'startLaunchTest',
+          endpoint: 'https://rp.us/api/v1',
+          project: 'tst',
+        });
+
+        // Setup three items in retry chain
+        const item1TempId = 'item1';
+        const item1RealId = 'uuid-item-1-real';
+        const item2TempId = 'item2';
+        const item2RealId = 'uuid-item-2-real';
+        const item3TempId = 'item3';
+        const item3RealId = 'uuid-item-3-real';
+
+        client.map = {};
+        client.map[item1TempId] = {
+          children: [],
+          promiseFinish: Promise.resolve(),
+          realId: item1RealId,
+        };
+        client.map[item2TempId] = {
+          children: [],
+          promiseFinish: Promise.resolve(),
+          realId: item2RealId,
+        };
+        client.map[item3TempId] = {
+          children: [],
+          promiseFinish: Promise.resolve(),
+          realId: item3RealId,
+        };
+
+        // Setup tracking maps to simulate chain: item1 -> item2 -> item3
+        client.previousItemUuidMap.set(item2TempId, item1TempId);
+        client.previousItemUuidMap.set(item3TempId, item2TempId);
+        client.launchUuid = 'launchUuid';
+
+        const spyFinishTestItemPromiseStart = jest
+          .spyOn(client, 'finishTestItemPromiseStart')
+          .mockImplementation(() => {});
+        jest.spyOn(client, 'cleanMap').mockImplementation();
+        jest.spyOn(client.helpers, 'now').mockReturnValue(1234567);
+
+        // Finish the third retried item
+        client.finishTestItem(item3TempId, {});
+
+        setTimeout(() => {
+          try {
+            // Item 3 should reference item 2, not item 1
+            expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
+              expect.any(Object),
+              item3TempId,
+              expect.objectContaining({
+                retry_of: item2RealId,
+                launchUuid: 'launchUuid',
+              }),
+            );
+            done();
+          } catch (error) {
+            done(error);
+          }
+        }, 50);
+      });
+
+      it('should not include retry_of if previous item not found in map', (done) => {
+        const client = new RPClient({
+          apiKey: 'startLaunchTest',
+          endpoint: 'https://rp.us/api/v1',
+          project: 'tst',
+        });
+
+        const item2TempId = 'item2';
+        const unknownPreviousTempId = 'item-unknown';
+
+        client.map = {};
+        client.map[item2TempId] = {
+          children: [],
+          promiseFinish: Promise.resolve(),
+          realId: 'uuid-item-2-real',
+        };
+        // Note: unknownPreviousTempId is NOT in the map
+
+        // Setup tracking map with non-existent previous item
+        client.previousItemUuidMap.set(item2TempId, unknownPreviousTempId);
+        client.launchUuid = 'launchUuid';
+
+        const spyFinishTestItemPromiseStart = jest
+          .spyOn(client, 'finishTestItemPromiseStart')
+          .mockImplementation(() => {});
+        jest.spyOn(client, 'cleanMap').mockImplementation();
+        jest.spyOn(client.helpers, 'now').mockReturnValue(1234567);
+
+        client.finishTestItem(item2TempId, {});
+
+        setTimeout(() => {
+          try {
+            // Should not include retry_of since previous item doesn't exist in map
+            expect(spyFinishTestItemPromiseStart).toHaveBeenCalledWith(
+              expect.any(Object),
+              item2TempId,
+              expect.not.objectContaining({
+                retry_of: expect.anything(),
+              }),
+            );
+            done();
+          } catch (error) {
+            done(error);
+          }
+        }, 50);
+      });
     });
   });
 

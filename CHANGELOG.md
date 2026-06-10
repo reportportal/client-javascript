@@ -1,4 +1,8 @@
 
+## [5.5.12] - 2026-06-10
+### Added
+- `retry_of` property automatically included in test item finish requests for retried items, containing the UUID of the previous retry.
+
 ## [5.5.11] - 2026-05-22
 ### Added
 - Google Analytics improvements.
