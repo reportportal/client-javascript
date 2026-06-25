@@ -4,6 +4,7 @@
   "description": "ReportPortal client for Node.js",
   "author": "ReportPortal.io",
   "scripts": {
+    "codegraph": "bash scripts/codegraph.sh",
     "build": "npm run clean && tsc",
     "clean": "rimraf ./build",
     "lint": "eslint ./statistics/**/* ./lib/**/*",
