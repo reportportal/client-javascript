@@ -1,4 +1,9 @@
 
+## [Unreleased]
+### Changed
+- Replaced the `uniqid` and `uuid` dependencies with the built-in `crypto.randomUUID()` for internal id generation, removing both external packages ([#210](https://github.com/reportportal/agent-js-playwright/issues/210)).
+- Bumped the minimum supported Node.js version to 14.17.0 (required by `crypto.randomUUID`).
+
 ## [5.5.11] - 2026-05-22
 ### Added
 - Google Analytics improvements.
