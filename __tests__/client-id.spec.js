@@ -1,7 +1,7 @@
 const fs = require('fs');
 const util = require('util');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 
 const testHomeDir = path.join(__dirname, '__tmp__', 'rp-home');
 process.env.RP_CLIENT_JS_HOME = testHomeDir;
@@ -56,7 +56,7 @@ describe('Client ID test suite', () => {
 
   it('getClientId should read client ID from ~/.rp/rp.properties', async () => {
     await unlinkFile(clientIdFile);
-    const clientId = uuidv4(undefined, undefined, 0);
+    const clientId = randomUUID();
     await writeFile(clientIdFile, `client.id=${clientId}\n`, 'utf-8');
     expect(await getClientId()).toEqual(clientId);
   });
@@ -66,7 +66,7 @@ describe('Client ID test suite', () => {
       'first line',
     async () => {
       await unlinkFile(clientIdFile);
-      const clientId = uuidv4(undefined, undefined, 0);
+      const clientId = randomUUID();
       await writeFile(clientIdFile, `client.id=${clientId}\ntest.property=555\n`, 'utf-8');
       expect(await getClientId()).toEqual(clientId);
     },
@@ -77,7 +77,7 @@ describe('Client ID test suite', () => {
       'first line',
     async () => {
       await unlinkFile(clientIdFile);
-      const clientId = uuidv4(undefined, undefined, 0);
+      const clientId = randomUUID();
       await writeFile(clientIdFile, `test.property=555\nclient.id=${clientId}\n`, 'utf-8');
       expect(await getClientId()).toEqual(clientId);
     },

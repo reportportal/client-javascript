@@ -1,7 +1,7 @@
 const fs = require('fs');
 const util = require('util');
 const ini = require('ini');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const { ENCODING, CLIENT_ID_KEY, RP_FOLDER_PATH, RP_PROPERTIES_FILE_PATH } = require('./constants');
 
 const exists = util.promisify(fs.exists);
@@ -33,7 +33,7 @@ async function storeClientId(clientId) {
 async function getClientId() {
   let clientId = await readClientId();
   if (!clientId) {
-    clientId = uuidv4(undefined, undefined, 0);
+    clientId = randomUUID();
     try {
       await storeClientId(clientId);
     } catch (ignore) {
