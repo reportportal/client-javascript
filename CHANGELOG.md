@@ -1,7 +1,5 @@
 
 ## [5.5.12] - 2026-07-06
-
-## [Unreleased]
 ### Changed
 - Replaced the `uniqid` and `uuid` dependencies with the built-in `crypto.randomUUID()` for internal id generation, removing both external packages ([#210](https://github.com/reportportal/agent-js-playwright/issues/210)).
 - Bumped the minimum supported Node.js version to 14.17.0 (required by `crypto.randomUUID`).
