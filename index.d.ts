@@ -212,6 +212,9 @@ declare module '@reportportal/client-javascript' {
      * attempt exists. Do not set manually.
      */
     retry_of?: string;
+    codeRef?: string;
+    parameters?: Array<{ key: string; value: string }>;
+    testCaseId?: string;
   }
 
   /**
@@ -280,7 +283,10 @@ declare module '@reportportal/client-javascript' {
     /**
      * Initializes a new Report Portal client.
      */
-    constructor(config: ReportPortalConfig, agentInfo?: { name?: string; version?: string; framework_version?: string });
+    constructor(
+      config: ReportPortalConfig,
+      agentInfo?: { name?: string; version?: string; framework_version?: string },
+    );
 
     /**
      * Starts a new launch.
