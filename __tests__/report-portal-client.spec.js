@@ -1,7 +1,7 @@
 const process = require('process');
-const RPClient = require('../lib/report-portal-client');
-const helpers = require('../lib/helpers');
-const { OUTPUT_TYPES } = require('../lib/constants/outputs');
+const RPClient = require('../src/lib/report-portal-client');
+const helpers = require('../src/lib/helpers');
+const { OUTPUT_TYPES } = require('../src/lib/constants/outputs');
 
 describe('ReportPortal javascript client', () => {
   afterEach(() => {

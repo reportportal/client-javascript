@@ -1,19 +1,34 @@
-const axios = require('axios');
-const { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } = require('./constants');
-const { getClientId } = require('./client-id');
+import axios from 'axios';
+import { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } from './constants';
+import { getClientId } from './client-id';
+import type { AgentParams } from '../lib/models/common';
 
-const hasOption = (options, optionName) => {
+interface EventParams {
+  interpreter: string | null;
+  client_name: string;
+  client_version: string;
+  agent_name?: string;
+  agent_version?: string;
+  framework_version?: string;
+  instanceID?: string;
+}
+
+const hasOption = (options: AgentParams, optionName: keyof AgentParams): boolean => {
   return Object.prototype.hasOwnProperty.call(options, optionName);
 };
 
 class Statistics {
-  constructor(eventName, agentParams) {
+  private eventName: string;
+
+  private eventParams: EventParams;
+
+  constructor(eventName: string, agentParams?: AgentParams) {
     this.eventName = eventName;
     this.eventParams = this.getEventParams(agentParams);
   }
 
-  getEventParams(agentParams) {
-    const params = {
+  getEventParams(agentParams?: AgentParams): EventParams {
+    const params: EventParams = {
       interpreter: INTERPRETER,
       client_name: PJSON_NAME,
       client_version: PJSON_VERSION,
@@ -34,11 +49,11 @@ class Statistics {
     return params;
   }
 
-  setInstanceID(instanceID) {
+  setInstanceID(instanceID: string): void {
     this.eventParams.instanceID = instanceID;
   }
 
-  async trackEvent() {
+  async trackEvent(): Promise<void> {
     try {
       const requestBody = {
         client_id: await getClientId(),
@@ -54,10 +69,11 @@ class Statistics {
         `https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_KEY}`,
         requestBody,
       );
-    } catch (error) {
-      console.error(error.message);
+    } catch (error: unknown) {
+      // eslint-disable-next-line no-console
+      console.error(error instanceof Error ? error.message : String(error));
     }
   }
 }
 
-module.exports = Statistics;
+export = Statistics;

@@ -1,8 +1,8 @@
 const nock = require('nock');
 const isEqual = require('lodash/isEqual');
 const http = require('http');
-const RestClient = require('../lib/rest');
-const logger = require('../lib/logger');
+const RestClient = require('../src/lib/rest');
+const logger = require('../src/lib/logger');
 
 describe('RestClient', () => {
   const options = {

@@ -5,7 +5,7 @@ const { randomUUID } = require('crypto');
 
 const testHomeDir = path.join(__dirname, '__tmp__', 'rp-home');
 process.env.RP_CLIENT_JS_HOME = testHomeDir;
-const { getClientId } = require('../statistics/client-id');
+const { getClientId } = require('../src/statistics/client-id');
 
 const uuidv4Validation = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 const clientIdFile = path.join(testHomeDir, '.rp', 'rp.properties');

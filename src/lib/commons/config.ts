@@ -1,29 +1,40 @@
-const { ReportPortalRequiredOptionError, ReportPortalValidationError } = require('./errors');
-const { OUTPUT_TYPES } = require('../constants/outputs');
+import { ReportPortalRequiredOptionError, ReportPortalValidationError } from './errors';
+import { OUTPUT_TYPES } from '../constants/outputs';
+import type {
+  NormalizedClientConfig,
+  OAuthConfig,
+  ReportPortalConfig,
+} from '../models/config';
 
-const getOption = (options, optionName, defaultValue) => {
-  if (!Object.prototype.hasOwnProperty.call(options, optionName) || !options[optionName]) {
+const getOption = <T, K extends keyof T>(
+  options: T,
+  optionName: K,
+  defaultValue: NonNullable<T[K]>,
+): NonNullable<T[K]> => {
+  const value = options[optionName];
+  if (!Object.prototype.hasOwnProperty.call(options, optionName) || !value) {
     return defaultValue;
   }
 
-  return options[optionName];
+  return value as NonNullable<T[K]>;
 };
 
-const getRequiredOption = (options, optionName) => {
+export const getRequiredOption = <T, K extends keyof T>(options: T, optionName: K): T[K] => {
   if (!Object.prototype.hasOwnProperty.call(options, optionName) || !options[optionName]) {
-    throw new ReportPortalRequiredOptionError(optionName);
+    throw new ReportPortalRequiredOptionError(String(optionName));
   }
 
   return options[optionName];
 };
 
-const getApiKey = ({ apiKey, token }) => {
+export const getApiKey = ({ apiKey, token }: Pick<ReportPortalConfig, 'apiKey' | 'token'>): string => {
   let calculatedApiKey = apiKey;
   if (!calculatedApiKey) {
     calculatedApiKey = token;
     if (!calculatedApiKey) {
       throw new ReportPortalRequiredOptionError('apiKey');
     } else {
+      // eslint-disable-next-line no-console
       console.warn(`Option 'token' is deprecated. Use 'apiKey' instead.`);
     }
   }
@@ -31,8 +42,8 @@ const getApiKey = ({ apiKey, token }) => {
   return calculatedApiKey;
 };
 
-const getOAuthConfig = (options) => {
-  const oauthParams = options.oauth || {};
+export const getOAuthConfig = (options: ReportPortalConfig): OAuthConfig | null => {
+  const oauthParams = options.oauth || ({} as Partial<OAuthConfig>);
 
   const { tokenEndpoint, username, password, clientId, clientSecret, scope } = oauthParams;
 
@@ -63,8 +74,18 @@ const getOAuthConfig = (options) => {
   };
 };
 
-const getClientConfig = (options) => {
-  let calculatedOptions = options;
+const DEFAULT_CLIENT_CONFIG: NormalizedClientConfig = {
+  apiKey: null,
+  oauth: null,
+  project: '',
+  endpoint: '',
+  isLaunchMergeRequired: false,
+  launchUuidPrintOutput: OUTPUT_TYPES.STDOUT,
+  skippedIsNotIssue: false,
+};
+
+export const getClientConfig = (options: ReportPortalConfig): NormalizedClientConfig => {
+  let calculatedOptions = DEFAULT_CLIENT_CONFIG;
   try {
     if (typeof options !== 'object') {
       throw new ReportPortalValidationError('`options` must be an object.');
@@ -74,7 +95,7 @@ const getClientConfig = (options) => {
     const oauthConfig = getOAuthConfig(options);
 
     // If OAuth is not configured, apiKey is required
-    let apiKey;
+    let apiKey: string | null;
     if (!oauthConfig) {
       apiKey = getApiKey(options);
     } else {
@@ -119,15 +140,9 @@ const getClientConfig = (options) => {
     };
   } catch (error) {
     // don't throw the error up to not break the entire process
+    // eslint-disable-next-line no-console
     console.dir(error);
   }
 
   return calculatedOptions;
-};
-
-module.exports = {
-  getClientConfig,
-  getRequiredOption,
-  getApiKey,
-  getOAuthConfig,
 };
