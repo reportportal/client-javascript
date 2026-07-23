@@ -5,7 +5,7 @@ import https from 'https';
 import * as logger from './logger';
 import OAuthInterceptor from './oauth';
 import { getProxyAgentForUrl } from './proxyHelper';
-import type { OAuthConfig, RestClientConfig } from './models/config';
+import type { OAuthConfig, RestClientConfig, RestClientOptions } from './models/config';
 
 const DEFAULT_MAX_CONNECTION_TIME_MS = 30000;
 const DEFAULT_RETRY_ATTEMPTS = 6;
@@ -15,7 +15,8 @@ const RETRY_MAX_DELAY_MS = 5000;
 interface NetworkError {
   message?: string;
   code?: string;
-  cause?: { code?: string };
+  // A nested cause may be a full Error (e.g. a Node system error carrying `code`).
+  cause?: { code?: string; message?: string };
 }
 
 const isTimeoutError = (error: NetworkError | null | undefined): boolean => {
@@ -49,14 +50,6 @@ const DEFAULT_RETRY_CONFIG: IAxiosRetryConfig = {
   shouldResetTimeout: true,
 };
 const SKIPPED_REST_CONFIG_KEYS = ['agent', 'retry', 'proxy', 'noProxy'];
-
-interface RestClientOptions {
-  baseURL: string;
-  headers?: Record<string, string>;
-  restClientConfig?: RestClientConfig;
-  oauthConfig?: OAuthConfig | null;
-  debug?: boolean;
-}
 
 class RestClient {
   private baseURL: string;

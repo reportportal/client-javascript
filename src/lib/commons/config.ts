@@ -1,10 +1,6 @@
 import { ReportPortalRequiredOptionError, ReportPortalValidationError } from './errors';
 import { OUTPUT_TYPES } from '../constants/outputs';
-import type {
-  NormalizedClientConfig,
-  OAuthConfig,
-  ReportPortalConfig,
-} from '../models/config';
+import type { NormalizedClientConfig, OAuthConfig, ReportPortalConfig } from '../models/config';
 
 const getOption = <T, K extends keyof T>(
   options: T,
@@ -27,7 +23,10 @@ export const getRequiredOption = <T, K extends keyof T>(options: T, optionName: 
   return options[optionName];
 };
 
-export const getApiKey = ({ apiKey, token }: Pick<ReportPortalConfig, 'apiKey' | 'token'>): string => {
+export const getApiKey = ({
+  apiKey,
+  token,
+}: Pick<ReportPortalConfig, 'apiKey' | 'token'>): string => {
   let calculatedApiKey = apiKey;
   if (!calculatedApiKey) {
     calculatedApiKey = token;

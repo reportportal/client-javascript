@@ -44,6 +44,17 @@ export interface RestClientConfig extends Omit<AxiosRequestConfig, 'proxy'> {
   debug?: boolean;
 }
 
+/**
+ * Options accepted by the `RestClient` constructor.
+ */
+export interface RestClientOptions {
+  baseURL: string;
+  headers?: Record<string, string>;
+  restClientConfig?: RestClientConfig;
+  oauthConfig?: OAuthConfig | null;
+  debug?: boolean;
+}
+
 export type LaunchUuidPrintOutput = 'STDOUT' | 'STDERR' | 'ENVIRONMENT' | 'FILE';
 
 /**

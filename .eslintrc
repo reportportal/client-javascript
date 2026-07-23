@@ -39,6 +39,8 @@
     "@typescript-eslint/ban-ts-comment": 0,
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/no-floating-promises": 2,
-    "max-classes-per-file": 0
+    "max-classes-per-file": 0,
+    "no-shadow": 0,
+    "@typescript-eslint/no-shadow": 2
   }
 }

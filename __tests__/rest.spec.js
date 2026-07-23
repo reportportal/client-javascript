@@ -2,6 +2,7 @@ const nock = require('nock');
 const isEqual = require('lodash/isEqual');
 const http = require('http');
 const RestClient = require('../src/lib/rest');
+const OAuthInterceptor = require('../src/lib/oauth');
 const logger = require('../src/lib/logger');
 
 describe('RestClient', () => {
@@ -59,6 +60,23 @@ describe('RestClient', () => {
       const client = new RestClient(optionsWithLoggerEnabled);
 
       expect(spyLogger).toHaveBeenCalledWith(client.axiosInstance);
+    });
+
+    it('attaches an OAuth interceptor to the axios instance when oauthConfig is provided', () => {
+      const attachSpy = jest.spyOn(OAuthInterceptor.prototype, 'attach');
+      const client = new RestClient({
+        ...options,
+        oauthConfig: {
+          tokenEndpoint: 'https://auth.example.com/oauth/token',
+          username: 'user',
+          password: 'password',
+          clientId: 'client-id',
+        },
+      });
+
+      expect(attachSpy).toHaveBeenCalledWith(client.axiosInstance);
+
+      attachSpy.mockRestore();
     });
   });
 
