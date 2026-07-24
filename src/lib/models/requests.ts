@@ -45,6 +45,7 @@ export interface StartTestItemOptions {
   testCaseId?: string;
   parameters?: TestItemParameter[];
   retry?: boolean;
+  retry_of?: string;
   uniqueId?: string;
 }
 

@@ -879,6 +879,102 @@ describe('ReportPortal javascript client', () => {
 
       expect(client.itemRetriesChainMap.get).toHaveBeenCalledWith('id1__name__');
     });
+
+    it('should include retry_of with the previous item UUID when retry is true', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const prevRealId = 'prev-item-uuid-1234';
+      const prevPromise = Promise.resolve({ id: prevRealId });
+
+      client.map = {
+        launchId: {
+          children: [],
+          finishSend: false,
+          promiseStart: Promise.resolve(),
+        },
+      };
+
+      const itemKey = client.calculateItemRetriesChainMapKey(
+        'launchId', undefined, 'My test', undefined,
+      );
+      client.itemRetriesChainMap.set(itemKey, prevPromise);
+
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'new-item-uuid' });
+      jest.spyOn(client, 'getUniqId').mockReturnValue('newTempId');
+
+      await client.startTestItem(
+        { name: 'My test', type: 'STEP', retry: true },
+        'launchId',
+      ).promise;
+
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ retry_of: prevRealId }),
+      );
+    });
+
+    it('should not include retry_of when retry is true but no previous entry exists', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      client.map = {
+        launchId: {
+          children: [],
+          finishSend: false,
+          promiseStart: Promise.resolve(),
+        },
+      };
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'new-item-uuid' });
+      jest.spyOn(client, 'getUniqId').mockReturnValue('newTempId');
+
+      await client.startTestItem(
+        { name: 'My test', type: 'STEP', retry: true },
+        'launchId',
+      ).promise;
+
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.not.objectContaining({ retry_of: expect.anything() }),
+      );
+    });
+
+    it('should not include retry_of when retry is false', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const prevPromise = Promise.resolve({ id: 'prev-item-uuid-1234' });
+      client.map = {
+        launchId: {
+          children: [],
+          finishSend: false,
+          promiseStart: Promise.resolve(),
+        },
+      };
+      const itemKey = client.calculateItemRetriesChainMapKey(
+        'launchId', undefined, 'My test', undefined,
+      );
+      client.itemRetriesChainMap.set(itemKey, prevPromise);
+
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'new-item-uuid' });
+      jest.spyOn(client, 'getUniqId').mockReturnValue('newTempId');
+
+      await client.startTestItem(
+        { name: 'My test', type: 'STEP', retry: false },
+        'launchId',
+      ).promise;
+
+      expect(client.restClient.create).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.not.objectContaining({ retry_of: expect.anything() }),
+      );
+    });
   });
 
   describe('finishTestItem', () => {
