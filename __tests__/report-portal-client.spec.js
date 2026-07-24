@@ -1170,6 +1170,225 @@ describe('ReportPortal javascript client', () => {
     }, 100);
   });
 
+  describe('sanitization and truncation', () => {
+    it('should truncate long launch name in startLaunch', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+
+      const longName = 'n'.repeat(300);
+      client.startLaunch({ name: longName, startTime: 12345 });
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.name.length).toBe(256);
+      expect(callArgs.name.endsWith('...')).toBe(true);
+    });
+
+    it('should clean binary characters in launch name', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+
+      client.startLaunch({ name: 'bad\x00launch\x1Bname', startTime: 12345 });
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.name).not.toContain('\x00');
+      expect(callArgs.name).not.toContain('\x1B');
+      expect(callArgs.name).toContain('\uFFFD');
+    });
+
+    it('should truncate launch description in startLaunch', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+
+      const longDesc = 'd'.repeat(3000);
+      client.startLaunch({ description: longDesc, startTime: 12345 });
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.description.length).toBe(2048);
+      expect(callArgs.description.endsWith('...')).toBe(true);
+    });
+
+    it('should truncate and sanitize attributes in startLaunch', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+      jest.spyOn(helpers, 'getSystemAttribute').mockReturnValue([]);
+
+      client.startLaunch({
+        startTime: 12345,
+        attributes: [{ key: 'k'.repeat(140), value: 'v'.repeat(140) }],
+      });
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.attributes[0].key.length).toBe(128);
+      expect(callArgs.attributes[0].value.length).toBe(128);
+    });
+
+    it('should limit attribute count to 256 in startTestItem', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      client.map = {
+        launchId: {
+          children: [],
+          promiseStart: Promise.resolve(),
+          realId: 'realLaunchId',
+          finishSend: false,
+        },
+      };
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'item-id' });
+
+      const attributes = [];
+      for (let i = 0; i < 300; i++) {
+        attributes.push({ key: `k${i.toString().padStart(3, '0')}`, value: 'value' });
+      }
+
+      const item = client.startTestItem(
+        { name: 'Test', type: 'SUITE', attributes },
+        'launchId',
+      );
+      await item.promise;
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.attributes.length).toBe(256);
+    });
+
+    it('should clean binary characters in test item name and description', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      client.map = {
+        launchId: {
+          children: [],
+          promiseStart: Promise.resolve(),
+          realId: 'realLaunchId',
+          finishSend: false,
+        },
+      };
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'item-id' });
+
+      const item = client.startTestItem(
+        {
+          name: 'test\x00item',
+          type: 'SUITE',
+          description: 'desc\x1Bription',
+        },
+        'launchId',
+      );
+      await item.promise;
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.name).not.toContain('\x00');
+      expect(callArgs.description).not.toContain('\x1B');
+    });
+
+    it('should truncate long test item name to 1024 chars', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      client.map = {
+        launchId: {
+          children: [],
+          promiseStart: Promise.resolve(),
+          realId: 'realLaunchId',
+          finishSend: false,
+        },
+      };
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'item-id' });
+
+      const item = client.startTestItem(
+        { name: 'n'.repeat(2000), type: 'SUITE' },
+        'launchId',
+      );
+      await item.promise;
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.name.length).toBe(1024);
+      expect(callArgs.name.endsWith('...')).toBe(true);
+    });
+
+    it('should clean binary chars in attributes in startTestItem', async () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+      });
+      client.map = {
+        launchId: {
+          children: [],
+          promiseStart: Promise.resolve(),
+          realId: 'realLaunchId',
+          finishSend: false,
+        },
+      };
+      jest.spyOn(client.restClient, 'create').mockResolvedValue({ id: 'item-id' });
+
+      const item = client.startTestItem(
+        {
+          name: 'Test',
+          type: 'SUITE',
+          attributes: [{ key: 'a\x00key', value: 'v\x1Balue' }],
+        },
+        'launchId',
+      );
+      await item.promise;
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.attributes[0].key).not.toContain('\x00');
+      expect(callArgs.attributes[0].value).not.toContain('\x1B');
+    });
+
+    it('should not apply sanitization when all options are disabled', () => {
+      const client = new RPClient({
+        apiKey: 'test',
+        endpoint: 'https://rp.us/api/v1',
+        project: 'tst',
+        truncateAttributes: false,
+        truncateFields: false,
+        replaceBinaryChars: false,
+      });
+      const myPromise = Promise.resolve({ id: 'testidlaunch' });
+      jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
+      jest.spyOn(helpers, 'getSystemAttribute').mockReturnValue([]);
+
+      const longName = 'n'.repeat(300);
+      client.startLaunch({
+        name: longName,
+        startTime: 12345,
+        attributes: [{ key: 'a\x00key', value: 'v'.repeat(200) }],
+      });
+
+      const callArgs = client.restClient.create.mock.calls[0][1];
+      expect(callArgs.name.length).toBe(300);
+      expect(callArgs.attributes[0].key).toContain('\x00');
+      expect(callArgs.attributes[0].value.length).toBe(200);
+    });
+  });
+
   describe('saveLog', () => {
     it('should return object with tempId and promise', () => {
       const client = new RPClient({ apiKey: 'any', endpoint: 'https://rp.api', project: 'prj' });
