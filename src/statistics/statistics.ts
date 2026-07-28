@@ -70,7 +70,6 @@ class Statistics {
         requestBody,
       );
     } catch (error: unknown) {
-      // eslint-disable-next-line no-console
       console.error(error instanceof Error ? error.message : String(error));
     }
   }

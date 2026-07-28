@@ -67,7 +67,6 @@ class OAuthInterceptor {
 
   logDebug(message: string, data: unknown = ''): void {
     if (this.debug) {
-      // eslint-disable-next-line no-console
       console.log(`[OAuth] ${message}`, data);
     }
   }
@@ -118,7 +117,6 @@ class OAuthInterceptor {
       // If refresh token grant failed, try password grant as fallback
       if (this.refreshToken) {
         this.logDebug('Refresh token failed, falling back to password grant');
-        // eslint-disable-next-line no-console
         console.warn(
           '[OAuth] Refresh token expired or invalid, re-authenticating with password grant',
         );
@@ -132,7 +130,6 @@ class OAuthInterceptor {
             fallbackError,
           );
 
-          // eslint-disable-next-line no-console
           console.error(`[OAuth] ${errorMessage}`);
           throw new Error(errorMessage);
         }
@@ -141,7 +138,6 @@ class OAuthInterceptor {
       // No fallback available, rethrow original error
       const errorMessage = formatTokenError('OAuth token request failed', error);
 
-      // eslint-disable-next-line no-console
       console.error(`[OAuth] ${errorMessage}`);
       throw new Error(errorMessage);
     }
@@ -236,7 +232,6 @@ class OAuthInterceptor {
           this.logDebug(`Request to ${config.url} with OAuth token`);
           return config;
         } catch (error: unknown) {
-          // eslint-disable-next-line no-console
           console.error(
             '[OAuth] Failed to obtain access token, request may fail:',
             error instanceof Error ? error.message : String(error),

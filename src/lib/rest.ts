@@ -88,7 +88,6 @@ class RestClient {
         });
         oauthInterceptor.attach(this.axiosInstance);
       } catch (error: unknown) {
-        // eslint-disable-next-line no-console
         console.error(
           '[RestClient] Failed to initialize OAuth interceptor:',
           error instanceof Error ? error.message : String(error),
@@ -184,7 +183,6 @@ method: ${method}`,
     const retryOption = this.restClientConfig?.retry;
     const onRetry: IAxiosRetryConfig['onRetry'] = (retryCount, error, requestConfig) => {
       if (this.restClientConfig?.debug) {
-        // eslint-disable-next-line no-console
         console.log(
           `[retry #${retryCount}] ${requestConfig.method?.toUpperCase()} ${requestConfig.url} -> ${
             error.code || error.message

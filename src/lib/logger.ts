@@ -8,7 +8,6 @@ export const addLogger = (axiosInstance: AxiosInstance): void => {
     // eslint-disable-next-line no-param-reassign
     config.startTime = startDate.valueOf();
 
-    // eslint-disable-next-line no-console
     console.log(`Request method=${config.method} url=${config.url} [${startDate.toISOString()}]`);
 
     return config;
@@ -19,7 +18,6 @@ export const addLogger = (axiosInstance: AxiosInstance): void => {
       const date = new Date();
       const { status, config } = response;
 
-      // eslint-disable-next-line no-console
       console.log(
         `Response status=${status} url=${config.url} time=${
           date.valueOf() - ((config as TimedRequestConfig).startTime ?? 0)
@@ -34,7 +32,6 @@ export const addLogger = (axiosInstance: AxiosInstance): void => {
       const { response, config } = error;
       const status = response ? response.status : null;
 
-      // eslint-disable-next-line no-console
       console.log(
         `Response ${status ? `status=${status}` : `message='${error.message}'`} url=${
           config?.url

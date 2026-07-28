@@ -32,6 +32,34 @@
   ],
   "main": "./lib/report-portal-client",
   "types": "./lib/report-portal-client.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/report-portal-client.d.ts",
+      "import": "./lib/report-portal-client.js",
+      "require": "./lib/report-portal-client.js"
+    },
+    "./constants": {
+      "types": "./constants.d.ts",
+      "import": "./constants.js",
+      "require": "./constants.js"
+    },
+    "./models": {
+      "types": "./models.d.ts",
+      "import": "./models.js",
+      "require": "./models.js"
+    },
+    "./helpers": {
+      "types": "./helpers.d.ts",
+      "import": "./helpers.js",
+      "require": "./helpers.js"
+    },
+    "./publicReportingAPI": {
+      "types": "./lib/publicReportingAPI.d.ts",
+      "import": "./lib/publicReportingAPI.js",
+      "require": "./lib/publicReportingAPI.js"
+    },
+    "./package.json": "./package.json"
+  },
   "engines": {
     "node": ">=14.17.0"
   },

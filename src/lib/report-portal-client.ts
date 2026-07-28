@@ -1,14 +1,12 @@
-/* eslint-disable no-console, class-methods-use-this */
 import { randomUUID } from 'crypto';
 import { URLSearchParams } from 'url';
 import * as helpers from './helpers';
-import type { SystemAttribute } from './helpers';
 import RestClient from './rest';
 import { getClientConfig } from './commons/config';
 import Statistics from '../statistics/statistics';
 import { EVENT_NAME } from '../statistics/constants';
 import { STATUSES } from './constants/statuses';
-import type { AgentParams, Attribute, Attachment, ClientResponse } from './models/common';
+import type { AgentParams, Attachment, ClientResponse } from './models/common';
 import type { NormalizedClientConfig, ReportPortalConfig } from './models/config';
 import type {
   FinishLaunchOptions,
@@ -73,7 +71,7 @@ class RPClient {
 
   private launchUuid: string;
 
-  private itemRetriesChainMap: Map<string, Promise<any>>;
+  private itemRetriesChainMap: Map<string, Promise<unknown>>;
 
   private itemRetriesChainKeyMapByTempId: Map<string, string>;
 
@@ -157,8 +155,8 @@ class RPClient {
   }
 
   getNewItemObj(startPromiseFunc: PromiseExecutor): ItemObj {
-    let resolveFinish!: (value?: any) => void;
-    let rejectFinish!: (reason?: any) => void;
+    let resolveFinish!: (value?: unknown) => void;
+    let rejectFinish!: (reason?: unknown) => void;
     const obj: ItemObj = {
       promiseStart: new Promise(startPromiseFunc),
       realId: '',
@@ -180,7 +178,7 @@ class RPClient {
     });
   }
 
-  checkConnect(): Promise<any> {
+  checkConnect(): Promise<unknown> {
     const url = [this.config.endpoint.replace('/v2', '/v1'), this.config.project, 'launch']
       .join('/')
       .concat('?page.page=1&page.size=1');
@@ -224,7 +222,7 @@ class RPClient {
       this.map[tempId].realId = launchDataRQ.id;
       this.launchUuid = launchDataRQ.id;
     } else {
-      const systemAttr = helpers.getSystemAttribute();
+      const systemAttr = helpers.getSystemAttributes();
       if (this.config.skippedIsNotIssue === true) {
         const skippedIsNotIssueAttribute = {
           key: 'skippedIssue',
@@ -234,7 +232,7 @@ class RPClient {
         systemAttr.push(skippedIsNotIssueAttribute);
       }
       const attributes = Array.isArray(launchDataRQ.attributes)
-        ? (launchDataRQ.attributes as any[]).concat(systemAttr)
+        ? launchDataRQ.attributes.concat(systemAttr)
         : systemAttr;
       const launchData = {
         name: this.config.launch || 'Test launch name',
@@ -368,7 +366,7 @@ class RPClient {
         .retrieveSyncAPI<LaunchSearchResponse>(launchSearchUrl)
         .then(
           (response) => {
-            const launchIds = response.content.map((launch: any) => launch.id);
+            const launchIds = response.content.map((launch) => launch.id);
             this.logDebug(`Found launches: ${launchIds}`, response.content);
             return launchIds;
           },
@@ -405,7 +403,7 @@ class RPClient {
    * This method is used for frameworks as Jasmine. There is problem when
    * it doesn't wait for promise resolve and stop the process.
    */
-  getPromiseFinishAllItems(launchTempId: string): Promise<any[]> {
+  getPromiseFinishAllItems(launchTempId: string): Promise<unknown[]> {
     const launchObj = this.map[launchTempId];
     return Promise.all(launchObj.children.map((itemId) => this.map[itemId].promiseFinish));
   }
@@ -421,8 +419,8 @@ class RPClient {
         new Error(`Launch with tempId "${launchTempId}" not found`),
       );
     }
-    let resolvePromise!: (value?: any) => void;
-    let rejectPromise!: (reason?: any) => void;
+    let resolvePromise!: (value?: unknown) => void;
+    let rejectPromise!: (reason?: unknown) => void;
     const promise = new Promise((resolve, reject) => {
       resolvePromise = resolve;
       rejectPromise = reject;
@@ -481,7 +479,7 @@ class RPClient {
     const testCaseId =
       testItemDataRQ.testCaseId ||
       helpers.generateTestCaseId(testItemDataRQ.codeRef, testItemDataRQ.parameters);
-    const testItemData: Record<string, any> = {
+    const testItemData: Record<string, unknown> = {
       startTime: this.helpers.now(),
       ...testItemDataRQ,
       ...(testCaseId && { testCaseId }),
@@ -518,8 +516,9 @@ class RPClient {
             const realParentId = this.map[parentTempId].realId;
             url += `${realParentId}`;
           }
-          if (executionItemPromise && prevResponse?.id) {
-            testItemData.retry_of = prevResponse.id;
+          const prevId = (prevResponse as StartTestItemResponse | undefined)?.id;
+          if (executionItemPromise && prevId) {
+            testItemData.retry_of = prevId;
           }
           testItemData.launchUuid = realLaunchId;
           this.logDebug(`Start test item with tempId ${tempId}`, testItemData);
@@ -563,7 +562,7 @@ class RPClient {
       );
     }
 
-    const finishTestItemData: Record<string, any> = {
+    const finishTestItemData: Record<string, unknown> = {
       endTime: this.helpers.now(),
       ...(itemObj.children.length ? {} : { status: STATUSES.PASSED }),
       ...finishTestItemRQ,
@@ -713,7 +712,7 @@ class RPClient {
     return this.saveLog(itemObj, requestPromise);
   }
 
-  getRequestLogWithFile(saveLogRQ: LogOptions, fileObj: Attachment): Promise<any> {
+  getRequestLogWithFile(saveLogRQ: LogOptions, fileObj: Attachment): Promise<unknown> {
     const url = 'log';
     // eslint-disable-next-line no-param-reassign
     saveLogRQ.file = { name: fileObj.name } as Attachment;
@@ -775,7 +774,7 @@ class RPClient {
   finishTestItemPromiseStart(
     itemObj: ItemObj,
     itemTempId: string,
-    finishTestItemData: Record<string, any>,
+    finishTestItemData: Record<string, unknown>,
   ): void {
     itemObj.promiseStart.then(
       () => {

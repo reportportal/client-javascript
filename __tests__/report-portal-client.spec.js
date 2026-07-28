@@ -338,7 +338,7 @@ describe('ReportPortal javascript client', () => {
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
       jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
-      jest.spyOn(helpers, 'getSystemAttribute').mockReturnValue(fakeSystemAttr);
+      jest.spyOn(helpers, 'getSystemAttributes').mockReturnValue(fakeSystemAttr);
 
       client.startLaunch({
         startTime: time,
@@ -367,7 +367,7 @@ describe('ReportPortal javascript client', () => {
       const myPromise = Promise.resolve({ id: 'testidlaunch' });
       const time = 12345734;
       jest.spyOn(client.restClient, 'create').mockReturnValue(myPromise);
-      jest.spyOn(helpers, 'getSystemAttribute').mockReturnValue(fakeSystemAttr);
+      jest.spyOn(helpers, 'getSystemAttributes').mockReturnValue(fakeSystemAttr);
 
       client.startLaunch({
         startTime: time,

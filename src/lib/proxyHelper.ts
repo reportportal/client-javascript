@@ -77,24 +77,19 @@ export function getProxyConfig(
   const noProxy = noProxyFromConfig || noProxyFromEnv;
 
   if (proxyConfig.debug) {
-    // eslint-disable-next-line no-console
-    console.log('[ProxyHelper] getProxyConfig called:');
-    // eslint-disable-next-line no-console
-    console.log('  URL:', url);
-    // eslint-disable-next-line no-console
-    console.log('  Hostname:', urlObj.hostname);
-    // eslint-disable-next-line no-console
-    console.log('  noProxy from config:', noProxyFromConfig);
-    // eslint-disable-next-line no-console
-    console.log('  noProxy from env:', noProxyFromEnv);
-    // eslint-disable-next-line no-console
-    console.log('  Final noProxy:', noProxy);
+    console.log(
+      `[ProxyHelper] getProxyConfig called:\n` +
+        `  URL: ${url}\n` +
+        `  Hostname: ${urlObj.hostname}\n` +
+        `  noProxy from config: ${noProxyFromConfig}\n` +
+        `  noProxy from env: ${noProxyFromEnv}\n` +
+        `  Final noProxy: ${noProxy}`,
+    );
   }
 
   const shouldBypass = shouldBypassProxy(url, noProxy);
   if (proxyConfig.debug) {
-    // eslint-disable-next-line no-console
-    console.log('  Should bypass proxy:', shouldBypass);
+    console.log(`  Should bypass proxy: ${shouldBypass}`);
   }
 
   if (shouldBypass) {
@@ -157,10 +152,10 @@ export function createProxyAgents(
 
   if (!proxyConfig) {
     if (restClientConfig.debug) {
-      // eslint-disable-next-line no-console
-      console.log('[ProxyHelper] No proxy for URL (bypassed or not configured):', url);
-      // eslint-disable-next-line no-console
-      console.log('  Using default agent to prevent axios from using env proxy');
+      console.log(
+        `[ProxyHelper] No proxy for URL (bypassed or not configured): ${url}\n` +
+          `  Using default agent to prevent axios from using env proxy`,
+      );
     }
 
     const cacheKey = getAgentCacheKey('no-proxy', isHttps);
@@ -182,19 +177,17 @@ export function createProxyAgents(
   const cached = agentCache.get(cacheKey);
   if (cached) {
     if (restClientConfig.debug) {
-      // eslint-disable-next-line no-console
       console.log('[ProxyHelper] Reusing cached proxy agent:', sanitizeUrlForLogging(proxyUrl));
     }
     return cached;
   }
 
   if (restClientConfig.debug) {
-    // eslint-disable-next-line no-console
-    console.log('[ProxyHelper] Creating proxy agent:');
-    // eslint-disable-next-line no-console
-    console.log('  URL:', url);
-    // eslint-disable-next-line no-console
-    console.log('  Proxy URL:', sanitizeUrlForLogging(proxyUrl));
+    console.log(
+      `[ProxyHelper] Creating proxy agent:\n` +
+        `  URL: ${url}\n` +
+        `  Proxy URL: ${sanitizeUrlForLogging(proxyUrl)}`,
+    );
   }
 
   const agents: ProxyAgents = isHttps

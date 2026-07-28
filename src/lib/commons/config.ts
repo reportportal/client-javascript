@@ -33,7 +33,6 @@ export const getApiKey = ({
     if (!calculatedApiKey) {
       throw new ReportPortalRequiredOptionError('apiKey');
     } else {
-      // eslint-disable-next-line no-console
       console.warn(`Option 'token' is deprecated. Use 'apiKey' instead.`);
     }
   }
@@ -139,7 +138,6 @@ export const getClientConfig = (options: ReportPortalConfig): NormalizedClientCo
     };
   } catch (error) {
     // don't throw the error up to not break the entire process
-    // eslint-disable-next-line no-console
     console.dir(error);
   }
 

@@ -4,15 +4,10 @@ import os from 'os';
 import RestClient from './rest';
 import { PJSON_NAME, PJSON_VERSION } from './pjson';
 import { TestItemParameter } from './models/requests';
+import { Attribute } from './models/common';
 
 const MIN = 3;
 const MAX = 256;
-
-export interface SystemAttribute {
-  key: string;
-  value: string | number;
-  system: boolean;
-}
 
 const getUUIDFromFileName = (filename: string): string => {
   const match = filename.match(/rplaunch-(.*)\.tmp/);
@@ -55,12 +50,12 @@ export const saveLaunchIdToFile = (launchId: string): void => {
   });
 };
 
-export const getSystemAttribute = (): SystemAttribute[] => {
+export const getSystemAttributes = (): Attribute[] => {
   const osType = os.type();
   const osArchitecture = os.arch();
   const RAMSize = os.totalmem();
   const nodeVersion = process.version;
-  const systemAttr: SystemAttribute[] = [
+  const systemAttr: Attribute[] = [
     {
       key: 'client',
       value: `${PJSON_NAME}|${PJSON_VERSION}`,
@@ -73,7 +68,7 @@ export const getSystemAttribute = (): SystemAttribute[] => {
     },
     {
       key: 'RAMSize',
-      value: RAMSize,
+      value: `${RAMSize}`,
       system: true,
     },
     {
@@ -123,7 +118,7 @@ export default {
   getServerResult,
   readLaunchesFromFile,
   saveLaunchIdToFile,
-  getSystemAttribute,
+  getSystemAttributes,
   generateTestCaseId,
   saveLaunchUuidToFile,
 };

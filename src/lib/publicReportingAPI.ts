@@ -13,22 +13,22 @@ class PublicReportingAPI {
   /**
    * Emit set description event.
    */
-  static setDescription(text: string, suite?: string): void {
-    emit(EVENTS.SET_DESCRIPTION, { text, suite });
+  static setDescription(text: string, suiteName?: string): void {
+    emit(EVENTS.SET_DESCRIPTION, { text, suite: suiteName });
   }
 
   /**
    * Emit add attributes event.
    */
-  static addAttributes(attributes: Attribute[], suite?: string): void {
-    emit(EVENTS.ADD_ATTRIBUTES, { attributes, suite });
+  static addAttributes(attributes: Attribute[], suiteName?: string): void {
+    emit(EVENTS.ADD_ATTRIBUTES, { attributes, suite: suiteName });
   }
 
   /**
    * Emit send log to test item event.
    */
-  static addLog(log: LogOptions, suite?: string): void {
-    emit(EVENTS.ADD_LOG, { log, suite });
+  static addLog(log: LogOptions, suiteName?: string): void {
+    emit(EVENTS.ADD_LOG, { log, suite: suiteName });
   }
 
   /**
@@ -41,8 +41,8 @@ class PublicReportingAPI {
   /**
    * Emit set testCaseId event.
    */
-  static setTestCaseId(testCaseId: string, suite?: string): void {
-    emit(EVENTS.SET_TEST_CASE_ID, { testCaseId, suite });
+  static setTestCaseId(testCaseId: string, suiteName?: string): void {
+    emit(EVENTS.SET_TEST_CASE_ID, { testCaseId, suite: suiteName });
   }
 
   /**
@@ -55,8 +55,8 @@ class PublicReportingAPI {
   /**
    * Emit set status event.
    */
-  static setStatus(status: string, suite?: string): void {
-    emit(EVENTS.SET_STATUS, { status, suite });
+  static setStatus(status: string, suiteName?: string): void {
+    emit(EVENTS.SET_STATUS, { status, suite: suiteName });
   }
 }
 
