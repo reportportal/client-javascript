@@ -11,10 +11,12 @@ import type { NormalizedClientConfig, ReportPortalConfig } from './models/config
 import type {
   FinishLaunchOptions,
   FinishTestItemOptions,
+  FinishTestItemRQ,
   LogOptions,
   MergeLaunchesOptions,
   StartLaunchOptions,
   StartTestItemOptions,
+  StartTestItemRQ,
   UpdateLaunchOptions,
 } from './models/requests';
 import type {
@@ -479,7 +481,7 @@ class RPClient {
     const testCaseId =
       testItemDataRQ.testCaseId ||
       helpers.generateTestCaseId(testItemDataRQ.codeRef, testItemDataRQ.parameters);
-    const testItemData: Record<string, unknown> = {
+    const testItemData: StartTestItemRQ = {
       startTime: this.helpers.now(),
       ...testItemDataRQ,
       ...(testCaseId && { testCaseId }),
@@ -562,7 +564,7 @@ class RPClient {
       );
     }
 
-    const finishTestItemData: Record<string, unknown> = {
+    const finishTestItemData: FinishTestItemRQ = {
       endTime: this.helpers.now(),
       ...(itemObj.children.length ? {} : { status: STATUSES.PASSED }),
       ...finishTestItemRQ,
@@ -774,7 +776,7 @@ class RPClient {
   finishTestItemPromiseStart(
     itemObj: ItemObj,
     itemTempId: string,
-    finishTestItemData: Record<string, unknown>,
+    finishTestItemData: FinishTestItemRQ,
   ): void {
     itemObj.promiseStart.then(
       () => {

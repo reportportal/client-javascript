@@ -1,7 +1,7 @@
 import type { Attribute } from './common';
 import type { LogOptions } from './requests';
 
-export interface PublicReportingAPIInterface {
+export interface ReportingApiInterface {
   setDescription(text: string, suiteName?: string): void;
   addAttributes(attributes: Attribute[], suiteName?: string): void;
   addLog(log: LogOptions, suiteName?: string): void;

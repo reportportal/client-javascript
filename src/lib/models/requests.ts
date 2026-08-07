@@ -49,6 +49,18 @@ export interface StartTestItemOptions {
   uniqueId?: string;
 }
 
+/**
+ * The actual start test item payload sent to the server.
+ * The client fills in the values omitted by the caller (startTime, launchUuid, retry_of).
+ */
+export interface StartTestItemRQ extends StartTestItemOptions {
+  startTime: string | number;
+  /**
+   * Set by the client right before the request, once the launch id is known.
+   */
+  launchUuid?: string;
+}
+
 export interface FinishTestItemOptions {
   endTime?: string | number;
   status?: STATUSES;
@@ -56,6 +68,14 @@ export interface FinishTestItemOptions {
   attributes?: Attribute[];
   description?: string;
   testCaseId?: string;
+}
+
+export interface FinishTestItemRQ extends FinishTestItemOptions {
+  endTime: string | number;
+  /**
+   * Set by the client right before the request, once the launch id is known.
+   */
+  launchUuid?: string;
 }
 
 export interface LogOptions {

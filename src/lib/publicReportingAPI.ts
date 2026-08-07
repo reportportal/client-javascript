@@ -1,5 +1,6 @@
 import { EVENTS } from './constants/events';
 import type { Attribute } from './models/common';
+import type { ReportingApiInterface } from './models/reporting';
 import type { LogOptions } from './models/requests';
 
 function emit(event: string, ...args: unknown[]): boolean {
@@ -60,4 +61,7 @@ class PublicReportingAPI {
   }
 }
 
-export = PublicReportingAPI;
+// checks static methods
+const publicReportingAPI = PublicReportingAPI satisfies ReportingApiInterface;
+
+export = publicReportingAPI;
