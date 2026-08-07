@@ -6,6 +6,24 @@ const OAuthInterceptor = require('../src/lib/oauth');
 const logger = require('../src/lib/logger');
 
 describe('RestClient', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    process.env = { ...originalEnv };
+    delete process.env.HTTP_PROXY;
+    delete process.env.HTTPS_PROXY;
+    delete process.env.NO_PROXY;
+    delete process.env.ALL_PROXY;
+    delete process.env.http_proxy;
+    delete process.env.https_proxy;
+    delete process.env.no_proxy;
+    delete process.env.all_proxy;
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
+  });
+
   const options = {
     baseURL: 'http://report-portal-host:8080/api/v1',
     headers: {
