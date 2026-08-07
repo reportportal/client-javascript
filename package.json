@@ -6,7 +6,7 @@
   "scripts": {
     "codegraph": "bash scripts/codegraph.sh",
     "build": "npm run clean && tsc",
-    "clean": "rimraf ./lib ./statistics ./helpers.js ./helpers.d.ts ./helpers.js.map ./models.js ./models.d.ts ./models.js.map ./constants.js ./constants.d.ts ./constants.js.map",
+    "clean": "rimraf ./build",
     "lint": "eslint \"src/**/*.ts\"",
     "format": "npm run lint -- --fix",
     "test": "jest",
@@ -14,49 +14,39 @@
     "prepublishOnly": "npm run build"
   },
   "directories": {
-    "lib": "./lib"
+    "lib": "./build/lib"
   },
   "files": [
-    "/lib",
-    "/statistics",
-    "/helpers.js",
-    "/helpers.d.ts",
-    "/helpers.js.map",
-    "/models.js",
-    "/models.d.ts",
-    "/models.js.map",
-    "/constants.js",
-    "/constants.d.ts",
-    "/constants.js.map",
+    "/build",
     "/VERSION"
   ],
-  "main": "./lib/report-portal-client",
-  "types": "./lib/report-portal-client.d.ts",
+  "main": "./build/lib/report-portal-client",
+  "types": "./build/lib/report-portal-client.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/report-portal-client.d.ts",
-      "import": "./lib/report-portal-client.js",
-      "require": "./lib/report-portal-client.js"
+      "types": "./build/lib/report-portal-client.d.ts",
+      "import": "./build/lib/report-portal-client.js",
+      "require": "./build/lib/report-portal-client.js"
     },
     "./constants": {
-      "types": "./constants.d.ts",
-      "import": "./constants.js",
-      "require": "./constants.js"
+      "types": "./build/constants.d.ts",
+      "import": "./build/constants.js",
+      "require": "./build/constants.js"
     },
     "./models": {
-      "types": "./models.d.ts",
-      "import": "./models.js",
-      "require": "./models.js"
+      "types": "./build/models.d.ts",
+      "import": "./build/models.js",
+      "require": "./build/models.js"
     },
     "./helpers": {
-      "types": "./helpers.d.ts",
-      "import": "./helpers.js",
-      "require": "./helpers.js"
+      "types": "./build/helpers.d.ts",
+      "import": "./build/helpers.js",
+      "require": "./build/helpers.js"
     },
     "./publicReportingAPI": {
-      "types": "./lib/publicReportingAPI.d.ts",
-      "import": "./lib/publicReportingAPI.js",
-      "require": "./lib/publicReportingAPI.js"
+      "types": "./build/lib/publicReportingAPI.d.ts",
+      "import": "./build/lib/publicReportingAPI.js",
+      "require": "./build/lib/publicReportingAPI.js"
     },
     "./package.json": "./package.json"
   },

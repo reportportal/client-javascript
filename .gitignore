@@ -6,14 +6,3 @@ coverage.lcov
 coverage/
 .npmrc
 build
-/lib
-/statistics
-/helpers.js
-/helpers.d.ts
-/helpers.js.map
-/models.js
-/models.d.ts
-/models.js.map
-/constants.js
-/constants.d.ts
-/constants.js.map
