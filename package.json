@@ -48,7 +48,27 @@
       "import": "./build/lib/publicReportingAPI.js",
       "require": "./build/lib/publicReportingAPI.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./lib/constants": {
+      "types": "./build/lib/constants/index.d.ts",
+      "import": "./build/lib/constants/index.js",
+      "require": "./build/lib/constants/index.js"
+    },
+    "./lib/models": {
+      "types": "./build/lib/models/index.d.ts",
+      "import": "./build/lib/models/index.js",
+      "require": "./build/lib/models/index.js"
+    },
+    "./lib/*": {
+      "types": "./build/lib/*.d.ts",
+      "import": "./build/lib/*.js",
+      "require": "./build/lib/*.js"
+    },
+    "./lib/*.js": {
+      "types": "./build/lib/*.d.ts",
+      "import": "./build/lib/*.js",
+      "require": "./build/lib/*.js"
+    }
   },
   "engines": {
     "node": ">=14.17.0"
