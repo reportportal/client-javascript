@@ -29,19 +29,19 @@
       "require": "./build/lib/report-portal-client.js"
     },
     "./constants": {
-      "types": "./build/constants.d.ts",
-      "import": "./build/constants.js",
-      "require": "./build/constants.js"
+      "types": "./build/lib/constants/index.d.ts",
+      "import": "./build/lib/constants/index.js",
+      "require": "./build/lib/constants/index.js"
     },
     "./models": {
-      "types": "./build/models.d.ts",
-      "import": "./build/models.js",
-      "require": "./build/models.js"
+      "types": "./build/lib/models/index.d.ts",
+      "import": "./build/lib/models/index.js",
+      "require": "./build/lib/models/index.js"
     },
     "./helpers": {
-      "types": "./build/helpers.d.ts",
-      "import": "./build/helpers.js",
-      "require": "./build/helpers.js"
+      "types": "./build/lib/helpers.d.ts",
+      "import": "./build/lib/helpers.js",
+      "require": "./build/lib/helpers.js"
     },
     "./publicReportingAPI": {
       "types": "./build/lib/publicReportingAPI.d.ts",
