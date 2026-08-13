@@ -1,10 +1,29 @@
 const nock = require('nock');
 const isEqual = require('lodash/isEqual');
 const http = require('http');
-const RestClient = require('../lib/rest');
-const logger = require('../lib/logger');
+const RestClient = require('../src/lib/rest');
+const OAuthInterceptor = require('../src/lib/oauth');
+const logger = require('../src/lib/logger');
 
 describe('RestClient', () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    process.env = { ...originalEnv };
+    delete process.env.HTTP_PROXY;
+    delete process.env.HTTPS_PROXY;
+    delete process.env.NO_PROXY;
+    delete process.env.ALL_PROXY;
+    delete process.env.http_proxy;
+    delete process.env.https_proxy;
+    delete process.env.no_proxy;
+    delete process.env.all_proxy;
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
+  });
+
   const options = {
     baseURL: 'http://report-portal-host:8080/api/v1',
     headers: {
@@ -59,6 +78,23 @@ describe('RestClient', () => {
       const client = new RestClient(optionsWithLoggerEnabled);
 
       expect(spyLogger).toHaveBeenCalledWith(client.axiosInstance);
+    });
+
+    it('attaches an OAuth interceptor to the axios instance when oauthConfig is provided', () => {
+      const attachSpy = jest.spyOn(OAuthInterceptor.prototype, 'attach');
+      const client = new RestClient({
+        ...options,
+        oauthConfig: {
+          tokenEndpoint: 'https://auth.example.com/oauth/token',
+          username: 'user',
+          password: 'password',
+          clientId: 'client-id',
+        },
+      });
+
+      expect(attachSpy).toHaveBeenCalledWith(client.axiosInstance);
+
+      attachSpy.mockRestore();
     });
   });
 

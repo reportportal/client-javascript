@@ -7,22 +7,69 @@
     "codegraph": "bash scripts/codegraph.sh",
     "build": "npm run clean && tsc",
     "clean": "rimraf ./build",
-    "lint": "eslint ./statistics/**/* ./lib/**/*",
+    "lint": "eslint \"src/**/*.ts\"",
     "format": "npm run lint -- --fix",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "prepublishOnly": "npm run build"
   },
   "directories": {
-    "lib": "./lib"
+    "lib": "./build/lib"
   },
   "files": [
-    "/lib",
-    "/statistics",
-    "/VERSION",
-    "index.d.ts"
+    "/build",
+    "/VERSION"
   ],
-  "main": "./lib/report-portal-client",
-  "types": "./index.d.ts",
+  "main": "./build/lib/report-portal-client",
+  "types": "./build/lib/report-portal-client.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/lib/report-portal-client.d.ts",
+      "import": "./build/lib/report-portal-client.js",
+      "require": "./build/lib/report-portal-client.js"
+    },
+    "./constants": {
+      "types": "./build/lib/constants/index.d.ts",
+      "import": "./build/lib/constants/index.js",
+      "require": "./build/lib/constants/index.js"
+    },
+    "./models": {
+      "types": "./build/lib/models/index.d.ts",
+      "import": "./build/lib/models/index.js",
+      "require": "./build/lib/models/index.js"
+    },
+    "./helpers": {
+      "types": "./build/lib/helpers.d.ts",
+      "import": "./build/lib/helpers.js",
+      "require": "./build/lib/helpers.js"
+    },
+    "./publicReportingAPI": {
+      "types": "./build/lib/publicReportingAPI.d.ts",
+      "import": "./build/lib/publicReportingAPI.js",
+      "require": "./build/lib/publicReportingAPI.js"
+    },
+    "./package.json": "./package.json",
+    "./lib/constants": {
+      "types": "./build/lib/constants/index.d.ts",
+      "import": "./build/lib/constants/index.js",
+      "require": "./build/lib/constants/index.js"
+    },
+    "./lib/models": {
+      "types": "./build/lib/models/index.d.ts",
+      "import": "./build/lib/models/index.js",
+      "require": "./build/lib/models/index.js"
+    },
+    "./lib/*": {
+      "types": "./build/lib/*.d.ts",
+      "import": "./build/lib/*.js",
+      "require": "./build/lib/*.js"
+    },
+    "./lib/*.js": {
+      "types": "./build/lib/*.d.ts",
+      "import": "./build/lib/*.js",
+      "require": "./build/lib/*.js"
+    }
+  },
   "engines": {
     "node": ">=14.17.0"
   },

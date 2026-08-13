@@ -1,25 +1,26 @@
-const fs = require('fs');
-const util = require('util');
-const ini = require('ini');
-const { randomUUID } = require('crypto');
-const { ENCODING, CLIENT_ID_KEY, RP_FOLDER_PATH, RP_PROPERTIES_FILE_PATH } = require('./constants');
+import fs from 'fs';
+import util from 'util';
+import * as ini from 'ini';
+import { randomUUID } from 'crypto';
+import { ENCODING, CLIENT_ID_KEY, RP_FOLDER_PATH, RP_PROPERTIES_FILE_PATH } from './constants';
 
 const exists = util.promisify(fs.exists);
 const readFile = util.promisify(fs.readFile);
 const mkdir = util.promisify(fs.mkdir);
 const writeFile = util.promisify(fs.writeFile);
 
-async function readClientId() {
+async function readClientId(): Promise<string | null> {
   if (await exists(RP_PROPERTIES_FILE_PATH)) {
     const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
     const properties = ini.parse(propertiesContent);
-    return properties[CLIENT_ID_KEY];
+    const value = properties[CLIENT_ID_KEY];
+    return typeof value === 'string' ? value : null;
   }
   return null;
 }
 
-async function storeClientId(clientId) {
-  const properties = {};
+async function storeClientId(clientId: string): Promise<void> {
+  const properties: Record<string, string> = {};
   if (await exists(RP_PROPERTIES_FILE_PATH)) {
     const propertiesContent = await readFile(RP_PROPERTIES_FILE_PATH, ENCODING);
     Object.assign(properties, ini.parse(propertiesContent));
@@ -30,7 +31,7 @@ async function storeClientId(clientId) {
   await writeFile(RP_PROPERTIES_FILE_PATH, propertiesContent, ENCODING);
 }
 
-async function getClientId() {
+export async function getClientId(): Promise<string> {
   let clientId = await readClientId();
   if (!clientId) {
     clientId = randomUUID();
@@ -42,5 +43,3 @@ async function getClientId() {
   }
   return clientId;
 }
-
-module.exports = { getClientId };

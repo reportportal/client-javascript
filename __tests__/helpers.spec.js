@@ -1,7 +1,7 @@
 const os = require('os');
 const fs = require('fs');
 const glob = require('glob');
-const helpers = require('../lib/helpers');
+const helpers = require('../src/lib/helpers');
 const pjson = require('../package.json');
 
 describe('Helpers', () => {
@@ -46,7 +46,7 @@ describe('Helpers', () => {
     });
   });
 
-  describe('getSystemAttribute', () => {
+  describe('getSystemAttributes', () => {
     it('should return correct system attributes', () => {
       jest.spyOn(os, 'type').mockReturnValue('osType');
       jest.spyOn(os, 'arch').mockReturnValue('osArchitecture');
@@ -75,7 +75,7 @@ describe('Helpers', () => {
         },
       ];
 
-      const attr = helpers.getSystemAttribute();
+      const attr = helpers.getSystemAttributes();
 
       expect(attr).toEqual(expectedAttr);
     });

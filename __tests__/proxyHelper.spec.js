@@ -5,7 +5,7 @@ const {
   getProxyConfig,
   createProxyAgents,
   getProxyAgentForUrl,
-} = require('../lib/proxyHelper');
+} = require('../src/lib/proxyHelper');
 
 describe('proxyHelper', () => {
   const originalEnv = process.env;
@@ -16,9 +16,11 @@ describe('proxyHelper', () => {
     delete process.env.HTTP_PROXY;
     delete process.env.HTTPS_PROXY;
     delete process.env.NO_PROXY;
+    delete process.env.ALL_PROXY;
     delete process.env.http_proxy;
     delete process.env.https_proxy;
     delete process.env.no_proxy;
+    delete process.env.all_proxy;
   });
 
   afterAll(() => {

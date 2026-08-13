@@ -1,35 +1,86 @@
-/* eslint-disable quotes,no-console,class-methods-use-this */
-const { randomUUID } = require('crypto');
-const { URLSearchParams } = require('url');
-const helpers = require('./helpers');
-const RestClient = require('./rest');
-const { getClientConfig } = require('./commons/config');
-const Statistics = require('../statistics/statistics');
-const { EVENT_NAME } = require('../statistics/constants');
-const { RP_STATUSES } = require('./constants/statuses');
+import { randomUUID } from 'crypto';
+import { URLSearchParams } from 'url';
+import * as helpers from './helpers';
+import RestClient from './rest';
+import { getClientConfig } from './commons/config';
+import Statistics from '../statistics/statistics';
+import { EVENT_NAME } from '../statistics/constants';
+import { STATUSES } from './constants/statuses';
+import type { AgentParams, Attachment, ClientResponse } from './models/common';
+import type { NormalizedClientConfig, ReportPortalConfig } from './models/config';
+import type {
+  FinishLaunchOptions,
+  FinishTestItemOptions,
+  FinishTestItemRQ,
+  LogOptions,
+  MergeLaunchesOptions,
+  StartLaunchOptions,
+  StartTestItemOptions,
+  StartTestItemRQ,
+  UpdateLaunchOptions,
+} from './models/requests';
+import type {
+  FinishLaunchResponse,
+  LaunchSearchResponse,
+  MergeLaunchesResponse,
+  ServerInfoResponse,
+  StartLaunchResponse,
+  StartTestItemResponse,
+} from './models/responses';
 
 const MULTIPART_BOUNDARY = Math.floor(Math.random() * 10000000000).toString();
 
+type PromiseExecutor = (
+  resolve: (value?: unknown) => void,
+  reject: (reason?: unknown) => void,
+) => void;
+
+interface ItemObj {
+  promiseStart: Promise<unknown>;
+  realId: string;
+  children: string[];
+  finishSend: boolean;
+  promiseFinish: Promise<unknown>;
+  resolveFinish: (value?: unknown) => void;
+  rejectFinish: (reason?: unknown) => void;
+}
+
+type RequestPromiseFunc = (itemUuid: string, launchUuid: string) => Promise<unknown>;
+
 class RPClient {
+  private config: NormalizedClientConfig;
+
+  private debug?: boolean;
+
+  private isLaunchMergeRequired: boolean;
+
+  private apiKey: string | null;
+
+  // deprecated
+  private token: string | null;
+
+  private map: Record<string, ItemObj>;
+
+  private baseURL: string;
+
+  private headers: Record<string, string>;
+
+  public helpers: typeof helpers;
+
+  private restClient: RestClient;
+
+  private statistics: Statistics;
+
+  private launchUuid: string;
+
+  private itemRetriesChainMap: Map<string, Promise<unknown>>;
+
+  private itemRetriesChainKeyMapByTempId: Map<string, string>;
+
   /**
    * Create a client for RP.
-   * @param {Object} options - config object.
-   * options should look like this
-   * {
-   *      apiKey: "reportportalApiKey",
-   *      endpoint: "http://localhost:8080/api/v1",
-   *      launch: "YOUR LAUNCH NAME",
-   *      project: "PROJECT NAME",
-   * }
-   *
-   * @param {Object} agentParams - agent's info object.
-   * agentParams should look like this
-   * {
-   *     name: "AGENT NAME",
-   *     version: "AGENT VERSION",
-   * }
    */
-  constructor(options, agentParams) {
+  constructor(options: ReportPortalConfig, agentParams?: AgentParams) {
     this.config = getClientConfig(options);
     this.debug = this.config.debug;
     this.isLaunchMergeRequired = this.config.isLaunchMergeRequired;
@@ -40,7 +91,7 @@ class RPClient {
     this.map = {};
     this.baseURL = [this.config.endpoint, this.config.project].join('/');
 
-    const headers = {
+    const headers: Record<string, string> = {
       'User-Agent': 'NodeJS',
       'Content-Type': 'application/json; charset=UTF-8',
       ...(this.config.headers || {}),
@@ -67,27 +118,22 @@ class RPClient {
     this.itemRetriesChainKeyMapByTempId = new Map();
   }
 
-  // eslint-disable-next-line valid-jsdoc
-  /**
-   *
-   * @Private
-   */
-  logDebug(msg, dataMsg = '') {
+  logDebug(msg: unknown, dataMsg: unknown = ''): void {
     if (this.debug) {
       console.log(msg, dataMsg);
     }
   }
 
-  calculateItemRetriesChainMapKey(launchId, parentId, name, itemId = '') {
+  calculateItemRetriesChainMapKey(
+    launchId: string,
+    parentId: string | undefined,
+    name: string,
+    itemId = '',
+  ): string {
     return `${launchId}__${parentId}__${name}__${itemId}`;
   }
 
-  // eslint-disable-next-line valid-jsdoc
-  /**
-   *
-   * @Private
-   */
-  cleanItemRetriesChain(tempIds) {
+  cleanItemRetriesChain(tempIds: string[]): void {
     tempIds.forEach((id) => {
       const key = this.itemRetriesChainKeyMapByTempId.get(id);
 
@@ -99,21 +145,21 @@ class RPClient {
     });
   }
 
-  getUniqId() {
+  getUniqId(): string {
     return randomUUID();
   }
 
-  getRejectAnswer(tempId, error) {
+  getRejectAnswer(tempId: string, error: Error): ClientResponse {
     return {
       tempId,
       promise: Promise.reject(error),
     };
   }
 
-  getNewItemObj(startPromiseFunc) {
-    let resolveFinish;
-    let rejectFinish;
-    const obj = {
+  getNewItemObj(startPromiseFunc: PromiseExecutor): ItemObj {
+    let resolveFinish!: (value?: unknown) => void;
+    let rejectFinish!: (reason?: unknown) => void;
+    const obj: ItemObj = {
       promiseStart: new Promise(startPromiseFunc),
       realId: '',
       children: [],
@@ -122,40 +168,35 @@ class RPClient {
         resolveFinish = resolve;
         rejectFinish = reject;
       }),
+      resolveFinish,
+      rejectFinish,
     };
-    obj.resolveFinish = resolveFinish;
-    obj.rejectFinish = rejectFinish;
     return obj;
   }
 
-  // eslint-disable-next-line valid-jsdoc
-  /**
-   *
-   * @Private
-   */
-  cleanMap(ids) {
+  cleanMap(ids: string[]): void {
     ids.forEach((id) => {
       delete this.map[id];
     });
   }
 
-  checkConnect() {
+  checkConnect(): Promise<unknown> {
     const url = [this.config.endpoint.replace('/v2', '/v1'), this.config.project, 'launch']
       .join('/')
       .concat('?page.page=1&page.size=1');
     return this.restClient.request('GET', url, {});
   }
 
-  getServerInfoUrl() {
+  getServerInfoUrl(): string {
     return this.config.endpoint.replace('/v1', '/info').replace('/v2', '/info');
   }
 
-  async fetchServerInfo() {
+  async fetchServerInfo(): Promise<ServerInfoResponse> {
     const url = this.getServerInfoUrl();
-    return this.restClient.request('GET', url, {});
+    return this.restClient.request<ServerInfoResponse>('GET', url, {});
   }
 
-  async triggerStatisticsEvent() {
+  async triggerStatisticsEvent(): Promise<void> {
     if (process.env.REPORTPORTAL_CLIENT_JS_NO_ANALYTICS) {
       return;
     }
@@ -172,45 +213,9 @@ class RPClient {
   }
 
   /**
-     * Start launch and report it.
-     * @param {Object} launchDataRQ - request object.
-     * launchDataRQ should look like this
-     * {
-            "description": "string" (support markdown),
-            "mode": "DEFAULT" or "DEBUG",
-            "name": "string",
-            "startTime": this.helper.now(),
-            "attributes": [
-                {
-                    "key": "string",
-                    "value": "string"
-                },
-                {
-                    "value": "string"
-                }
-            ]
-     * }
-     * @Returns an object which contains a tempID and a promise
-     *
-     * As system attributes, this method sends the following data (these data are not for public use):
-     * client name, version;
-     * agent name, version (if given);
-     * browser name, version (if given);
-     * OS type, architecture;
-     * RAMSize;
-     * nodeJS version;
-     *
-     * This method works in two ways:
-     * First - If launchDataRQ object doesn't contain ID field,
-     * it would create a new Launch instance at the Report Portal with it ID.
-     * Second - If launchDataRQ would contain ID field,
-     * client would connect to the existing Launch which ID
-     * has been sent , and would send all data to it.
-     * Notice that Launch which ID has been sent must be 'IN PROGRESS' state at the Report Portal
-     * or it would throw an error.
-     * @Returns {Object} - an object which contains a tempID and a promise
-     */
-  startLaunch(launchDataRQ) {
+   * Start launch and report it.
+   */
+  startLaunch(launchDataRQ: StartLaunchOptions): ClientResponse {
     const tempId = this.getUniqId();
 
     if (launchDataRQ.id) {
@@ -219,7 +224,7 @@ class RPClient {
       this.map[tempId].realId = launchDataRQ.id;
       this.launchUuid = launchDataRQ.id;
     } else {
-      const systemAttr = helpers.getSystemAttribute();
+      const systemAttr = helpers.getSystemAttributes();
       if (this.config.skippedIsNotIssue === true) {
         const skippedIsNotIssueAttribute = {
           key: 'skippedIssue',
@@ -241,7 +246,7 @@ class RPClient {
       this.map[tempId] = this.getNewItemObj((resolve, reject) => {
         const url = 'launch';
         this.logDebug(`Start launch with tempId ${tempId}`, launchData);
-        this.restClient.create(url, launchData).then(
+        this.restClient.create<StartLaunchResponse>(url, launchData).then(
           (response) => {
             this.map[tempId].realId = response.id;
             this.launchUuid = response.id;
@@ -273,16 +278,8 @@ class RPClient {
 
   /**
    * Finish launch.
-   * @param {string} launchTempId - temp launch id (returned in the query "startLaunch").
-   * @param {Object} finishExecutionRQ - finish launch info should include time and status.
-   * finishExecutionRQ should look like this
-   * {
-   *      "endTime": this.helper.now(),
-   *      "status": "passed" or one of ‘passed’, ‘failed’, ‘stopped’, ‘skipped’, ‘interrupted’, ‘cancelled’
-   * }
-   * @Returns {Object} - an object which contains a tempID and a promise
    */
-  finishLaunch(launchTempId, finishExecutionRQ) {
+  finishLaunch(launchTempId: string, finishExecutionRQ: FinishLaunchOptions = {}): ClientResponse {
     const launchObj = this.map[launchTempId];
     if (!launchObj) {
       return this.getRejectAnswer(
@@ -300,7 +297,7 @@ class RPClient {
           () => {
             this.logDebug(`Finish launch with tempId ${launchTempId}`, finishExecutionData);
             const url = ['launch', launchObj.realId, 'finish'].join('/');
-            this.restClient.update(url, finishExecutionData).then(
+            this.restClient.update<FinishLaunchResponse>(url, finishExecutionData).then(
               (response) => {
                 this.logDebug(`Success finish launch with tempId ${launchTempId}`, response);
                 console.log(`\nReportPortal Launch Link: ${response.link}`);
@@ -333,10 +330,11 @@ class RPClient {
 
   /*
    * This method is used to create data object for merge request to ReportPortal.
-   *
-   * @Returns {Object} - an object which contains a data for merge launches in ReportPortal.
    */
-  getMergeLaunchesRequest(launchIds, mergeOptions = {}) {
+  getMergeLaunchesRequest(
+    launchIds: Array<string | number>,
+    mergeOptions: MergeLaunchesOptions = {},
+  ) {
     return {
       launches: launchIds,
       mergeType: 'BASIC',
@@ -352,53 +350,43 @@ class RPClient {
 
   /**
    * This method is used for merge launches in ReportPortal.
-   * @param {Object} mergeOptions - options for merge request, can override default options.
-   * mergeOptions should look like this
-   * {
-   *      "extendSuitesDescription": boolean,
-   *      "description": string,
-   *      "mergeType": 'BASIC' | 'DEEP',
-   *      "name": string
-   * }
-   * Please, keep in mind that this method is work only in case
-   * the option isLaunchMergeRequired is true.
-   *
-   * @returns {Promise} - action promise
+   * Please, keep in mind that this method work only in case the option isLaunchMergeRequired is true.
    */
-  mergeLaunches(mergeOptions = {}) {
+  mergeLaunches(mergeOptions: MergeLaunchesOptions = {}): Promise<void> | undefined {
     if (this.isLaunchMergeRequired) {
       const launchUUIds = helpers.readLaunchesFromFile();
       const params = new URLSearchParams({
         'filter.in.uuid': launchUUIds,
         'page.size': launchUUIds.length,
-      });
+      } as unknown as Record<string, string>);
       const launchSearchUrl =
         this.config.mode === 'DEBUG'
           ? `launch/mode?${params.toString()}`
           : `launch?${params.toString()}`;
       this.logDebug(`Find launches with UUIDs to merge: ${launchUUIds}`);
       return this.restClient
-        .retrieveSyncAPI(launchSearchUrl)
+        .retrieveSyncAPI<LaunchSearchResponse>(launchSearchUrl)
         .then(
           (response) => {
             const launchIds = response.content.map((launch) => launch.id);
             this.logDebug(`Found launches: ${launchIds}`, response.content);
             return launchIds;
           },
-          (error) => {
+          (error): Array<string | number> => {
             this.logDebug(`Error during launches search with UUIDs: ${launchUUIds}`, error);
             console.dir(error);
+            return [];
           },
         )
         .then((launchIds) => {
           const request = this.getMergeLaunchesRequest(launchIds, mergeOptions);
           this.logDebug(`Merge launches with ids: ${launchIds}`, request);
           const mergeURL = 'launch/merge';
-          return this.restClient.create(mergeURL, request);
+          return this.restClient.create<MergeLaunchesResponse>(mergeURL, request);
         })
         .then((response) => {
           this.logDebug(`Launches with UUIDs: ${launchUUIds} were successfully merged!`);
-          if (this.config.launchUuidPrint) {
+          if (this.config.launchUuidPrint && response.uuid) {
             this.config.launchUuidPrintOutput(response.uuid);
           }
         })
@@ -410,41 +398,22 @@ class RPClient {
     this.logDebug(
       'Option isLaunchMergeRequired is false, merge process cannot be done as no launch UUIDs where saved.',
     );
+    return undefined;
   }
 
   /*
    * This method is used for frameworks as Jasmine. There is problem when
-   * it doesn't wait for promise resolve and stop the process. So it better to call
-   * this method at the spec's function as @afterAll() and manually resolve this promise.
-   *
-   * @return Promise
+   * it doesn't wait for promise resolve and stop the process.
    */
-  getPromiseFinishAllItems(launchTempId) {
+  getPromiseFinishAllItems(launchTempId: string): Promise<unknown[]> {
     const launchObj = this.map[launchTempId];
     return Promise.all(launchObj.children.map((itemId) => this.map[itemId].promiseFinish));
   }
 
   /**
-     * Update launch.
-     * @param {string} launchTempId - temp launch id (returned in the query "startLaunch").
-     * @param {Object} launchData - new launch data
-     * launchData should look like this
-     * {
-            "description": "string" (support markdown),
-            "mode": "DEFAULT" or "DEBUG",
-            "attributes": [
-                {
-                    "key": "string",
-                    "value": "string"
-                },
-                {
-                    "value": "string"
-                }
-            ]
-        }
-     * @Returns {Object} - an object which contains a tempId and a promise
-     */
-  updateLaunch(launchTempId, launchData) {
+   * Update launch.
+   */
+  updateLaunch(launchTempId: string, launchData: UpdateLaunchOptions): ClientResponse {
     const launchObj = this.map[launchTempId];
     if (!launchObj) {
       return this.getRejectAnswer(
@@ -452,8 +421,8 @@ class RPClient {
         new Error(`Launch with tempId "${launchTempId}" not found`),
       );
     }
-    let resolvePromise;
-    let rejectPromise;
+    let resolvePromise!: (value?: unknown) => void;
+    let rejectPromise!: (reason?: unknown) => void;
     const promise = new Promise((resolve, reject) => {
       resolvePromise = resolve;
       rejectPromise = reject;
@@ -486,33 +455,13 @@ class RPClient {
   }
 
   /**
-     * If there is no parentItemId starts Suite, else starts test or item.
-     * @param {Object} testItemDataRQ - object with item parameters
-     * testItemDataRQ should look like this
-     * {
-            "description": "string" (support markdown),
-            "name": "string",
-            "startTime": this.helper.now(),
-            "attributes": [
-                {
-                    "key": "string",
-                    "value": "string"
-                },
-                {
-                    "value": "string"
-                }
-            ],
-            "type": 'SUITE' or one of 'SUITE', 'STORY', 'TEST',
-                    'SCENARIO', 'STEP', 'BEFORE_CLASS', 'BEFORE_GROUPS',
-                    'BEFORE_METHOD', 'BEFORE_SUITE', 'BEFORE_TEST',
-                    'AFTER_CLASS', 'AFTER_GROUPS', 'AFTER_METHOD',
-                    'AFTER_SUITE', 'AFTER_TEST'
-        }
-     * @param {string} launchTempId - temp launch id (returned in the query "startLaunch").
-     * @param {string} parentTempId (optional) - temp item id (returned in the query "startTestItem").
-     * @Returns {Object} - an object which contains a tempId and a promise
-     */
-  startTestItem(testItemDataRQ, launchTempId, parentTempId) {
+   * If there is no parentItemId starts Suite, else starts test or item.
+   */
+  startTestItem(
+    testItemDataRQ: StartTestItemOptions,
+    launchTempId: string,
+    parentTempId?: string,
+  ): ClientResponse {
     let parentMapId = launchTempId;
     const launchObj = this.map[launchTempId];
     if (!launchObj) {
@@ -532,7 +481,7 @@ class RPClient {
     const testCaseId =
       testItemDataRQ.testCaseId ||
       helpers.generateTestCaseId(testItemDataRQ.codeRef, testItemDataRQ.parameters);
-    const testItemData = {
+    const testItemData: StartTestItemRQ = {
       startTime: this.helpers.now(),
       ...testItemDataRQ,
       ...(testCaseId && { testCaseId }),
@@ -569,12 +518,13 @@ class RPClient {
             const realParentId = this.map[parentTempId].realId;
             url += `${realParentId}`;
           }
-          if (executionItemPromise && prevResponse?.id) {
-            testItemData.retry_of = prevResponse.id;
+          const prevId = (prevResponse as StartTestItemResponse | undefined)?.id;
+          if (executionItemPromise && prevId) {
+            testItemData.retry_of = prevId;
           }
           testItemData.launchUuid = realLaunchId;
           this.logDebug(`Start test item with tempId ${tempId}`, testItemData);
-          this.restClient.create(url, testItemData).then(
+          this.restClient.create<StartTestItemResponse>(url, testItemData).then(
             (response) => {
               this.logDebug(`Success start item with tempId ${tempId}`, response);
               this.map[tempId].realId = response.id;
@@ -603,30 +553,9 @@ class RPClient {
   }
 
   /**
-     * Finish Suite or Step level.
-     * @param {string} itemTempId - temp item id (returned in the query "startTestItem").
-     * @param {Object} finishTestItemRQ - object with item parameters.
-     * finishTestItemRQ should look like this
-     {
-        "endTime": this.helper.now(),
-        "issue": {
-          "comment": "string",
-          "externalSystemIssues": [
-            {
-              "submitDate": 0,
-              "submitter": "string",
-              "systemId": "string",
-              "ticketId": "string",
-              "url": "string"
-            }
-          ],
-          "issueType": "string"
-        },
-        "status": "passed" or one of 'passed', 'failed', 'stopped', 'skipped', 'interrupted', 'cancelled'
-     }
-     * @Returns {Object} - an object which contains a tempId and a promise
-     */
-  finishTestItem(itemTempId, finishTestItemRQ) {
+   * Finish Suite or Step level.
+   */
+  finishTestItem(itemTempId: string, finishTestItemRQ: FinishTestItemOptions = {}): ClientResponse {
     const itemObj = this.map[itemTempId];
     if (!itemObj) {
       return this.getRejectAnswer(
@@ -635,16 +564,13 @@ class RPClient {
       );
     }
 
-    const finishTestItemData = {
+    const finishTestItemData: FinishTestItemRQ = {
       endTime: this.helpers.now(),
-      ...(itemObj.children.length ? {} : { status: RP_STATUSES.PASSED }),
+      ...(itemObj.children.length ? {} : { status: STATUSES.PASSED }),
       ...finishTestItemRQ,
     };
 
-    if (
-      finishTestItemData.status === RP_STATUSES.SKIPPED &&
-      this.config.skippedIsNotIssue === true
-    ) {
+    if (finishTestItemData.status === STATUSES.SKIPPED && this.config.skippedIsNotIssue === true) {
       finishTestItemData.issue = { issueType: 'NOT_ISSUE' };
     }
 
@@ -689,7 +615,7 @@ class RPClient {
     };
   }
 
-  saveLog(itemObj, requestPromiseFunc) {
+  saveLog(itemObj: ItemObj, requestPromiseFunc: RequestPromiseFunc): ClientResponse {
     const tempId = this.getUniqId();
     this.map[tempId] = this.getNewItemObj((resolve, reject) => {
       itemObj.promiseStart.then(
@@ -727,7 +653,7 @@ class RPClient {
     };
   }
 
-  sendLog(itemTempId, saveLogRQ, fileObj) {
+  sendLog(itemTempId: string, saveLogRQ: LogOptions, fileObj?: Attachment): ClientResponse {
     const saveLogData = {
       time: this.helpers.now(),
       message: '',
@@ -743,17 +669,8 @@ class RPClient {
 
   /**
    * Send log of test results.
-   * @param {string} itemTempId - temp item id (returned in the query "startTestItem").
-   * @param {Object} saveLogRQ - object with data of test result.
-   * saveLogRQ should look like this
-   * {
-   *      level: 'error' or one of 'trace', 'debug', 'info', 'warn', 'error', '',
-   *      message: 'string' (support markdown),
-   *      time: this.helpers.now()
-   * }
-   * @Returns {Object} - an object which contains a tempId and a promise
    */
-  sendLogWithoutFile(itemTempId, saveLogRQ) {
+  sendLogWithoutFile(itemTempId: string, saveLogRQ: LogOptions): ClientResponse {
     const itemObj = this.map[itemTempId];
     if (!itemObj) {
       return this.getRejectAnswer(
@@ -762,7 +679,7 @@ class RPClient {
       );
     }
 
-    const requestPromise = (itemUuid, launchUuid) => {
+    const requestPromise: RequestPromiseFunc = (itemUuid, launchUuid) => {
       const url = 'log';
       const isItemUuid = itemUuid !== launchUuid;
       return this.restClient.create(
@@ -774,27 +691,9 @@ class RPClient {
   }
 
   /**
-     * Send log of test results with file.
-     * @param {string} itemTempId - temp item id (returned in the query "startTestItem").
-     * @param {Object} saveLogRQ - object with data of test result.
-     * saveLogRQ should look like this
-     * {
-     *      level: 'error' or one of 'trace', 'debug', 'info', 'warn', 'error', '',
-     *      message: 'string' (support markdown),
-     *      time: this.helpers.now()
-     * }
-     * @param {Object} fileObj - object with file data.
-     * fileObj should look like this
-     * {
-          name: 'string',
-          type: "image/png" or your file mimeType
-            (supported types: 'image/*', application/ ['xml', 'javascript', 'json', 'css', 'php'],
-            another format will be opened in a new browser tab ),
-          content: file
-     * }
-     * @Returns {Object} - an object which contains a tempId and a promise
-     */
-  sendLogWithFile(itemTempId, saveLogRQ, fileObj) {
+   * Send log of test results with file.
+   */
+  sendLogWithFile(itemTempId: string, saveLogRQ: LogOptions, fileObj: Attachment): ClientResponse {
     const itemObj = this.map[itemTempId];
     if (!itemObj) {
       return this.getRejectAnswer(
@@ -803,7 +702,7 @@ class RPClient {
       );
     }
 
-    const requestPromise = (itemUuid, launchUuid) => {
+    const requestPromise: RequestPromiseFunc = (itemUuid, launchUuid) => {
       const isItemUuid = itemUuid !== launchUuid;
 
       return this.getRequestLogWithFile(
@@ -815,10 +714,10 @@ class RPClient {
     return this.saveLog(itemObj, requestPromise);
   }
 
-  getRequestLogWithFile(saveLogRQ, fileObj) {
+  getRequestLogWithFile(saveLogRQ: LogOptions, fileObj: Attachment): Promise<unknown> {
     const url = 'log';
     // eslint-disable-next-line no-param-reassign
-    saveLogRQ.file = { name: fileObj.name };
+    saveLogRQ.file = { name: fileObj.name } as Attachment;
     this.logDebug(`Save log with file: ${fileObj.name}`, saveLogRQ);
     return this.restClient
       .create(url, this.buildMultiPartStream([saveLogRQ], fileObj, MULTIPART_BOUNDARY), {
@@ -836,12 +735,7 @@ class RPClient {
       });
   }
 
-  // eslint-disable-next-line valid-jsdoc
-  /**
-   *
-   * @Private
-   */
-  buildMultiPartStream(jsonPart, filePart, boundary) {
+  buildMultiPartStream(jsonPart: unknown[], filePart: Attachment, boundary: string): Buffer {
     const eol = '\r\n';
     const bx = `--${boundary}`;
     const buffers = [
@@ -873,13 +767,17 @@ class RPClient {
           eol +
           eol,
       ),
-      Buffer.from(filePart.content, 'base64'),
+      Buffer.from(filePart.content as string, 'base64'),
       Buffer.from(`${eol + bx}--${eol}`),
     ];
     return Buffer.concat(buffers);
   }
 
-  finishTestItemPromiseStart(itemObj, itemTempId, finishTestItemData) {
+  finishTestItemPromiseStart(
+    itemObj: ItemObj,
+    itemTempId: string,
+    finishTestItemData: FinishTestItemRQ,
+  ): void {
     itemObj.promiseStart.then(
       () => {
         const url = ['item', itemObj.realId].join('/');
@@ -905,4 +803,4 @@ class RPClient {
   }
 }
 
-module.exports = RPClient;
+export = RPClient;

@@ -1,39 +1,47 @@
-const fs = require('fs');
-const glob = require('glob');
-const os = require('os');
-const RestClient = require('./rest');
-const pjson = require('../package.json');
+import fs from 'fs';
+import { sync as globSync } from 'glob';
+import os from 'os';
+import RestClient from './rest';
+import { PJSON_NAME, PJSON_VERSION } from './pjson';
+import { TestItemParameter } from './models/requests';
+import { Attribute } from './models/common';
 
 const MIN = 3;
 const MAX = 256;
-const PJSON_VERSION = pjson.version;
-const PJSON_NAME = pjson.name;
 
-const getUUIDFromFileName = (filename) => filename.match(/rplaunch-(.*)\.tmp/)[1];
+const getUUIDFromFileName = (filename: string): string => {
+  const match = filename.match(/rplaunch-(.*)\.tmp/);
+  return match ? match[1] : '';
+};
 
-const formatName = (name) => {
+export const formatName = (name: string): string => {
   const len = name.length;
   // eslint-disable-next-line no-mixed-operators
   return (len < MIN ? name + new Array(MIN - len + 1).join('.') : name).slice(-MAX);
 };
 
-const now = () => {
+export const now = (): number => {
   return new Date().valueOf();
 };
 
 // TODO: deprecate and remove
-const getServerResult = (url, request, options, method) => {
+export const getServerResult = (
+  url: string,
+  request: unknown,
+  options: ConstructorParameters<typeof RestClient>[0],
+  method: string,
+): Promise<unknown> => {
   return new RestClient(options).request(method, url, request, options);
 };
 
-const readLaunchesFromFile = () => {
-  const files = glob.sync('rplaunch-*.tmp');
+export const readLaunchesFromFile = (): string[] => {
+  const files = globSync('rplaunch-*.tmp');
   const ids = files.map(getUUIDFromFileName);
 
   return ids;
 };
 
-const saveLaunchIdToFile = (launchId) => {
+export const saveLaunchIdToFile = (launchId: string): void => {
   const filename = `rplaunch-${launchId}.tmp`;
   fs.open(filename, 'w', (err) => {
     if (err) {
@@ -42,12 +50,12 @@ const saveLaunchIdToFile = (launchId) => {
   });
 };
 
-const getSystemAttribute = () => {
+export const getSystemAttributes = (): Attribute[] => {
   const osType = os.type();
   const osArchitecture = os.arch();
   const RAMSize = os.totalmem();
   const nodeVersion = process.version;
-  const systemAttr = [
+  const systemAttr: Attribute[] = [
     {
       key: 'client',
       value: `${PJSON_NAME}|${PJSON_VERSION}`,
@@ -60,7 +68,7 @@ const getSystemAttribute = () => {
     },
     {
       key: 'RAMSize',
-      value: RAMSize,
+      value: `${RAMSize}`,
       system: true,
     },
     {
@@ -73,16 +81,19 @@ const getSystemAttribute = () => {
   return systemAttr;
 };
 
-const generateTestCaseId = (codeRef, params) => {
+export const generateTestCaseId = (
+  codeRef?: string,
+  params?: TestItemParameter[],
+): string | undefined => {
   if (!codeRef) {
-    return;
+    return undefined;
   }
 
   if (!params) {
     return codeRef;
   }
 
-  const parameters = params.reduce(
+  const parameters = params.reduce<string[]>(
     (result, item) => (item.value ? result.concat(item.value) : result),
     [],
   );
@@ -90,7 +101,7 @@ const generateTestCaseId = (codeRef, params) => {
   return `${codeRef}[${parameters}]`;
 };
 
-const saveLaunchUuidToFile = (launchUuid) => {
+export const saveLaunchUuidToFile = (launchUuid: string): void => {
   const filename = `rp-launch-uuid-${launchUuid}.tmp`;
   fs.open(filename, 'w', (err) => {
     if (err) {
@@ -99,13 +110,15 @@ const saveLaunchUuidToFile = (launchUuid) => {
   });
 };
 
-module.exports = {
+// Default export preserves the historical CommonJS shape (`module.exports = { ... }`)
+// so consumers importing `helpers` as a default still work.
+export default {
   formatName,
   now,
   getServerResult,
   readLaunchesFromFile,
   saveLaunchIdToFile,
-  getSystemAttribute,
+  getSystemAttributes,
   generateTestCaseId,
   saveLaunchUuidToFile,
 };

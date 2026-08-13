@@ -1,9 +1,10 @@
 const axios = require('axios');
 const { HttpsProxyAgent } = require('https-proxy-agent');
-const OAuthInterceptor = require('../lib/oauth');
+const OAuthInterceptor = require('../src/lib/oauth');
 
 jest.mock('axios', () => ({
   post: jest.fn(),
+  isAxiosError: jest.fn((error) => !!error && typeof error === 'object' && error.isAxiosError === true),
 }));
 
 describe('OAuthInterceptor', () => {
@@ -134,6 +135,7 @@ describe('OAuthInterceptor', () => {
     const oauthInterceptor = new OAuthInterceptor(baseConfig);
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     axios.post.mockRejectedValue({
+      isAxiosError: true,
       response: {
         status: 400,
         data: { error: 'invalid_grant' },
@@ -148,6 +150,54 @@ describe('OAuthInterceptor', () => {
     );
 
     consoleSpy.mockRestore();
+  });
+
+  it('throws a descriptive error when the token response has no access token', async () => {
+    const oauthInterceptor = new OAuthInterceptor(baseConfig);
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    // Response resolves successfully but is missing the access_token field.
+    axios.post.mockResolvedValue({ data: { expires_in: 120 } });
+
+    await expect(oauthInterceptor.getAccessToken()).rejects.toThrow(
+      'OAuth token request failed: No access token received from OAuth server',
+    );
+    expect(consoleSpy).toHaveBeenCalledWith(
+      '[OAuth] OAuth token request failed: No access token received from OAuth server',
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it('formats non-Axios errors using their message', async () => {
+    const oauthInterceptor = new OAuthInterceptor(baseConfig);
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+    // A plain Error (not an AxiosError, so no response payload to include).
+    axios.post.mockRejectedValue(new Error('network is unreachable'));
+
+    await expect(oauthInterceptor.getAccessToken()).rejects.toThrow(
+      'OAuth token request failed: network is unreachable',
+    );
+
+    consoleSpy.mockRestore();
+  });
+
+  it('propagates request errors through the attached rejection handler', async () => {
+    const oauthInterceptor = new OAuthInterceptor(baseConfig);
+    let rejectionHandler;
+    const axiosInstance = {
+      interceptors: {
+        request: {
+          use: jest.fn((fulfilled, rejected) => {
+            rejectionHandler = rejected;
+          }),
+        },
+      },
+    };
+
+    oauthInterceptor.attach(axiosInstance);
+    const error = new Error('request setup failed');
+
+    await expect(rejectionHandler(error)).rejects.toBe(error);
   });
 
   it('logs debug messages only when debug mode is enabled', () => {
@@ -231,6 +281,7 @@ describe('OAuthInterceptor', () => {
     // First call (refresh token) fails
     axios.post
       .mockRejectedValueOnce({
+        isAxiosError: true,
         response: {
           status: 400,
           data: { error: 'invalid_grant', error_description: 'refresh token expired' },
@@ -286,12 +337,14 @@ describe('OAuthInterceptor', () => {
     // Both calls fail
     axios.post
       .mockRejectedValueOnce({
+        isAxiosError: true,
         response: {
           status: 400,
           data: { error: 'invalid_grant' },
         },
       })
       .mockRejectedValueOnce({
+        isAxiosError: true,
         response: {
           status: 401,
           data: { error: 'invalid_credentials' },
@@ -344,6 +397,37 @@ describe('OAuthInterceptor', () => {
     expect(config.headers).toEqual({ 'Content-Type': 'application/x-www-form-urlencoded' });
     expect(config.httpsAgent).toBeInstanceOf(HttpsProxyAgent);
 
+    nowSpy.mockRestore();
+  });
+
+  it('logs the proxied token request when debug and proxy are both enabled', async () => {
+    const baseTime = 1700000750000;
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => baseTime);
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const oauthInterceptor = new OAuthInterceptor({
+      ...baseConfig,
+      restClientConfig: {
+        debug: true,
+        proxy: {
+          protocol: 'https',
+          host: '127.0.0.1',
+          port: 9000,
+        },
+      },
+    });
+    axios.post.mockResolvedValue({
+      data: { access_token: 'token-debug-proxy', expires_in: 120 },
+    });
+
+    const token = await oauthInterceptor.getAccessToken();
+
+    expect(token).toBe('token-debug-proxy');
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `[OAuth] Making token request to ${baseConfig.tokenEndpoint} with proxy agent`,
+      '',
+    );
+
+    consoleSpy.mockRestore();
     nowSpy.mockRestore();
   });
 

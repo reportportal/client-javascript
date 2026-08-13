@@ -1,5 +1,6 @@
-const axios = require('axios');
-const { getProxyAgentForUrl } = require('./proxyHelper');
+import axios, { AxiosInstance } from 'axios';
+import { getProxyAgentForUrl } from './proxyHelper';
+import type { OAuthConfig, RestClientConfig } from './models/config';
 
 const TOKEN_REFRESH_THRESHOLD_MS = 60000;
 const DEFAULT_TOKEN_EXPIRATION_MS = 3600000; // 1 hour in milliseconds
@@ -7,20 +8,48 @@ const SECOND_IN_MS = 1000;
 const GRANT_TYPE_PASSWORD = 'password';
 const GRANT_TYPE_REFRESH_TOKEN = 'refresh_token';
 
+interface OAuthInterceptorConfig extends OAuthConfig {
+  debug?: boolean;
+  restClientConfig?: RestClientConfig;
+}
+
+function formatTokenError(prefix: string, error: unknown): string {
+  if (axios.isAxiosError(error) && error.response) {
+    return `${prefix}: ${error.response.status} - ${JSON.stringify(error.response.data)}`;
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  return `${prefix}: ${message}`;
+}
+
+/**
+ * OAuth 2.0 Password Grant Flow Interceptor.
+ */
 class OAuthInterceptor {
-  /**
-   * OAuth 2.0 Password Grant Flow Interceptor
-   * @param {Object} config - OAuth configuration
-   * @param {string} config.tokenEndpoint - OAuth token endpoint URL
-   * @param {string} config.username - Username for password grant
-   * @param {string} config.password - Password for password grant
-   * @param {string} config.clientId - OAuth client ID
-   * @param {string} [config.clientSecret] - OAuth client secret (optional)
-   * @param {string} [config.scope] - OAuth scope (optional)
-   * @param {boolean} [config.debug] - Enable debug logging
-   * @param {Object} [config.restClientConfig] - REST client configuration for proxy support
-   */
-  constructor(config) {
+  private tokenEndpoint: string;
+
+  private username: string;
+
+  private password: string;
+
+  private clientId: string;
+
+  private clientSecret?: string;
+
+  private scope?: string;
+
+  private restClientConfig: RestClientConfig;
+
+  private debug: boolean;
+
+  private accessToken: string | null;
+
+  private refreshToken: string | null;
+
+  private tokenExpiresAt: number | null;
+
+  private tokenRenewPromise: Promise<string> | null;
+
+  constructor(config: OAuthInterceptorConfig) {
     this.tokenEndpoint = config.tokenEndpoint;
     this.username = config.username;
     this.password = config.password;
@@ -36,17 +65,16 @@ class OAuthInterceptor {
     this.tokenRenewPromise = null;
   }
 
-  logDebug(message, data = '') {
+  logDebug(message: string, data: unknown = ''): void {
     if (this.debug) {
       console.log(`[OAuth] ${message}`, data);
     }
   }
 
   /**
-   * Obtains or refreshes the access token
-   * @returns {Promise<string>} Access token
+   * Obtains or refreshes the access token.
    */
-  async getAccessToken() {
+  async getAccessToken(): Promise<string> {
     if (this.tokenRenewPromise) {
       this.logDebug('Waiting for ongoing token refresh');
       return this.tokenRenewPromise;
@@ -78,10 +106,9 @@ class OAuthInterceptor {
   }
 
   /**
-   * Refreshes the access token using password grant or refresh token grant
-   * @returns {Promise<string>} Access token
+   * Refreshes the access token using password grant or refresh token grant.
    */
-  async renewToken() {
+  async renewToken(): Promise<string> {
     try {
       return await this.requestToken(
         this.refreshToken ? GRANT_TYPE_REFRESH_TOKEN : GRANT_TYPE_PASSWORD,
@@ -97,12 +124,11 @@ class OAuthInterceptor {
 
         try {
           return await this.requestToken(GRANT_TYPE_PASSWORD);
-        } catch (fallbackError) {
-          const errorMessage = fallbackError.response
-            ? `OAuth password grant fallback failed: ${
-                fallbackError.response.status
-              } - ${JSON.stringify(fallbackError.response.data)}`
-            : `OAuth password grant fallback failed: ${fallbackError.message}`;
+        } catch (fallbackError: unknown) {
+          const errorMessage = formatTokenError(
+            'OAuth password grant fallback failed',
+            fallbackError,
+          );
 
           console.error(`[OAuth] ${errorMessage}`);
           throw new Error(errorMessage);
@@ -110,11 +136,7 @@ class OAuthInterceptor {
       }
 
       // No fallback available, rethrow original error
-      const errorMessage = error.response
-        ? `OAuth token request failed: ${error.response.status} - ${JSON.stringify(
-            error.response.data,
-          )}`
-        : `OAuth token request failed: ${error.message}`;
+      const errorMessage = formatTokenError('OAuth token request failed', error);
 
       console.error(`[OAuth] ${errorMessage}`);
       throw new Error(errorMessage);
@@ -122,19 +144,16 @@ class OAuthInterceptor {
   }
 
   /**
-   * Requests a token using the specified grant type
-   * @param {string} grantType - Either 'password' or 'refresh_token'
-   * @returns {Promise<string>} Access token
-   * @private
+   * Requests a token using the specified grant type.
    */
-  async requestToken(grantType) {
+  private async requestToken(grantType: string): Promise<string> {
     const params = new URLSearchParams();
     params.append('client_id', this.clientId);
     params.append('grant_type', grantType);
 
     if (grantType === GRANT_TYPE_REFRESH_TOKEN) {
       this.logDebug('Requesting new access token using refresh_token');
-      params.append('refresh_token', this.refreshToken);
+      params.append('refresh_token', this.refreshToken as string);
     } else {
       this.logDebug('Requesting access token using username and password');
       params.append('username', this.username);
@@ -169,7 +188,7 @@ class OAuthInterceptor {
       ...(this.restClientConfig.httpsAgent && { httpsAgent: this.restClientConfig.httpsAgent }),
       ...(this.restClientConfig.httpAgent && { httpAgent: this.restClientConfig.httpAgent }),
       // Explicitly disable axios built-in proxy when using custom agents
-      ...(usingProxyAgent && { proxy: false }),
+      ...(usingProxyAgent && { proxy: false as const }),
     });
 
     const {
@@ -197,14 +216,13 @@ class OAuthInterceptor {
       this.logDebug('Token obtained, no expiration provided, assuming 1 hour');
     }
 
-    return this.accessToken;
+    return this.accessToken as string;
   }
 
   /**
-   * Attaches the interceptor to an axios instance
-   * @param {Object} axiosInstance - Axios instance to attach interceptor to
+   * Attaches the interceptor to an axios instance.
    */
-  attach(axiosInstance) {
+  attach(axiosInstance: AxiosInstance): void {
     axiosInstance.interceptors.request.use(
       async (config) => {
         try {
@@ -213,8 +231,11 @@ class OAuthInterceptor {
           config.headers.Authorization = `Bearer ${token}`;
           this.logDebug(`Request to ${config.url} with OAuth token`);
           return config;
-        } catch (error) {
-          console.error('[OAuth] Failed to obtain access token, request may fail:', error.message);
+        } catch (error: unknown) {
+          console.error(
+            '[OAuth] Failed to obtain access token, request may fail:',
+            error instanceof Error ? error.message : String(error),
+          );
           return config;
         }
       },
@@ -223,4 +244,4 @@ class OAuthInterceptor {
   }
 }
 
-module.exports = OAuthInterceptor;
+export = OAuthInterceptor;
