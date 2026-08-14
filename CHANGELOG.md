@@ -1,3 +1,8 @@
+### Changed
+- The client has been migrated to TypeScript. It now ships with bundled type
+  definitions (no separate `@types` package required) and exposes constants,
+  models and helpers via subpath imports (e.g.
+  `@reportportal/client-javascript/constants`).
 ### Added
 - `retry_of` property is now automatically included in the `startTestItem`
   request payload when `retry: true` and a previous attempt exists in the

@@ -48,6 +48,28 @@ rpClient.checkConnect().then(() => {
 });
 ```
 
+## TypeScript
+
+Starting from version 5.6.0, the client has been migrated to TypeScript and ships with bundled type definitions. It works with both CommonJS and ES module projects:
+
+```typescript
+import RPClient from '@reportportal/client-javascript';
+
+const rpClient = new RPClient({
+    apiKey: 'reportportalApiKey',
+    endpoint: 'http://your-instance.com:8080/api/v1',
+    launch: 'LAUNCH_NAME',
+    project: 'PROJECT_NAME',
+});
+```
+
+Constants, models and helpers are available via subpath imports:
+
+```typescript
+import { RP_STATUSES } from '@reportportal/client-javascript/constants';
+import PublicReportingAPI from '@reportportal/client-javascript/publicReportingAPI';
+```
+
 ## Configuration
 
 When creating a client instance, you need to specify the following options.
