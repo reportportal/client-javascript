@@ -3,6 +3,24 @@
 Internal notes for contributors. This content is intentionally kept out of
 README.md, which is published to package registries.
 
+## Subpath facades
+
+`npm run build` compiles to `build/` and then runs `scripts/generate-resolver-facades.js`,
+which writes a one-line re-export at every public subpath location — `helpers.js`,
+`constants.js`, `models.js`, `publicReportingAPI.js` and a `lib/**` mirror of the compiled
+tree — together with matching `.d.ts` files.
+
+Those files are never loaded at runtime: Node, TypeScript and bundlers all read the
+`exports` / `typesVersions` maps in `package.json` and go straight to `build/lib`. They
+exist for tools that resolve imports by walking the filesystem, chiefly
+`eslint-import-resolver-node` (the default resolver of `eslint-plugin-import`), which
+otherwise reports `import/no-unresolved` for every subpath import and forces each consumer
+to configure an ignore. They also keep the `lib/**` paths published up to 5.5.x resolvable.
+
+Everything the script writes is gitignored, recorded in `.generated-facades.json` and
+removed by `npm run clean`. When a new subpath is added to `exports`, add the matching alias
+to the `aliases` map in the script — the `lib/**` mirror updates itself.
+
 ## Code knowledge graph
 
 This repo carries a local **code knowledge graph** ([colbymchenry/codegraph](https://github.com/colbymchenry/codegraph))

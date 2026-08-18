@@ -5,8 +5,9 @@
   "author": "ReportPortal.io",
   "scripts": {
     "codegraph": "bash scripts/codegraph.sh",
-    "build": "npm run clean && tsc",
-    "clean": "rimraf ./build",
+    "build": "npm run clean && tsc && npm run facades",
+    "facades": "node scripts/generate-resolver-facades.js",
+    "clean": "node scripts/generate-resolver-facades.js --clean && rimraf ./build",
     "lint": "eslint \"src/**/*.ts\"",
     "format": "npm run lint -- --fix",
     "test": "jest",
@@ -18,7 +19,16 @@
   },
   "files": [
     "/build",
-    "/VERSION"
+    "/VERSION",
+    "/lib",
+    "/helpers.js",
+    "/helpers.d.ts",
+    "/constants.js",
+    "/constants.d.ts",
+    "/models.js",
+    "/models.d.ts",
+    "/publicReportingAPI.js",
+    "/publicReportingAPI.d.ts"
   ],
   "main": "./build/lib/report-portal-client",
   "types": "./build/lib/report-portal-client.d.ts",
@@ -68,6 +78,15 @@
       "types": "./build/lib/*.d.ts",
       "import": "./build/lib/*.js",
       "require": "./build/lib/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "constants": ["./build/lib/constants/index.d.ts"],
+      "models": ["./build/lib/models/index.d.ts"],
+      "helpers": ["./build/lib/helpers.d.ts"],
+      "publicReportingAPI": ["./build/lib/publicReportingAPI.d.ts"],
+      "lib/*": ["./build/lib/*"]
     }
   },
   "engines": {
