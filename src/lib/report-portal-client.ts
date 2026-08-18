@@ -21,28 +21,32 @@ import type {
 } from './models/requests';
 import type {
   FinishLaunchResponse,
+  FinishTestItemResponse,
   LaunchSearchResponse,
   MergeLaunchesResponse,
+  PageLaunchResource,
   ServerInfoResponse,
   StartLaunchResponse,
   StartTestItemResponse,
+  UpdateLaunchResponse,
 } from './models/responses';
 
 const MULTIPART_BOUNDARY = Math.floor(Math.random() * 10000000000).toString();
 
-type PromiseExecutor = (
-  resolve: (value?: unknown) => void,
-  reject: (reason?: unknown) => void,
+// Executor for a launch or item promise.
+type PromiseExecutor<T = unknown> = (
+  resolve: (value: T) => void,
+  reject: (reason?: Error) => void,
 ) => void;
 
-interface ItemObj {
-  promiseStart: Promise<unknown>;
+interface ItemObj<T = unknown> {
+  promiseStart: Promise<T>;
   realId: string;
   children: string[];
   finishSend: boolean;
-  promiseFinish: Promise<unknown>;
-  resolveFinish: (value?: unknown) => void;
-  rejectFinish: (reason?: unknown) => void;
+  promiseFinish: Promise<T>;
+  resolveFinish: (value: T) => void;
+  rejectFinish: (reason?: Error) => void;
 }
 
 type RequestPromiseFunc = (itemUuid: string, launchUuid: string) => Promise<unknown>;
@@ -149,22 +153,22 @@ class RPClient {
     return randomUUID();
   }
 
-  getRejectAnswer(tempId: string, error: Error): ClientResponse {
+  getRejectAnswer<T = unknown>(tempId: string, error: Error): ClientResponse<T> {
     return {
       tempId,
-      promise: Promise.reject(error),
+      promise: Promise.reject<T>(error),
     };
   }
 
-  getNewItemObj(startPromiseFunc: PromiseExecutor): ItemObj {
-    let resolveFinish!: (value?: unknown) => void;
-    let rejectFinish!: (reason?: unknown) => void;
-    const obj: ItemObj = {
-      promiseStart: new Promise(startPromiseFunc),
+  getNewItemObj<T = unknown>(startPromiseFunc: PromiseExecutor<T>): ItemObj<T> {
+    let resolveFinish!: (value: T) => void;
+    let rejectFinish!: (reason?: Error) => void;
+    const obj: ItemObj<T> = {
+      promiseStart: new Promise<T>(startPromiseFunc),
       realId: '',
       children: [],
       finishSend: false,
-      promiseFinish: new Promise((resolve, reject) => {
+      promiseFinish: new Promise<T>((resolve, reject) => {
         resolveFinish = resolve;
         rejectFinish = reject;
       }),
@@ -180,11 +184,11 @@ class RPClient {
     });
   }
 
-  checkConnect(): Promise<unknown> {
+  checkConnect(): Promise<PageLaunchResource> {
     const url = [this.config.endpoint.replace('/v2', '/v1'), this.config.project, 'launch']
       .join('/')
       .concat('?page.page=1&page.size=1');
-    return this.restClient.request('GET', url, {});
+    return this.restClient.request<PageLaunchResource>('GET', url, {});
   }
 
   getServerInfoUrl(): string {
@@ -215,12 +219,19 @@ class RPClient {
   /**
    * Start launch and report it.
    */
-  startLaunch(launchDataRQ: StartLaunchOptions): ClientResponse {
+  startLaunch(
+    launchDataRQ: StartLaunchOptions,
+  ): ClientResponse<StartLaunchResponse | StartLaunchOptions> {
     const tempId = this.getUniqId();
+    // Result of starting or reusing a launch.
+    let launchObj: ItemObj<StartLaunchResponse | StartLaunchOptions>;
 
     if (launchDataRQ.id) {
       this.logDebug(`Use existing launch with tempId ${tempId}`, launchDataRQ);
-      this.map[tempId] = this.getNewItemObj((resolve) => resolve(launchDataRQ));
+      launchObj = this.getNewItemObj<StartLaunchResponse | StartLaunchOptions>((resolve) =>
+        resolve(launchDataRQ),
+      );
+      this.map[tempId] = launchObj as ItemObj;
       this.map[tempId].realId = launchDataRQ.id;
       this.launchUuid = launchDataRQ.id;
     } else {
@@ -243,44 +254,50 @@ class RPClient {
         attributes,
       };
 
-      this.map[tempId] = this.getNewItemObj((resolve, reject) => {
-        const url = 'launch';
-        this.logDebug(`Start launch with tempId ${tempId}`, launchData);
-        this.restClient.create<StartLaunchResponse>(url, launchData).then(
-          (response) => {
-            this.map[tempId].realId = response.id;
-            this.launchUuid = response.id;
-            if (this.config.launchUuidPrint) {
-              this.config.launchUuidPrintOutput(this.launchUuid);
-            }
+      launchObj = this.getNewItemObj<StartLaunchResponse | StartLaunchOptions>(
+        (resolve, reject) => {
+          const url = 'launch';
+          this.logDebug(`Start launch with tempId ${tempId}`, launchData);
+          this.restClient.create<StartLaunchResponse>(url, launchData).then(
+            (response) => {
+              this.map[tempId].realId = response.id;
+              this.launchUuid = response.id;
+              if (this.config.launchUuidPrint) {
+                this.config.launchUuidPrintOutput(this.launchUuid);
+              }
 
-            if (this.isLaunchMergeRequired) {
-              helpers.saveLaunchIdToFile(response.id);
-            }
+              if (this.isLaunchMergeRequired) {
+                helpers.saveLaunchIdToFile(response.id);
+              }
 
-            this.logDebug(`Success start launch with tempId ${tempId}`, response);
-            resolve(response);
-          },
-          (error) => {
-            this.logDebug(`Error start launch with tempId ${tempId}`, error);
-            console.dir(error);
-            reject(error);
-          },
-        );
-      });
+              this.logDebug(`Success start launch with tempId ${tempId}`, response);
+              resolve(response);
+            },
+            (error) => {
+              this.logDebug(`Error start launch with tempId ${tempId}`, error);
+              console.dir(error);
+              reject(error);
+            },
+          );
+        },
+      );
+      this.map[tempId] = launchObj as ItemObj;
     }
     this.triggerStatisticsEvent().catch(console.error);
     return {
       tempId,
-      promise: this.map[tempId].promiseStart,
+      promise: launchObj.promiseStart,
     };
   }
 
   /**
    * Finish launch.
    */
-  finishLaunch(launchTempId: string, finishExecutionRQ: FinishLaunchOptions = {}): ClientResponse {
-    const launchObj = this.map[launchTempId];
+  finishLaunch(
+    launchTempId: string,
+    finishExecutionRQ: FinishLaunchOptions = {},
+  ): ClientResponse<FinishLaunchResponse> {
+    const launchObj = this.map[launchTempId] as ItemObj<FinishLaunchResponse> | undefined;
     if (!launchObj) {
       return this.getRejectAnswer(
         launchTempId,
@@ -413,7 +430,10 @@ class RPClient {
   /**
    * Update launch.
    */
-  updateLaunch(launchTempId: string, launchData: UpdateLaunchOptions): ClientResponse {
+  updateLaunch(
+    launchTempId: string,
+    launchData: UpdateLaunchOptions,
+  ): ClientResponse<UpdateLaunchResponse> {
     const launchObj = this.map[launchTempId];
     if (!launchObj) {
       return this.getRejectAnswer(
@@ -421,9 +441,9 @@ class RPClient {
         new Error(`Launch with tempId "${launchTempId}" not found`),
       );
     }
-    let resolvePromise!: (value?: unknown) => void;
-    let rejectPromise!: (reason?: unknown) => void;
-    const promise = new Promise((resolve, reject) => {
+    let resolvePromise!: (value: UpdateLaunchResponse) => void;
+    let rejectPromise!: (reason?: Error) => void;
+    const promise = new Promise<UpdateLaunchResponse>((resolve, reject) => {
       resolvePromise = resolve;
       rejectPromise = reject;
     });
@@ -432,7 +452,7 @@ class RPClient {
       () => {
         const url = ['launch', launchObj.realId, 'update'].join('/');
         this.logDebug(`Update launch with tempId ${launchTempId}`, launchData);
-        this.restClient.update(url, launchData).then(
+        this.restClient.update<UpdateLaunchResponse>(url, launchData).then(
           (response) => {
             this.logDebug(`Launch with tempId ${launchTempId} were successfully updated`, response);
             resolvePromise(response);
@@ -461,7 +481,7 @@ class RPClient {
     testItemDataRQ: StartTestItemOptions,
     launchTempId: string,
     parentTempId?: string,
-  ): ClientResponse {
+  ): ClientResponse<StartTestItemResponse> {
     let parentMapId = launchTempId;
     const launchObj = this.map[launchTempId];
     if (!launchObj) {
@@ -509,7 +529,7 @@ class RPClient {
     const executionItemPromise = testItemDataRQ.retry && this.itemRetriesChainMap.get(itemKey);
 
     const tempId = this.getUniqId();
-    this.map[tempId] = this.getNewItemObj((resolve, reject) => {
+    const itemObj = this.getNewItemObj<StartTestItemResponse>((resolve, reject) => {
       (executionItemPromise || parentPromise).then(
         (prevResponse) => {
           const realLaunchId = this.map[launchTempId].realId;
@@ -542,21 +562,25 @@ class RPClient {
         },
       );
     });
+    this.map[tempId] = itemObj as ItemObj;
     this.map[parentMapId].children.push(tempId);
     this.itemRetriesChainKeyMapByTempId.set(tempId, itemKey);
-    this.itemRetriesChainMap.set(itemKey, this.map[tempId].promiseStart);
+    this.itemRetriesChainMap.set(itemKey, itemObj.promiseStart);
 
     return {
       tempId,
-      promise: this.map[tempId].promiseStart,
+      promise: itemObj.promiseStart,
     };
   }
 
   /**
    * Finish Suite or Step level.
    */
-  finishTestItem(itemTempId: string, finishTestItemRQ: FinishTestItemOptions = {}): ClientResponse {
-    const itemObj = this.map[itemTempId];
+  finishTestItem(
+    itemTempId: string,
+    finishTestItemRQ: FinishTestItemOptions = {},
+  ): ClientResponse<FinishTestItemResponse> {
+    const itemObj = this.map[itemTempId] as ItemObj<FinishTestItemResponse> | undefined;
     if (!itemObj) {
       return this.getRejectAnswer(
         itemTempId,
@@ -773,8 +797,8 @@ class RPClient {
     return Buffer.concat(buffers);
   }
 
-  finishTestItemPromiseStart(
-    itemObj: ItemObj,
+  finishTestItemPromiseStart<T = unknown>(
+    itemObj: ItemObj<T>,
     itemTempId: string,
     finishTestItemData: FinishTestItemRQ,
   ): void {
@@ -783,7 +807,7 @@ class RPClient {
         const url = ['item', itemObj.realId].join('/');
         this.logDebug(`Finish test item with tempId ${itemTempId}`, itemObj);
         this.restClient
-          .update(url, Object.assign(finishTestItemData, { launchUuid: this.launchUuid }))
+          .update<T>(url, Object.assign(finishTestItemData, { launchUuid: this.launchUuid }))
           .then(
             (response) => {
               this.logDebug(`Success finish item with tempId ${itemTempId}`, response);
