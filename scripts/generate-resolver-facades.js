@@ -33,7 +33,10 @@ const readManifest = () => {
     const entries = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
     return Array.isArray(entries) ? entries : [];
   } catch (e) {
-    return [];
+    if (e.code === 'ENOENT') {
+      return [];
+    }
+    throw e;
   }
 };
 
