@@ -110,15 +110,6 @@ export const saveLaunchUuidToFile = (launchUuid: string): void => {
   });
 };
 
-export const formatMicrosecondsToISOString = (microseconds: number): string => {
-  const milliseconds = Math.floor(microseconds / 1000);
-  const microsecondsRemainder = microseconds % 1000;
-
-  return new Date(milliseconds)
-    .toISOString()
-    .replace('Z', `${String(microsecondsRemainder).padStart(3, '0')}Z`);
-};
-
 // Default export preserves the historical CommonJS shape (`module.exports = { ... }`)
 // so consumers importing `helpers` as a default still work.
 export default {
@@ -130,5 +121,4 @@ export default {
   getSystemAttributes,
   generateTestCaseId,
   saveLaunchUuidToFile,
-  formatMicrosecondsToISOString,
 };
