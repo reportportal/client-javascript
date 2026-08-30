@@ -1,9 +1,9 @@
 const nock = require('nock');
 const isEqual = require('lodash/isEqual');
 const http = require('http');
-const RestClient = require('../src/lib/rest');
-const OAuthInterceptor = require('../src/lib/oauth');
-const logger = require('../src/lib/logger');
+const RestClient = require('../src/rest');
+const OAuthInterceptor = require('../src/oauth');
+const logger = require('../src/logger');
 
 describe('RestClient', () => {
   const originalEnv = process.env;

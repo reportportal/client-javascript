@@ -14,9 +14,6 @@
     "test:coverage": "jest --coverage",
     "prepublishOnly": "npm run build"
   },
-  "directories": {
-    "lib": "./build/lib"
-  },
   "files": [
     "/build",
     "/VERSION",
@@ -29,63 +26,63 @@
     "/publicReportingAPI.js",
     "/publicReportingAPI.d.ts"
   ],
-  "main": "./build/lib/report-portal-client",
-  "types": "./build/lib/report-portal-client.d.ts",
+  "main": "./build/report-portal-client",
+  "types": "./build/report-portal-client.d.ts",
   "exports": {
     ".": {
-      "types": "./build/lib/report-portal-client.d.ts",
-      "import": "./build/lib/report-portal-client.js",
-      "require": "./build/lib/report-portal-client.js"
+      "types": "./build/report-portal-client.d.ts",
+      "import": "./build/report-portal-client.js",
+      "require": "./build/report-portal-client.js"
     },
     "./constants": {
-      "types": "./build/lib/constants/index.d.ts",
-      "import": "./build/lib/constants/index.js",
-      "require": "./build/lib/constants/index.js"
+      "types": "./build/constants/index.d.ts",
+      "import": "./build/constants/index.js",
+      "require": "./build/constants/index.js"
     },
     "./models": {
-      "types": "./build/lib/models/index.d.ts",
-      "import": "./build/lib/models/index.js",
-      "require": "./build/lib/models/index.js"
+      "types": "./build/models/index.d.ts",
+      "import": "./build/models/index.js",
+      "require": "./build/models/index.js"
     },
     "./helpers": {
-      "types": "./build/lib/helpers.d.ts",
-      "import": "./build/lib/helpers.js",
-      "require": "./build/lib/helpers.js"
+      "types": "./build/helpers.d.ts",
+      "import": "./build/helpers.js",
+      "require": "./build/helpers.js"
     },
     "./publicReportingAPI": {
-      "types": "./build/lib/publicReportingAPI.d.ts",
-      "import": "./build/lib/publicReportingAPI.js",
-      "require": "./build/lib/publicReportingAPI.js"
+      "types": "./build/publicReportingAPI.d.ts",
+      "import": "./build/publicReportingAPI.js",
+      "require": "./build/publicReportingAPI.js"
     },
     "./package.json": "./package.json",
     "./lib/constants": {
-      "types": "./build/lib/constants/index.d.ts",
-      "import": "./build/lib/constants/index.js",
-      "require": "./build/lib/constants/index.js"
+      "types": "./build/constants/index.d.ts",
+      "import": "./build/constants/index.js",
+      "require": "./build/constants/index.js"
     },
     "./lib/models": {
-      "types": "./build/lib/models/index.d.ts",
-      "import": "./build/lib/models/index.js",
-      "require": "./build/lib/models/index.js"
+      "types": "./build/models/index.d.ts",
+      "import": "./build/models/index.js",
+      "require": "./build/models/index.js"
     },
     "./lib/*": {
-      "types": "./build/lib/*.d.ts",
-      "import": "./build/lib/*.js",
-      "require": "./build/lib/*.js"
+      "types": "./build/*.d.ts",
+      "import": "./build/*.js",
+      "require": "./build/*.js"
     },
     "./lib/*.js": {
-      "types": "./build/lib/*.d.ts",
-      "import": "./build/lib/*.js",
-      "require": "./build/lib/*.js"
+      "types": "./build/*.d.ts",
+      "import": "./build/*.js",
+      "require": "./build/*.js"
     }
   },
   "typesVersions": {
     "*": {
-      "constants": ["./build/lib/constants/index.d.ts"],
-      "models": ["./build/lib/models/index.d.ts"],
-      "helpers": ["./build/lib/helpers.d.ts"],
-      "publicReportingAPI": ["./build/lib/publicReportingAPI.d.ts"],
-      "lib/*": ["./build/lib/*"]
+      "constants": ["./build/constants/index.d.ts"],
+      "models": ["./build/models/index.d.ts"],
+      "helpers": ["./build/helpers.d.ts"],
+      "publicReportingAPI": ["./build/publicReportingAPI.d.ts"],
+      "lib/*": ["./build/*"]
     }
   },
   "engines": {

@@ -1,6 +1,6 @@
 import os from 'os';
 import path from 'path';
-import { PJSON_NAME, PJSON_VERSION } from '../lib/pjson';
+import { PJSON_NAME, PJSON_VERSION } from '../pjson';
 
 export const ENCODING = 'utf-8';
 export { PJSON_NAME, PJSON_VERSION };

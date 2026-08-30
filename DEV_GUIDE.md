@@ -10,14 +10,14 @@ which writes a one-line re-export at each public subpath alias — `helpers.js`,
 `constants.js`, `models.js`, `publicReportingAPI.js` — together with matching `.d.ts` files.
 
 Supported package imports resolve through the `exports` / `typesVersions` maps in
-`package.json` straight to `build/lib` for Node, TypeScript and bundlers; these files are
-never on that path. They exist only for tools that resolve imports by walking the filesystem
+`package.json` straight to `build` for Node, TypeScript and bundlers; these files are never
+on that path. They exist only for tools that resolve imports by walking the filesystem
 instead of reading `exports`, chiefly `eslint-import-resolver-node` (the default resolver of
 `eslint-plugin-import`), which otherwise reports `import/no-unresolved` for these subpath
 imports and forces each consumer to configure an ignore.
 
 The alias list in the script is intentionally fixed and small — it does not mirror every
-internal module under `build/lib`. Deep `lib/**` imports as published up to 5.5.x (e.g.
+internal module under `build`. Deep `lib/**` imports as published up to 5.5.x (e.g.
 `require('@reportportal/client-javascript/lib/rest')`) resolve via the `exports` map for
 Node, TypeScript and bundlers, but are **not** backed by a physical `lib/**` tree — a
 filesystem-based resolver hitting one of those undocumented deep paths still needs a local

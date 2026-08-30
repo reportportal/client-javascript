@@ -7,7 +7,7 @@ interface PackageJson {
 }
 
 // Resolve the package's own package.json by walking up from this module's directory.
-// Works both from compiled output (`lib/`) and from source when run via ts-jest (`src/lib/`).
+// Works both from compiled output (`build/`) and from source when run via ts-jest (`src/`).
 function findPackageJson(dir: string): PackageJson {
   let current = dir;
   for (;;) {

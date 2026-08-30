@@ -5,7 +5,7 @@ const {
   getProxyConfig,
   createProxyAgents,
   getProxyAgentForUrl,
-} = require('../src/lib/proxyHelper');
+} = require('../src/proxyHelper');
 
 describe('proxyHelper', () => {
   const originalEnv = process.env;

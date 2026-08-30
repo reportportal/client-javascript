@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { HttpsProxyAgent } = require('https-proxy-agent');
-const OAuthInterceptor = require('../src/lib/oauth');
+const OAuthInterceptor = require('../src/oauth');
 
 jest.mock('axios', () => ({
   post: jest.fn(),

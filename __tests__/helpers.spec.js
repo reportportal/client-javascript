@@ -1,7 +1,7 @@
 const os = require('os');
 const fs = require('fs');
 const glob = require('glob');
-const helpers = require('../src/lib/helpers');
+const helpers = require('../src/helpers');
 const pjson = require('../package.json');
 
 describe('Helpers', () => {
