@@ -20,7 +20,6 @@
   "files": [
     "/build",
     "/VERSION",
-    "/lib",
     "/helpers.js",
     "/helpers.d.ts",
     "/constants.js",
