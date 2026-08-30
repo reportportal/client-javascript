@@ -26,15 +26,24 @@ const BUILD_DIR = path.join(ROOT, 'build');
 
 const toPosix = (p) => p.split(path.sep).join('/');
 
-/** Public subpath alias -> module it re-exports, relative to `build`. */
+/**
+ * Public subpath alias -> module it re-exports, relative to `build`.
+ *
+ * `typesOnly: true` means `package.json#exports` has no `import` / `require` condition for
+ * that alias (it re-exports pure TypeScript types with no runtime value — see
+ * DEV_GUIDE.md#subpath-facades) — Node rejects `require()`/`import()` of it regardless of
+ * whether a `.js` file physically exists, so writing one would be misleading; only the
+ * `.d.ts` facade is generated.
+ */
 const ALIASES = {
-  helpers: 'helpers',
-  constants: 'constants/index',
-  models: 'models/index',
-  publicReportingAPI: 'publicReportingAPI',
+  helpers: { module: 'helpers' },
+  constants: { module: 'constants/index' },
+  models: { module: 'models/index', typesOnly: true },
+  publicReportingAPI: { module: 'publicReportingAPI' },
 };
 
-const facadeFiles = () => Object.keys(ALIASES).flatMap((name) => [`${name}.js`, `${name}.d.ts`]);
+const facadeFiles = () =>
+  Object.entries(ALIASES).flatMap(([name, { typesOnly }]) => (typesOnly ? [`${name}.d.ts`] : [`${name}.js`, `${name}.d.ts`]));
 
 const clean = () => {
   const files = facadeFiles().filter((file) => fs.existsSync(path.join(ROOT, file)));
@@ -65,10 +74,12 @@ const generate = () => {
     throw new Error(`Nothing to generate from: ${toPosix(path.relative(ROOT, BUILD_DIR))} is missing, run "tsc" first.`);
   }
 
-  Object.entries(ALIASES).forEach(([name, module]) => {
+  Object.entries(ALIASES).forEach(([name, { module, typesOnly }]) => {
     const specifier = `./build/${module}`;
 
-    fs.writeFileSync(path.join(ROOT, `${name}.js`), `module.exports = require('${specifier}');\n`);
+    if (!typesOnly) {
+      fs.writeFileSync(path.join(ROOT, `${name}.js`), `module.exports = require('${specifier}');\n`);
+    }
 
     const declaration = path.join(BUILD_DIR, `${module}.d.ts`);
     fs.writeFileSync(path.join(ROOT, `${name}.d.ts`), declarationFacade(specifier, declaration));

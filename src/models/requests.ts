@@ -1,6 +1,7 @@
 import { Attachment, Attribute, Issue } from './common';
 import { LAUNCH_MODES } from '../constants/launchModes';
 import { LOG_LEVELS } from '../constants/logLevels';
+import { MERGE_TYPES } from '../constants/mergeTypes';
 import { STATUSES } from '../constants/statuses';
 import { TEST_ITEM_TYPES } from '../constants/testItemTypes';
 
@@ -83,11 +84,6 @@ export interface LogOptions {
   message?: string;
   time?: string | number;
   file?: Attachment;
-}
-
-export enum MERGE_TYPES {
-  BASIC = 'BASIC',
-  DEEP = 'DEEP',
 }
 
 export interface MergeLaunchesOptions {

@@ -21,7 +21,6 @@
     "/helpers.d.ts",
     "/constants.js",
     "/constants.d.ts",
-    "/models.js",
     "/models.d.ts",
     "/publicReportingAPI.js",
     "/publicReportingAPI.d.ts"
@@ -40,9 +39,7 @@
       "require": "./build/constants/index.js"
     },
     "./models": {
-      "types": "./build/models/index.d.ts",
-      "import": "./build/models/index.js",
-      "require": "./build/models/index.js"
+      "types": "./build/models/index.d.ts"
     },
     "./helpers": {
       "types": "./build/helpers.d.ts",
@@ -59,11 +56,6 @@
       "types": "./build/constants/index.d.ts",
       "import": "./build/constants/index.js",
       "require": "./build/constants/index.js"
-    },
-    "./lib/models": {
-      "types": "./build/models/index.d.ts",
-      "import": "./build/models/index.js",
-      "require": "./build/models/index.js"
     },
     "./lib/*": {
       "types": "./build/*.d.ts",

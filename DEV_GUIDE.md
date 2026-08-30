@@ -7,7 +7,17 @@ README.md, which is published to package registries.
 
 `npm run build` compiles to `build/` and then runs `scripts/generate-resolver-facades.js`,
 which writes a one-line re-export at each public subpath alias — `helpers.js`,
-`constants.js`, `models.js`, `publicReportingAPI.js` — together with matching `.d.ts` files.
+`constants.js`, `publicReportingAPI.js` — together with matching `.d.ts` files. `models` only
+gets a `.d.ts` facade: `src/models/**` is TypeScript types with no runtime value (confirmed —
+the compiled `build/models/*.js` files are all empty `__esModule` stubs), so
+`package.json#exports["./models"]` has no `import` / `require` condition. Node enforces that
+regardless of whether a `.js` file physically exists at the root, so writing one would just be
+misleading. If a consumer's TypeScript setup runs with `isolatedModules` and they import from
+`models` without `import type`, they'll now get `ERR_PACKAGE_PATH_NOT_EXPORTED` at runtime
+instead of a silently-empty object — that's intentional; there are no known consumers of this
+brand-new subpath yet, so this is the cheapest point to make the contract strict. If a genuine
+runtime value ever needs to live under `models`, move it to `constants/` (like `MERGE_TYPES`,
+which used to live here) instead of adding a runtime condition back.
 
 Supported package imports resolve through the `exports` / `typesVersions` maps in
 `package.json` straight to `build` for Node, TypeScript and bundlers; these files are never

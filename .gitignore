@@ -12,7 +12,6 @@ build
 /helpers.d.ts
 /constants.js
 /constants.d.ts
-/models.js
 /models.d.ts
 /publicReportingAPI.js
 /publicReportingAPI.d.ts
