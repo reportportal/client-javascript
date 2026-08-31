@@ -1,10 +1,9 @@
 module.exports = {
   transform: {
-    '^.+\\.ts$': ['ts-jest', { diagnostics: false, tsconfig: 'tsconfig.json' }],
-    '^.+\\.js$': 'babel-jest',
+    '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.spec.json' }],
   },
   moduleFileExtensions: ['ts', 'js', 'json'],
-  testRegex: '/__tests__/.*\\.(test|spec).js$',
+  testRegex: '/__tests__/.*\\.(test|spec).ts$',
   testEnvironment: 'node',
   collectCoverageFrom: [
     'src/**/*.ts',

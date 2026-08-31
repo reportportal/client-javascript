@@ -1,10 +1,11 @@
-const axios = require('axios');
-const Statistics = require('../src/statistics/statistics');
-const { MEASUREMENT_ID, API_KEY } = require('../src/statistics/constants');
+import axios, { AxiosResponse } from 'axios';
+import Statistics from '../src/statistics/statistics';
+import { MEASUREMENT_ID, API_KEY } from '../src/statistics/constants';
+import type { AgentParams } from '../src/models/common';
 
 const uuidv4Validation = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 
-const agentParams = {
+const agentParams: AgentParams = {
   name: 'AgentName',
   version: 'AgentVersion',
 };
@@ -42,41 +43,36 @@ const agentRequestValidation = expect.objectContaining({
   events: expect.arrayContaining([expect.objectContaining(agentEventValidationObject)]),
 });
 
+// The client doesn't do anything with the resolved response, it just awaits it not throwing -
+// so a minimal stand-in cast to AxiosResponse is enough to satisfy the mock's return type.
+const fakeAxiosResponse = { send: () => {} } as unknown as AxiosResponse;
+
 describe('Statistics', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('should send proper event to axios', async () => {
-    jest.spyOn(axios, 'post').mockReturnValue({
-      send: () => {}, // eslint-disable-line
-    });
+    const postSpy = jest.spyOn(axios, 'post').mockResolvedValue(fakeAxiosResponse);
 
     const statistics = new Statistics(eventName, agentParams);
     await statistics.trackEvent();
 
-    expect(axios.post).toHaveBeenCalledTimes(1);
-    expect(axios.post).toHaveBeenCalledWith(url, agentRequestValidation);
+    expect(postSpy).toHaveBeenCalledTimes(1);
+    expect(postSpy).toHaveBeenCalledWith(url, agentRequestValidation);
   });
 
-  [
-    undefined,
-    {},
-    {
-      name: null,
-      version: null,
-    },
-  ].forEach((params) => {
+  (
+    [undefined, {}, { name: null, version: null }] as unknown as (AgentParams | undefined)[]
+  ).forEach((params) => {
     it(`should not fail if agent params: ${JSON.stringify(params)}`, async () => {
-      jest.spyOn(axios, 'post').mockReturnValue({
-        send: () => {}, // eslint-disable-line
-      });
+      const postSpy = jest.spyOn(axios, 'post').mockResolvedValue(fakeAxiosResponse);
 
       const statistics = new Statistics(eventName, params);
       await statistics.trackEvent();
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith(url, baseRequestValidation);
+      expect(postSpy).toHaveBeenCalledTimes(1);
+      expect(postSpy).toHaveBeenCalledWith(url, baseRequestValidation);
     });
 
     it('Should properly handle errors if any', async () => {
@@ -94,16 +90,14 @@ describe('Statistics', () => {
 
   describe('setInstanceID', () => {
     it('should set instanceID in event params', async () => {
-      jest.spyOn(axios, 'post').mockReturnValue({
-        send: () => {}, // eslint-disable-line
-      });
+      const postSpy = jest.spyOn(axios, 'post').mockResolvedValue(fakeAxiosResponse);
 
       const statistics = new Statistics(eventName, agentParams);
       statistics.setInstanceID('test-instance-id');
       await statistics.trackEvent();
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      expect(axios.post).toHaveBeenCalledWith(
+      expect(postSpy).toHaveBeenCalledTimes(1);
+      expect(postSpy).toHaveBeenCalledWith(
         url,
         expect.objectContaining({
           events: expect.arrayContaining([
@@ -118,15 +112,13 @@ describe('Statistics', () => {
     });
 
     it('should not include instanceID if setInstanceID was not called', async () => {
-      jest.spyOn(axios, 'post').mockReturnValue({
-        send: () => {}, // eslint-disable-line
-      });
+      const postSpy = jest.spyOn(axios, 'post').mockResolvedValue(fakeAxiosResponse);
 
       const statistics = new Statistics(eventName, agentParams);
       await statistics.trackEvent();
 
-      expect(axios.post).toHaveBeenCalledTimes(1);
-      const callArgs = axios.post.mock.calls[0][1];
+      expect(postSpy).toHaveBeenCalledTimes(1);
+      const callArgs = postSpy.mock.calls[0][1] as { events: { params: Record<string, unknown> }[] };
       expect(callArgs.events[0].params).not.toHaveProperty('instanceID');
     });
   });

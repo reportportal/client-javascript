@@ -1,9 +1,32 @@
-const nock = require('nock');
-const isEqual = require('lodash/isEqual');
-const http = require('http');
-const RestClient = require('../src/rest');
-const OAuthInterceptor = require('../src/oauth');
-const logger = require('../src/logger');
+import nock from 'nock';
+import isEqual from 'lodash/isEqual';
+import http from 'http';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { IAxiosRetryConfig } from 'axios-retry';
+import RestClient from '../src/rest';
+import OAuthInterceptor from '../src/oauth';
+import * as logger from '../src/logger';
+import type { RestClientConfig, RestClientOptions } from '../src/models/config';
+
+// `baseURL` / `headers` / `restClientConfig` / `axiosInstance` are private on RestClient, and
+// `getRestConfig` returns a plain stripped-down object rather than a true AxiosRequestConfig -
+// this gives the tests typed access to that internal shape without loosening the real API.
+interface RestClientInternal {
+  baseURL: string;
+  headers?: Record<string, string>;
+  restClientConfig?: RestClientConfig;
+  axiosInstance: AxiosInstance;
+  buildPath(path?: string): string;
+  getRestConfig(): Record<string, unknown>;
+  getRetryConfig(): IAxiosRetryConfig;
+  retrieve<T = unknown>(path: string, options?: AxiosRequestConfig): Promise<T>;
+  create<T = unknown>(path: string, data: unknown, options?: AxiosRequestConfig): Promise<T>;
+  update<T = unknown>(path: string, data: unknown, options?: AxiosRequestConfig): Promise<T>;
+  delete<T = unknown>(path: string, data: unknown, options?: AxiosRequestConfig): Promise<T>;
+  retrieveSyncAPI<T = unknown>(path: string, options?: AxiosRequestConfig): Promise<T>;
+}
+const asInternal = (client: RestClient): RestClientInternal =>
+  client as unknown as RestClientInternal;
 
 describe('RestClient', () => {
   const originalEnv = process.env;
@@ -24,7 +47,7 @@ describe('RestClient', () => {
     process.env = originalEnv;
   });
 
-  const options = {
+  const options: RestClientOptions = {
     baseURL: 'http://report-portal-host:8080/api/v1',
     headers: {
       'User-Agent': 'NodeJS',
@@ -37,16 +60,18 @@ describe('RestClient', () => {
       timeout: 0,
     },
   };
-  const noOptions = {};
-  const getRetryAttempts = (client) => client.getRetryConfig().retries + 1;
-  const restClient = new RestClient(options);
-  const restClientNoRetry = new RestClient({
-    ...options,
-    restClientConfig: {
-      ...options.restClientConfig,
-      retry: 0,
-    },
-  });
+  const noOptions: AxiosRequestConfig = {};
+  const getRetryAttempts = (client: RestClientInternal) => client.getRetryConfig().retries! + 1;
+  const restClient = asInternal(new RestClient(options));
+  const restClientNoRetry = asInternal(
+    new RestClient({
+      ...options,
+      restClientConfig: {
+        ...options.restClientConfig,
+        retry: 0,
+      },
+    }),
+  );
   const retryAttempts = getRetryAttempts(restClient);
 
   const unathorizedError = {
@@ -68,29 +93,31 @@ describe('RestClient', () => {
 
     it('adds Logger to axios instance if enabled', () => {
       const spyLogger = jest.spyOn(logger, 'addLogger').mockReturnValue();
-      const optionsWithLoggerEnabled = {
+      const optionsWithLoggerEnabled: RestClientOptions = {
         ...options,
         restClientConfig: {
           ...options.restClientConfig,
           debug: true,
         },
       };
-      const client = new RestClient(optionsWithLoggerEnabled);
+      const client = asInternal(new RestClient(optionsWithLoggerEnabled));
 
       expect(spyLogger).toHaveBeenCalledWith(client.axiosInstance);
     });
 
     it('attaches an OAuth interceptor to the axios instance when oauthConfig is provided', () => {
       const attachSpy = jest.spyOn(OAuthInterceptor.prototype, 'attach');
-      const client = new RestClient({
-        ...options,
-        oauthConfig: {
-          tokenEndpoint: 'https://auth.example.com/oauth/token',
-          username: 'user',
-          password: 'password',
-          clientId: 'client-id',
-        },
-      });
+      const client = asInternal(
+        new RestClient({
+          ...options,
+          oauthConfig: {
+            tokenEndpoint: 'https://auth.example.com/oauth/token',
+            username: 'user',
+            password: 'password',
+            clientId: 'client-id',
+          },
+        }),
+      );
 
       expect(attachSpy).toHaveBeenCalledWith(client.axiosInstance);
 
@@ -104,28 +131,30 @@ describe('RestClient', () => {
       const mathRandomSpy = jest.spyOn(Math, 'random').mockImplementationOnce(() => 0);
 
       expect(retryConfig.retries).toBe(6);
-      expect(retryAttempts).toBe(retryConfig.retries + 1);
+      expect(retryAttempts).toBe(retryConfig.retries! + 1);
       expect(retryConfig.shouldResetTimeout).toBe(true);
-      expect(retryConfig.retryDelay(1)).toBe(200);
+      expect(retryConfig.retryDelay!(1, undefined as never)).toBe(200);
 
       mathRandomSpy.mockImplementationOnce(() => 1);
-      expect(retryConfig.retryDelay(4)).toBeCloseTo(1600 * 0.6);
+      expect(retryConfig.retryDelay!(4, undefined as never)).toBeCloseTo(1600 * 0.6);
 
       mathRandomSpy.mockImplementationOnce(() => 0);
-      expect(retryConfig.retryDelay(10)).toBe(5000);
+      expect(retryConfig.retryDelay!(10, undefined as never)).toBe(5000);
 
       mathRandomSpy.mockRestore();
     });
 
     it('uses custom retry attempts when a numeric value is provided', (done) => {
       const customRetries = 2;
-      const client = new RestClient({
-        ...options,
-        restClientConfig: {
-          ...options.restClientConfig,
-          retry: customRetries,
-        },
-      });
+      const client = asInternal(
+        new RestClient({
+          ...options,
+          restClientConfig: {
+            ...options.restClientConfig,
+            retry: customRetries,
+          },
+        }),
+      );
       expect(getRetryAttempts(client)).toBe(customRetries + 1);
 
       const scope = nock(options.baseURL)
@@ -133,7 +162,7 @@ describe('RestClient', () => {
         .times(getRetryAttempts(client))
         .replyWithError(netErrConnectionResetError);
 
-      client.retrieve('users/custom-retry-number', noOptions).catch((error) => {
+      client.retrieve('users/custom-retry-number', noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -144,17 +173,19 @@ describe('RestClient', () => {
 
     it('merges retry configuration object from settings', () => {
       const customDelay = () => 250;
-      const client = new RestClient({
-        ...options,
-        restClientConfig: {
-          ...options.restClientConfig,
-          retry: {
-            retries: 4,
-            retryDelay: customDelay,
-            shouldResetTimeout: true,
+      const client = asInternal(
+        new RestClient({
+          ...options,
+          restClientConfig: {
+            ...options.restClientConfig,
+            retry: {
+              retries: 4,
+              retryDelay: customDelay,
+              shouldResetTimeout: true,
+            },
           },
-        },
-      });
+        }),
+      );
 
       const retryConfig = client.getRetryConfig();
 
@@ -168,24 +199,29 @@ describe('RestClient', () => {
       const timeoutError = {
         message: 'timeout of 1ms exceeded',
       };
-      expect(retryConfig.retryCondition(timeoutError)).toBe(true);
+      expect(retryConfig.retryCondition!(timeoutError as never)).toBe(true);
     });
 
     it('handles undefined restClientConfig without crashing during retries', () => {
-      const client = new RestClient({
-        baseURL: options.baseURL,
-        headers: options.headers,
-        restClientConfig: undefined,
-      });
+      const client = asInternal(
+        new RestClient({
+          baseURL: options.baseURL,
+          headers: options.headers,
+          restClientConfig: undefined,
+        }),
+      );
 
       const retryConfig = client.getRetryConfig();
       expect(retryConfig.retries).toBe(6);
 
       const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-      const onRetry = retryConfig.onRetry;
-      
+      const onRetry = retryConfig.onRetry!;
+
       expect(() => {
-        onRetry(1, { code: 'ECONNABORTED' }, { method: 'GET', url: 'http://test.com' });
+        onRetry(1, { code: 'ECONNABORTED' } as never, {
+          method: 'GET',
+          url: 'http://test.com',
+        } as never);
       }).not.toThrow();
 
       consoleSpy.mockRestore();
@@ -202,24 +238,28 @@ describe('RestClient', () => {
 
   describe('getRestConfig', () => {
     it("return {} in case agent property doesn't exist", () => {
-      const client = new RestClient({
-        ...options,
-        restClientConfig: {},
-      });
+      const client = asInternal(
+        new RestClient({
+          ...options,
+          restClientConfig: {},
+        }),
+      );
 
       expect(client.getRestConfig()).toEqual({});
     });
 
     it('creates object with correct properties with http(s) agent', () => {
-      const client = new RestClient({
-        ...options,
-        restClientConfig: {
-          agent: {
-            rejectUnauthorized: false,
+      const client = asInternal(
+        new RestClient({
+          ...options,
+          restClientConfig: {
+            agent: {
+              rejectUnauthorized: false,
+            },
+            timeout: 10000,
           },
-          timeout: 10000,
-        },
-      });
+        }),
+      );
 
       const config = client.getRestConfig();
 
@@ -247,7 +287,7 @@ describe('RestClient', () => {
     it('catches NETWORK errors', (done) => {
       const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
-      restClientNoRetry.retrieve('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieve('users', noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -259,7 +299,7 @@ describe('RestClient', () => {
     it('catches API errors', (done) => {
       const scope = nock(options.baseURL).get('/users').reply(403, unathorizedError);
 
-      restClientNoRetry.retrieve('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieve('users', noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -293,7 +333,7 @@ describe('RestClient', () => {
         .post('/users', (body) => isEqual(body, newUser))
         .replyWithError(netErrConnectionResetError);
 
-      restClientNoRetry.create('users', newUser, noOptions).catch((error) => {
+      restClientNoRetry.create('users', newUser, noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -309,7 +349,7 @@ describe('RestClient', () => {
         .post('/users', (body) => isEqual(body, newUser))
         .reply(403, unathorizedError);
 
-      restClientNoRetry.create('users', newUser, noOptions).catch((error) => {
+      restClientNoRetry.create('users', newUser, noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -343,7 +383,7 @@ describe('RestClient', () => {
         .put('/users/1', (body) => isEqual(body, newUserInfo))
         .replyWithError(netErrConnectionResetError);
 
-      restClientNoRetry.update('users/1', newUserInfo, noOptions).catch((error) => {
+      restClientNoRetry.update('users/1', newUserInfo, noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -359,7 +399,7 @@ describe('RestClient', () => {
         .put('/users/1', (body) => isEqual(body, newUserInfo))
         .reply(403, unathorizedError);
 
-      restClientNoRetry.update('users/1', newUserInfo, noOptions).catch((error) => {
+      restClientNoRetry.update('users/1', newUserInfo, noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -391,7 +431,7 @@ describe('RestClient', () => {
         .delete('/users/1')
         .replyWithError(netErrConnectionResetError);
 
-      restClientNoRetry.delete('users/1', emptyBody, noOptions).catch((error) => {
+      restClientNoRetry.delete('users/1', emptyBody, noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -405,7 +445,7 @@ describe('RestClient', () => {
 
       const scope = nock(options.baseURL).delete('/users/1').reply(403, unathorizedError);
 
-      restClientNoRetry.delete('users/1', emptyBody, noOptions).catch((error) => {
+      restClientNoRetry.delete('users/1', emptyBody, noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();
@@ -432,7 +472,7 @@ describe('RestClient', () => {
     it('catches NETWORK errors', (done) => {
       const scope = nock(options.baseURL).get('/users').replyWithError(netErrConnectionResetError);
 
-      restClientNoRetry.retrieveSyncAPI('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieveSyncAPI('users', noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(netErrConnectionResetError.message);
         expect(scope.isDone()).toBeTruthy();
@@ -444,7 +484,7 @@ describe('RestClient', () => {
     it('catches API errors', (done) => {
       const scope = nock(options.baseURL).get('/users').reply(403, unathorizedError);
 
-      restClientNoRetry.retrieveSyncAPI('users', noOptions).catch((error) => {
+      restClientNoRetry.retrieveSyncAPI('users', noOptions).catch((error: Error) => {
         expect(error instanceof Error).toBeTruthy();
         expect(error.message).toMatch(unauthorizedErrorMessage);
         expect(scope.isDone()).toBeTruthy();

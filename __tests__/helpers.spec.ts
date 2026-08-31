@@ -1,8 +1,9 @@
-const os = require('os');
-const fs = require('fs');
-const glob = require('glob');
-const helpers = require('../src/helpers');
-const pjson = require('../package.json');
+import os from 'os';
+import fs from 'fs';
+import * as glob from 'glob';
+import * as helpers from '../src/helpers';
+import type { TestItemParameter } from '../src/models/requests';
+import pjson from '../package.json';
 
 describe('Helpers', () => {
   describe('formatName', () => {
@@ -22,7 +23,7 @@ describe('Helpers', () => {
 
   describe('now', () => {
     it('returns milliseconds from unix time', () => {
-      expect(new Date() - helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
+      expect(Number(new Date()) - helpers.now()).toBeLessThan(100); // less than 100 miliseconds difference
     });
   });
 
@@ -50,7 +51,7 @@ describe('Helpers', () => {
     it('should return correct system attributes', () => {
       jest.spyOn(os, 'type').mockReturnValue('osType');
       jest.spyOn(os, 'arch').mockReturnValue('osArchitecture');
-      jest.spyOn(os, 'totalmem').mockReturnValue('1');
+      jest.spyOn(os, 'totalmem').mockReturnValue(1);
       const nodeVersion = process.version;
       const expectedAttr = [
         {
@@ -106,7 +107,7 @@ describe('Helpers', () => {
           key: 'keyThree',
           value: 'valueThree',
         },
-      ];
+      ] as TestItemParameter[];
 
       const testCaseId = helpers.generateTestCaseId('codeRef', parameters);
 
