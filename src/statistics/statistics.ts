@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { MEASUREMENT_ID, API_KEY, PJSON_NAME, PJSON_VERSION, INTERPRETER } from './constants';
 import { getClientId } from './client-id';
-import type { AgentParams } from '../lib/models/common';
+import type { AgentParams } from '../models/common';
 
 interface EventParams {
   interpreter: string | null;

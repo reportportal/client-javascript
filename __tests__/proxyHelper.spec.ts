@@ -1,11 +1,12 @@
-const { HttpsProxyAgent } = require('https-proxy-agent');
-const { HttpProxyAgent } = require('http-proxy-agent');
-const {
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import {
   shouldBypassProxy,
   getProxyConfig,
   createProxyAgents,
   getProxyAgentForUrl,
-} = require('../src/lib/proxyHelper');
+} from '../src/proxyHelper';
+import type { RestClientConfig } from '../src/models/config';
 
 describe('proxyHelper', () => {
   const originalEnv = process.env;
@@ -30,7 +31,7 @@ describe('proxyHelper', () => {
   describe('shouldBypassProxy', () => {
     it('returns false when noProxy is not provided', () => {
       expect(shouldBypassProxy('http://example.com', '')).toBe(false);
-      expect(shouldBypassProxy('http://example.com', null)).toBe(false);
+      expect(shouldBypassProxy('http://example.com', null as unknown as string)).toBe(false);
       expect(shouldBypassProxy('http://example.com', undefined)).toBe(false);
     });
 
@@ -85,12 +86,12 @@ describe('proxyHelper', () => {
     });
 
     it('returns null when proxy is explicitly disabled', () => {
-      const config = { proxy: false };
+      const config: RestClientConfig = { proxy: false };
       expect(getProxyConfig('http://example.com', config)).toBeNull();
     });
 
     it('returns null when URL matches noProxy from config', () => {
-      const config = { noProxy: 'example.com,localhost' };
+      const config: RestClientConfig = { noProxy: 'example.com,localhost' };
       expect(getProxyConfig('http://example.com', config)).toBeNull();
       expect(getProxyConfig('http://localhost', config)).toBeNull();
     });
@@ -102,12 +103,12 @@ describe('proxyHelper', () => {
 
     it('prefers noProxy from config over environment', () => {
       process.env.NO_PROXY = 'other.com';
-      const config = { noProxy: 'example.com' };
+      const config: RestClientConfig = { noProxy: 'example.com' };
       expect(getProxyConfig('http://example.com', config)).toBeNull();
     });
 
     it('returns proxy URL from string config', () => {
-      const config = { proxy: 'http://proxy.example.com:8080' };
+      const config: RestClientConfig = { proxy: 'http://proxy.example.com:8080' };
       const result = getProxyConfig('http://target.com', config);
       expect(result).toEqual({
         proxyUrl: 'http://proxy.example.com:8080',
@@ -115,7 +116,7 @@ describe('proxyHelper', () => {
     });
 
     it('returns proxy URL from object config', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: {
           protocol: 'https',
           host: 'proxy.example.com',
@@ -129,7 +130,7 @@ describe('proxyHelper', () => {
     });
 
     it('returns proxy URL with authentication', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: {
           protocol: 'http',
           host: 'proxy.example.com',
@@ -147,7 +148,7 @@ describe('proxyHelper', () => {
     });
 
     it('uses http as default protocol for object config', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: {
           host: 'proxy.example.com',
           port: 8080,
@@ -184,7 +185,7 @@ describe('proxyHelper', () => {
 
     it('prioritizes explicit config over environment variables', () => {
       process.env.HTTPS_PROXY = 'http://env-proxy.com:8080';
-      const config = { proxy: 'http://config-proxy.com:9090' };
+      const config: RestClientConfig = { proxy: 'http://config-proxy.com:9090' };
       const result = getProxyConfig('https://target.com', config);
       expect(result).toEqual({
         proxyUrl: 'http://config-proxy.com:9090',
@@ -196,47 +197,47 @@ describe('proxyHelper', () => {
     it('returns default agent when no proxy is configured', () => {
       const agents = createProxyAgents('http://example.com', {});
       expect(agents.httpAgent).toBeDefined();
-      expect(agents.httpAgent.constructor.name).toBe('Agent');
+      expect(agents.httpAgent!.constructor.name).toBe('Agent');
     });
 
     it('creates HttpProxyAgent for HTTP URLs', () => {
-      const config = { proxy: 'http://proxy.example.com:8080' };
+      const config: RestClientConfig = { proxy: 'http://proxy.example.com:8080' };
       const agents = createProxyAgents('http://target.com', config);
       expect(agents.httpAgent).toBeInstanceOf(HttpProxyAgent);
       expect(agents.httpsAgent).toBeUndefined();
     });
 
     it('creates HttpsProxyAgent for HTTPS URLs', () => {
-      const config = { proxy: 'http://proxy.example.com:8080' };
+      const config: RestClientConfig = { proxy: 'http://proxy.example.com:8080' };
       const agents = createProxyAgents('https://target.com', config);
       expect(agents.httpsAgent).toBeInstanceOf(HttpsProxyAgent);
       expect(agents.httpAgent).toBeUndefined();
     });
 
     it('returns default agent when URL is in noProxy list', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: 'http://proxy.example.com:8080',
         noProxy: 'target.com',
       };
       const agents = createProxyAgents('http://target.com', config);
       expect(agents.httpAgent).toBeDefined();
-      expect(agents.httpAgent.constructor.name).toBe('Agent');
+      expect(agents.httpAgent!.constructor.name).toBe('Agent');
     });
 
     it('returns default HTTPS agent for HTTPS URLs in noProxy list', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: 'http://proxy.example.com:8080',
         noProxy: 'target.com',
       };
       const agents = createProxyAgents('https://target.com', config);
       expect(agents.httpsAgent).toBeDefined();
-      expect(agents.httpsAgent.constructor.name).toBe('Agent');
+      expect(agents.httpsAgent!.constructor.name).toBe('Agent');
     });
   });
 
   describe('getProxyAgentForUrl', () => {
     it('returns appropriate agent based on URL protocol', () => {
-      const config = { proxy: 'http://proxy.example.com:8080' };
+      const config: RestClientConfig = { proxy: 'http://proxy.example.com:8080' };
 
       const httpAgents = getProxyAgentForUrl('http://target.com', config);
       expect(httpAgents.httpAgent).toBeInstanceOf(HttpProxyAgent);
@@ -246,13 +247,13 @@ describe('proxyHelper', () => {
     });
 
     it('respects noProxy configuration', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: 'http://proxy.example.com:8080',
         noProxy: 'localhost,target.com',
       };
       const agents = getProxyAgentForUrl('http://target.com', config);
       expect(agents.httpAgent).toBeDefined();
-      expect(agents.httpAgent.constructor.name).toBe('Agent');
+      expect(agents.httpAgent!.constructor.name).toBe('Agent');
     });
 
     it('works with environment variables', () => {
@@ -266,12 +267,12 @@ describe('proxyHelper', () => {
       process.env.NO_PROXY = 'target.com';
       const agents = getProxyAgentForUrl('http://target.com', {});
       expect(agents.httpAgent).toBeDefined();
-      expect(agents.httpAgent.constructor.name).toBe('Agent');
+      expect(agents.httpAgent!.constructor.name).toBe('Agent');
     });
   });
 
   describe('credential sanitization in debug logs', () => {
-    let consoleLogSpy;
+    let consoleLogSpy: jest.SpyInstance;
 
     beforeEach(() => {
       consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
@@ -282,7 +283,7 @@ describe('proxyHelper', () => {
     });
 
     it('sanitizes proxy credentials in debug logs when using proxy config object', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: {
           protocol: 'https',
           host: 'proxy.example.com',
@@ -309,7 +310,7 @@ describe('proxyHelper', () => {
     });
 
     it('sanitizes proxy credentials in debug logs when using proxy URL string', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: 'https://myuser:mypassword@proxy.example.com:8080',
         debug: true,
       };
@@ -325,7 +326,7 @@ describe('proxyHelper', () => {
     });
 
     it('logs proxy URL normally when no credentials are present', () => {
-      const config = {
+      const config: RestClientConfig = {
         proxy: 'https://proxy.example.com:8080',
         debug: true,
       };

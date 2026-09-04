@@ -1,8 +1,6 @@
-const { getClientConfig, getRequiredOption, getApiKey } = require('../src/lib/commons/config');
-const {
-  ReportPortalRequiredOptionError,
-  ReportPortalValidationError,
-} = require('../src/lib/commons/errors');
+import { getClientConfig, getRequiredOption, getApiKey } from '../src/commons/config';
+import { ReportPortalRequiredOptionError, ReportPortalValidationError } from '../src/commons/errors';
+import type { ReportPortalConfig } from '../src/models/config';
 
 describe('Config commons test suite', () => {
   describe('getRequiredOption', () => {
@@ -26,7 +24,7 @@ describe('Config commons test suite', () => {
     it('should throw ReportPortalRequiredOptionError in case of option not present in options', () => {
       let error;
       try {
-        getRequiredOption({ other: 1 }, 'project');
+        getRequiredOption({ other: 1 } as unknown as { project: unknown }, 'project');
       } catch (e) {
         error = e;
       }
@@ -73,7 +71,7 @@ describe('Config commons test suite', () => {
   describe('getClientConfig', () => {
     it('should print ReportPortalValidationError error to the console in case of options is not an object type', () => {
       jest.spyOn(console, 'dir').mockImplementation();
-      getClientConfig('options');
+      getClientConfig('options' as unknown as ReportPortalConfig);
 
       expect(console.dir).toHaveBeenCalledWith(
         new ReportPortalValidationError('`options` must be an object.'),
@@ -85,7 +83,7 @@ describe('Config commons test suite', () => {
       getClientConfig({
         apiKey: '123',
         project: 'prj',
-      });
+      } as unknown as ReportPortalConfig);
 
       expect(console.dir).toHaveBeenCalledWith(new ReportPortalRequiredOptionError('endpoint'));
     });
@@ -95,7 +93,7 @@ describe('Config commons test suite', () => {
       getClientConfig({
         apiKey: '123',
         endpoint: 'https://abc.com',
-      });
+      } as unknown as ReportPortalConfig);
 
       expect(console.dir).toHaveBeenCalledWith(new ReportPortalRequiredOptionError('project'));
     });
@@ -105,7 +103,7 @@ describe('Config commons test suite', () => {
       getClientConfig({
         project: 'prj',
         endpoint: 'https://abc.com',
-      });
+      } as unknown as ReportPortalConfig);
 
       expect(console.dir).toHaveBeenCalledWith(new ReportPortalRequiredOptionError('apiKey'));
     });

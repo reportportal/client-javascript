@@ -1,3 +1,15 @@
+### Changed
+- The client has been migrated to TypeScript. It now ships with bundled type
+  definitions (no separate `@types` package required) and exposes constants,
+  models and helpers via subpath imports (e.g.
+  `@reportportal/client-javascript/constants`).
+- **Breaking Change** Deep `lib/**` imports published up to 5.5.x (e.g.
+  `require('@reportportal/client-javascript/lib/helpers')`) still resolve for Node,
+  TypeScript and bundlers via the `exports` map, but are no longer backed by physical files.
+  Tools that resolve imports by walking the filesystem instead of reading `exports` — most
+  notably `eslint-import-resolver-node`, the default resolver of `eslint-plugin-import` —
+  will report [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/issues/1810) for these paths. Switch to the new subpath aliases
+  (`constants`, `models`, `helpers`, `publicReportingAPI`) instead.
 ### Added
 - `retry_of` property is now automatically included in the `startTestItem`
   request payload when `retry: true` and a previous attempt exists in the

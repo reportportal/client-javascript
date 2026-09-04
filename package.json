@@ -5,73 +5,91 @@
   "author": "ReportPortal.io",
   "scripts": {
     "codegraph": "bash scripts/codegraph.sh",
-    "build": "npm run clean && tsc",
-    "clean": "rimraf ./build",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run clean && tsc && npm run facades",
+    "facades": "node scripts/generate-resolver-facades.js",
+    "clean": "node scripts/generate-resolver-facades.js --clean && rimraf ./build",
     "lint": "eslint \"src/**/*.ts\"",
     "format": "npm run lint -- --fix",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "npm run typecheck && jest",
+    "test:coverage": "npm run typecheck && jest --coverage",
     "prepublishOnly": "npm run build"
-  },
-  "directories": {
-    "lib": "./build/lib"
   },
   "files": [
     "/build",
-    "/VERSION"
+    "/VERSION",
+    "/helpers.js",
+    "/helpers.d.ts",
+    "/constants.js",
+    "/constants.d.ts",
+    "/models.d.ts",
+    "/publicReportingAPI.js",
+    "/publicReportingAPI.d.ts"
   ],
-  "main": "./build/lib/report-portal-client",
-  "types": "./build/lib/report-portal-client.d.ts",
+  "main": "./build/report-portal-client",
+  "types": "./build/report-portal-client.d.ts",
   "exports": {
     ".": {
-      "types": "./build/lib/report-portal-client.d.ts",
-      "import": "./build/lib/report-portal-client.js",
-      "require": "./build/lib/report-portal-client.js"
+      "types": "./build/report-portal-client.d.ts",
+      "import": "./build/report-portal-client.js",
+      "require": "./build/report-portal-client.js"
     },
     "./constants": {
-      "types": "./build/lib/constants/index.d.ts",
-      "import": "./build/lib/constants/index.js",
-      "require": "./build/lib/constants/index.js"
+      "types": "./build/constants/index.d.ts",
+      "import": "./build/constants/index.js",
+      "require": "./build/constants/index.js"
     },
     "./models": {
-      "types": "./build/lib/models/index.d.ts",
-      "import": "./build/lib/models/index.js",
-      "require": "./build/lib/models/index.js"
+      "types": "./build/models/index.d.ts"
     },
     "./helpers": {
-      "types": "./build/lib/helpers.d.ts",
-      "import": "./build/lib/helpers.js",
-      "require": "./build/lib/helpers.js"
+      "types": "./build/helpers.d.ts",
+      "import": "./build/helpers.js",
+      "require": "./build/helpers.js"
     },
     "./publicReportingAPI": {
-      "types": "./build/lib/publicReportingAPI.d.ts",
-      "import": "./build/lib/publicReportingAPI.js",
-      "require": "./build/lib/publicReportingAPI.js"
+      "types": "./build/publicReportingAPI.d.ts",
+      "import": "./build/publicReportingAPI.js",
+      "require": "./build/publicReportingAPI.js"
     },
     "./package.json": "./package.json",
     "./lib/constants": {
-      "types": "./build/lib/constants/index.d.ts",
-      "import": "./build/lib/constants/index.js",
-      "require": "./build/lib/constants/index.js"
-    },
-    "./lib/models": {
-      "types": "./build/lib/models/index.d.ts",
-      "import": "./build/lib/models/index.js",
-      "require": "./build/lib/models/index.js"
+      "types": "./build/constants/index.d.ts",
+      "import": "./build/constants/index.js",
+      "require": "./build/constants/index.js"
     },
     "./lib/*": {
-      "types": "./build/lib/*.d.ts",
-      "import": "./build/lib/*.js",
-      "require": "./build/lib/*.js"
+      "types": "./build/*.d.ts",
+      "import": "./build/*.js",
+      "require": "./build/*.js"
     },
     "./lib/*.js": {
-      "types": "./build/lib/*.d.ts",
-      "import": "./build/lib/*.js",
-      "require": "./build/lib/*.js"
+      "types": "./build/*.d.ts",
+      "import": "./build/*.js",
+      "require": "./build/*.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "constants": [
+        "./build/constants/index.d.ts"
+      ],
+      "models": [
+        "./build/models/index.d.ts"
+      ],
+      "helpers": [
+        "./build/helpers.d.ts"
+      ],
+      "publicReportingAPI": [
+        "./build/publicReportingAPI.d.ts"
+      ],
+      "lib/*": [
+        "./build/*"
+      ]
     }
   },
   "engines": {
-    "node": ">=14.17.0"
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "axios": "^1.15.2",
@@ -85,6 +103,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.17.25",
     "@types/node": "^18.19.8",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "^5.62.0",

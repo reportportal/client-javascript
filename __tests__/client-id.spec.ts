@@ -1,11 +1,14 @@
-const fs = require('fs');
-const util = require('util');
-const path = require('path');
-const { randomUUID } = require('crypto');
+import fs from 'fs';
+import util from 'util';
+import path from 'path';
+import { randomUUID } from 'crypto';
 
 const testHomeDir = path.join(__dirname, '__tmp__', 'rp-home');
 process.env.RP_CLIENT_JS_HOME = testHomeDir;
-const { getClientId } = require('../src/statistics/client-id');
+
+// A static `import` would be hoisted above the `process.env` assignment above, so the module
+// (which reads RP_CLIENT_JS_HOME at load time) is loaded lazily via a dynamic import instead.
+let getClientId: () => Promise<string>;
 
 const uuidv4Validation = /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 const clientIdFile = path.join(testHomeDir, '.rp', 'rp.properties');
@@ -14,18 +17,21 @@ const unlink = util.promisify(fs.unlink);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const removeTestHomeDir = () => fs.promises.rm(testHomeDir, { recursive: true, force: true });
-const unlinkFile = async (filePath) => {
+const unlinkFile = async (filePath: string) => {
   try {
     await unlink(filePath);
   } catch (error) {
-    if (error.code !== 'ENOENT') {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
       throw error;
     }
   }
 };
 
 describe('Client ID test suite', () => {
-  beforeAll(removeTestHomeDir);
+  beforeAll(async () => {
+    await removeTestHomeDir();
+    ({ getClientId } = await import('../src/statistics/client-id'));
+  });
   afterAll(removeTestHomeDir);
 
   it('getClientId should return the same client ID for two calls', async () => {
