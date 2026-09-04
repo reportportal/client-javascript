@@ -1,8 +1,22 @@
 module.exports = {
-  moduleFileExtensions: ['js'],
-  testRegex: '/__tests__/.*\\.(test|spec).js$',
+  transform: {
+    '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.spec.json' }],
+  },
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  testRegex: '/__tests__/.*\\.(test|spec).ts$',
   testEnvironment: 'node',
-  collectCoverageFrom: ['lib/**/*.js', '!lib/logger.js'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/statistics/**',
+    '!src/types/**',
+    '!src/logger.ts',
+    '!src/pjson.ts',
+    '!src/models/**',
+    '!src/constants/index.ts',
+    '!src/constants/launchModes.ts',
+    '!src/constants/logLevels.ts',
+    '!src/constants/testItemTypes.ts',
+  ],
   coverageThreshold: {
     global: {
       branches: 80,

@@ -2,23 +2,23 @@
   "compilerOptions": {
     "sourceMap": true,
     "esModuleInterop": true,
-    "allowJs": true,
+    "allowJs": false,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
     "downlevelIteration": true,
     "declaration": true,
-    "lib": ["es2016", "es2016.array.include"],
+    "lib": ["ES2020"],
     "module": "commonjs",
-    "target": "ES2015",
+    "target": "ES2020",
+    "rootDir": "src",
+    "outDir": "./build",
     "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*"]
-    },
-    "typeRoots": ["node_modules/@types"],
-    "outDir": "./build"
+    "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "include": [
-    "statistics/**/*", "lib/**/*", "__tests__/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "__tests__"]
 }
