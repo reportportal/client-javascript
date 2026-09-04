@@ -1,3 +1,5 @@
+
+## [5.6.0] - 2026-09-04
 ### Changed
 - The client has been migrated to TypeScript. It now ships with bundled type
   definitions (no separate `@types` package required) and exposes constants,
