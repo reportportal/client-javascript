@@ -10,6 +10,8 @@
   notably `eslint-import-resolver-node`, the default resolver of `eslint-plugin-import` —
   will report [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/issues/1810) for these paths. Switch to the new subpath aliases
   (`constants`, `models`, `helpers`, `publicReportingAPI`) instead.
+- **Breaking Change** Dropped support for Node.js 14. The minimum supported Node.js
+  version is now 16.0.0.
 ### Added
 - `retry_of` property is now automatically included in the `startTestItem`
   request payload when `retry: true` and a previous attempt exists in the
