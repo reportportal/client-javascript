@@ -83,10 +83,8 @@ const DEFAULT_CLIENT_CONFIG: NormalizedClientConfig = {
 };
 
 export const getClientConfig = (options: ReportPortalConfig): NormalizedClientConfig => {
-  let calculatedOptions: NormalizedClientConfig =
-    options && typeof options === 'object'
-      ? ({ ...DEFAULT_CLIENT_CONFIG, ...options } as NormalizedClientConfig)
-      : DEFAULT_CLIENT_CONFIG;
+  let calculatedOptions = DEFAULT_CLIENT_CONFIG;
+  
   try {
     if (typeof options !== 'object') {
       throw new ReportPortalValidationError('`options` must be an object.');
